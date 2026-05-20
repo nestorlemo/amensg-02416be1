@@ -52,6 +52,7 @@ function LandingPage() {
         <Problems />
         <Services />
         <Architecture />
+        <ExampleWorkflow />
         <Cases />
         <Sectors />
         <Process />
@@ -305,6 +306,97 @@ function Architecture() {
           );
         })}
       </div>
+    </Section>
+  );
+}
+
+/* ───────────────────────── EXAMPLE WORKFLOW ───────────────────────── */
+
+function ExampleWorkflow() {
+  const steps = [
+    {
+      pillar: "Integración",
+      title: "Ingreso del pedido",
+      desc: "Llega una solicitud por WhatsApp Business y queda capturada como evento estructurado.",
+      stack: ["WhatsApp API", "Webhook", "Zod"],
+      color: "from-tech-blue to-cyan-bright",
+    },
+    {
+      pillar: "Integración",
+      title: "Consulta a sistemas reales",
+      desc: "Se busca el cliente en el ERP, el stock en la base y el precio vigente en la plataforma interna.",
+      stack: ["SAP / ERP", "SQL", "REST"],
+      color: "from-tech-blue to-cyan-bright",
+    },
+    {
+      pillar: "IA aplicada",
+      title: "Decisión del agente",
+      desc: "Un agente con tools interpreta el pedido, valida reglas de negocio y arma la respuesta sobre el catálogo propio.",
+      stack: ["OpenAI", "RAG", "Tools"],
+      color: "from-teal-accent to-tech-blue",
+    },
+    {
+      pillar: "Orquestación",
+      title: "Acción automatizada",
+      desc: "Se genera el pedido en el ERP, se notifica al equipo comercial y se confirma al cliente por el mismo canal.",
+      stack: ["n8n", "Workers", "Colas"],
+      color: "from-cyan-bright to-teal-accent",
+    },
+    {
+      pillar: "Operación",
+      title: "Trazabilidad y métricas",
+      desc: "Cada paso queda registrado con su input, output y latencia, listo para auditar o reprocesar.",
+      stack: ["Logs", "Métricas", "Reproceso"],
+      color: "from-tech-blue to-navy",
+    },
+  ];
+
+  return (
+    <Section id="ejemplo" eyebrow="Ejemplo end-to-end" tone="surface">
+      <SectionHeading>
+        Cómo se ven integración, automatización e IA{" "}
+        <span className="text-tech-blue">trabajando juntas</span>
+      </SectionHeading>
+      <p className="mt-4 max-w-2xl text-muted-foreground text-[15px]">
+        Un flujo de ejemplo simplificado: un pedido entrante recorre el CORE de punta a punta, tocando los
+        mismos pilares descritos arriba.
+      </p>
+
+      <ol className="mt-12 relative space-y-5 md:space-y-0 md:grid md:grid-cols-5 md:gap-4">
+        <div className="hidden md:block absolute top-7 left-[8%] right-[8%] h-px bg-gradient-to-r from-tech-blue/30 via-cyan-bright/50 to-teal-accent/30" />
+        {steps.map((s, i) => (
+          <li key={s.title} className="relative">
+            <div className="relative p-5 rounded-2xl bg-card border border-border h-full hover:-translate-y-0.5 transition-all shadow-sm">
+              <div className="flex items-center gap-3">
+                <div
+                  className={`h-9 w-9 shrink-0 rounded-full bg-gradient-to-br ${s.color} text-white font-bold flex items-center justify-center text-sm shadow-md`}
+                >
+                  {i + 1}
+                </div>
+                <span className="text-[10px] tracking-[0.2em] uppercase font-semibold text-tech-blue">
+                  {s.pillar}
+                </span>
+              </div>
+              <h3 className="mt-4 text-[15px] font-semibold text-foreground leading-snug">{s.title}</h3>
+              <p className="mt-2 text-[13px] text-muted-foreground leading-relaxed">{s.desc}</p>
+              <div className="mt-4 flex flex-wrap gap-1.5">
+                {s.stack.map((t) => (
+                  <span
+                    key={t}
+                    className="px-2 py-0.5 rounded-md bg-muted text-[10.5px] font-mono text-foreground/75 border border-border"
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </li>
+        ))}
+      </ol>
+
+      <p className="mt-8 text-center text-[12px] text-muted-foreground">
+        Mismo patrón aplicable a onboarding, facturación, soporte interno, conciliaciones y más.
+      </p>
     </Section>
   );
 }
