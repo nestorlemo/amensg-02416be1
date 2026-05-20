@@ -250,12 +250,12 @@ function Architecture() {
   return (
     <Section id="arquitectura" eyebrow="Cómo construimos" tone="navy">
       <SectionHeading invert>
-        Cuatro pilares técnicos detrás de cada{" "}
-        <span className="text-gradient-cyan">solución productiva</span>
+        Cada pilar es una parte concreta del{" "}
+        <span className="text-gradient-cyan">diagrama AMENSG CORE</span>
       </SectionHeading>
       <p className="mt-4 max-w-2xl text-white/70 text-[15px]">
-        No vendemos demos: entregamos software mantenible, integrado con tu operación y preparado para crecer
-        sin volverse una caja negra.
+        Tomamos los nodos y flechas del diagrama y mostramos qué construimos en cada uno: nada de capas
+        decorativas, sólo el trabajo real detrás de que funcione en producción.
       </p>
 
       <div className="mt-12 grid md:grid-cols-2 gap-5">
@@ -266,6 +266,13 @@ function Architecture() {
               key={p.title}
               className="group relative p-6 md:p-7 rounded-2xl glass-card hover:-translate-y-0.5 transition-all"
             >
+              <div className="flex items-center justify-between gap-3 mb-4">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cyan-bright/10 border border-cyan-bright/30 text-[10px] tracking-[0.18em] uppercase text-cyan-bright font-semibold">
+                  {p.ref}
+                </span>
+                <span className="text-[11px] text-white/45 truncate">{p.refDetail}</span>
+              </div>
+
               <div className="flex items-start gap-4">
                 <div
                   className={`h-12 w-12 shrink-0 rounded-xl bg-gradient-to-br ${p.color} flex items-center justify-center text-white shadow-lg`}
