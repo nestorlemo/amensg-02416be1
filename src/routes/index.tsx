@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import {
   ArrowRight, Sparkles, Brain, Workflow, Plug, Code2, Database, FileCheck2,
   Repeat, Network, FileSpreadsheet, BookOpen, ClipboardCheck,
-  MessageCircle, Mail, MapPin, Phone, Cpu, ShieldCheck, LineChart,
+  MessageCircle, Mail, MapPin, Phone, ShieldCheck, LineChart,
   Search, PencilRuler, Hammer, Gauge,
 } from "lucide-react";
 import { Header } from "@/components/amensg/Header";
