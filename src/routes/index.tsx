@@ -261,16 +261,16 @@ function Casos() {
         <div className="mt-6 grid gap-6 md:grid-cols-2">
           {[
             {
+              eyebrow: "SECTOR ENERGÍA",
+              title: "Agente de IA para gestión de conocimiento.",
+              text: "Agente inteligente con IA generativa para consulta de conocimiento interno, complementado con agentes de voz y chat para consultas de gestión y obtención de datos en tiempo real.",
+              chips: ["n8n + OpenAI", "RAG", "Voz y chat", "Tiempo real"],
+            },
+            {
               eyebrow: "SECTOR FINANCIERO · URUGUAY Y PARAGUAY",
               title: "Análisis de riesgo crediticio automatizado.",
               text: "Robots que consultan fuentes oficiales de información crediticia en Uruguay y Paraguay e integran los resultados en los flujos de decisión del cliente.",
               chips: ["RPA multi-país", "Fuentes oficiales", "Decisión automatizada"],
-            },
-            {
-              eyebrow: "SECTOR ENERGÍA",
-              title: "Agente de IA para gestión de conocimiento.",
-              text: "Agente inteligente desarrollado para consulta de conocimiento interno con IA generativa.",
-              chips: ["n8n + OpenAI", "RAG", "Conocimiento interno"],
             },
           ].map((c, i) => (
             <Reveal key={c.title} delay={i * 90}>
