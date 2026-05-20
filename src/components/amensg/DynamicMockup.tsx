@@ -178,9 +178,17 @@ function WorkflowScene() {
   // map node index in `order` to which edge lights up after entering it
   const litEdges = step; // number of lit edges so far (0..4)
 
+  // Logical canvas
+  const CW = 620;
+  const CH = 270;
+  const X = (px: number) => `${((px / CW) * 100).toFixed(3)}%`;
+  const Y = (py: number) => `${((py / CH) * 100).toFixed(3)}%`;
+  const W = (w: number) => `${((w / CW) * 100).toFixed(3)}%`;
+
   return (
-    <div className="relative h-full p-5">
-      <svg className="absolute inset-0 h-full w-full pointer-events-none" preserveAspectRatio="none">
+    <div className="flex h-full items-center justify-center px-3">
+      <div className="relative w-full max-w-[620px]" style={{ aspectRatio: `${CW} / ${CH}` }}>
+      <svg className="absolute inset-0 h-full w-full pointer-events-none" viewBox={`0 0 ${CW} ${CH}`} preserveAspectRatio="none">
         {(() => {
           const paths = [
             "M 96 123 C 120 123, 150 123, 147 123",
@@ -193,7 +201,7 @@ function WorkflowScene() {
           return (
             <>
               {paths.map((d, i) => (
-                <path key={i} d={d} stroke="rgba(255,255,255,0.13)" strokeWidth="1.8" fill="none" />
+                <path key={i} d={d} stroke="rgba(255,255,255,0.13)" strokeWidth="1.8" fill="none" vectorEffect="non-scaling-stroke" />
               ))}
               {[paths[0], paths[1], paths[2], paths[4]].map((d, i) => (
                 <path
@@ -202,6 +210,7 @@ function WorkflowScene() {
                   stroke="#19C3FF"
                   strokeWidth="1.8"
                   fill="none"
+                  vectorEffect="non-scaling-stroke"
                   style={{ opacity: i < litEdges ? 1 : 0, transition: "opacity 0.6s ease" }}
                 />
               ))}
