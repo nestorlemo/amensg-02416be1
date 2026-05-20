@@ -448,7 +448,7 @@ function ContactBlock() {
 
 /* ─────────────── Tecnologías + Contacto + Footer ──────── */
 function TechContactFooter() {
-  const techs = ["Java", "PostgreSQL", "n8n", "OpenAI", "AWS", "GitHub", "APIs REST", "SQL/NoSQL", "AutoHotkey"];
+  const techs = ["Java", "PostgreSQL", "n8n", "OpenAI", "Claude", "AWS", "GitHub", "APIs REST", "SQL/NoSQL"];
   return (
     <section id="contacto" className="bg-[#06101F] pt-24 md:pt-32">
       <div className="mx-auto max-w-7xl px-5 md:px-8">
