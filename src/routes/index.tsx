@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, useRef } from "react";
 import {
   Menu, X, ArrowRight, Workflow, Bot, Network, Mail, MapPin,
-  MessageCircle, CheckCircle2, AlertCircle,
+  CheckCircle2, AlertCircle,
 } from "lucide-react";
 import { DynamicMockup } from "@/components/amensg/DynamicMockup";
 
