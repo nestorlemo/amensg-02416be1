@@ -213,9 +213,10 @@ function WorkflowScene() {
       {nodes.map((n) => {
         const idx = order.indexOf(n.id);
         const state = idx >= 0 ? nodeState(idx) : step >= 4 ? "active" : "";
-        const visible = idx >= 0 ? step >= idx : step >= 4; // w4 (branch false) appears with step 3
+        const visible = idx >= 0 ? step >= idx : step >= 4;
         const isActive = state === "active";
         const isDone = state === "done";
+        const isAgent = n.id === "w2";
         return (
           <div
             key={n.id}
@@ -228,15 +229,33 @@ function WorkflowScene() {
             }}
           >
             <div
-              className={`mx-auto flex h-[54px] w-[54px] items-center justify-center rounded-[13px] border text-[21px] transition-all ${
+              className={`relative mx-auto flex h-[54px] w-[54px] items-center justify-center rounded-[13px] border transition-all ${
+                isAgent ? "text-[18px]" : "text-[21px]"
+              } ${
                 isActive
                   ? "border-[#19C3FF] bg-[#19C3FF]/12 text-[#19C3FF] shadow-[0_0_22px_-4px_rgba(25,195,255,0.5)]"
                   : isDone
                     ? "border-[#20E0B2]/45 bg-white/5 text-[#20E0B2]"
-                    : "border-white/12 bg-white/5 text-[#cfe4f7]"
+                    : isAgent
+                      ? "border-[#a78bfa]/40 bg-[#a78bfa]/8 text-[#c4b5fd]"
+                      : "border-white/12 bg-white/5 text-[#cfe4f7]"
               }`}
             >
-              {n.icon}
+              {isAgent ? (
+                <>
+                  <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="4" y="8" width="16" height="11" rx="2.5" />
+                    <path d="M12 3v5" />
+                    <circle cx="12" cy="3" r="1.2" fill="currentColor" />
+                    <circle cx="9" cy="13" r="1.1" fill="currentColor" />
+                    <circle cx="15" cy="13" r="1.1" fill="currentColor" />
+                    <path d="M9 16.5h6" />
+                  </svg>
+                  <span className="absolute -top-1.5 -right-1.5 rounded-[5px] bg-[#a78bfa] px-1 py-[1px] text-[7px] font-bold text-[#1a0f2e] leading-none">AI</span>
+                </>
+              ) : (
+                n.icon
+              )}
             </div>
             <div className="mt-1.5 text-center text-[9.5px] font-medium leading-tight text-[#aebfd6] whitespace-pre-line">
               {n.label}
