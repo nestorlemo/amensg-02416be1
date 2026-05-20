@@ -98,10 +98,10 @@ function Hero() {
               Analizar mi proceso <ArrowRight className="h-4 w-4" />
             </a>
             <a
-              href="#soluciones"
+              href="#servicios"
               className="inline-flex items-center gap-2 h-12 px-6 rounded-full border border-white/25 text-white hover:bg-white/10 transition font-medium"
             >
-              Ver soluciones
+              Ver servicios
             </a>
           </div>
 
@@ -579,7 +579,7 @@ function Footer() {
           <ul className="space-y-2 text-sm">
             {[
               ["#servicios", "Servicios"],
-              ["#soluciones", "Soluciones"],
+              ["#arquitectura", "Arquitectura"],
               ["#casos", "Casos"],
               ["#proceso", "Cómo trabajamos"],
               ["#equipo", "Equipo"],
