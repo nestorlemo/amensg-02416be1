@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 140" width="520" height="140">
+  <rect width="520" height="140" fill="#06101F"></rect>
+  <g transform="translate(25, 22)">
+    <path d="M 45 0 L 88 25 L 88 75 L 45 100 L 2 75 L 2 25 Z" fill="none" stroke="#FFFFFF" stroke-width="6" stroke-linejoin="round"></path>
+    <line x1="22" y1="68" x2="68" y2="32" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"></line>
+    <circle cx="22" cy="68" r="7" fill="#FFFFFF"></circle>
+    <circle cx="45" cy="50" r="9" fill="#19C3FF"></circle>
+    <circle cx="68" cy="32" r="7" fill="#FFFFFF"></circle>
+  </g>
+  <text x="135" y="92" font-family="Inter, &#39;Inter Tight&#39;, system-ui, sans-serif" font-size="58" font-weight="700" letter-spacing="-2.8" fill="#FFFFFF">amensg</text>
+</svg>
