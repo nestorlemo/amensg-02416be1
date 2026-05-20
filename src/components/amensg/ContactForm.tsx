@@ -2,7 +2,7 @@ import { useState } from "react";
 import { z } from "zod";
 import { Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 
-const N8N_WEBHOOK_URL = "REEMPLAZAR_POR_WEBHOOK_REAL";
+const N8N_WEBHOOK_URL: string = "REEMPLAZAR_POR_WEBHOOK_REAL";
 
 const schema = z.object({
   nombre: z.string().trim().min(2, "Ingresá tu nombre").max(80),
