@@ -52,6 +52,7 @@ function LandingPage() {
         <Problems />
         <Services />
         <Architecture />
+        <ExampleWorkflow />
         <Cases />
         <Sectors />
         <Process />
