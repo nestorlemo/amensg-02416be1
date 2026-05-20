@@ -361,7 +361,7 @@ function Casos() {
             {
               eyebrow: "SECTOR ENERGÍA",
               title: "Agente de IA para gestión de conocimiento.",
-              text: "Agente inteligente desarrollado en un hackathon de innovación para consulta de conocimiento interno con IA generativa.",
+              text: "Agente inteligente desarrollado para consulta de conocimiento interno con IA generativa.",
               chips: ["n8n + OpenAI", "RAG", "Conocimiento interno"],
             },
           ].map((c, i) => (
