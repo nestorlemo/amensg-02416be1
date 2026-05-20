@@ -246,13 +246,12 @@ function Casos() {
               SECTOR TELECOMUNICACIONES · 13+ AÑOS EN PRODUCCIÓN
             </span>
             <h3 className="mt-4 text-2xl md:text-3xl font-bold tracking-tight text-white">
-              Plataforma de gestión comercial para venta de servicios celulares.
+              Plataforma de gestión comercial para venta de servicios de telefonía móvil.
             </h3>
             <p className="mt-5 max-w-4xl text-[15px] leading-relaxed text-white/65">
-              Plataforma integral que gestiona el ciclo completo de venta de servicios celulares por call center: captación y gestión de ventas, administración de contratos, envío de documentación y entrega de equipos a los clientes. Integra los sistemas corporativos del operador y orquesta los procesos de activación, distribución y control. Construida en Java sobre PostgreSQL, en producción desde hace más de una década.
+              Plataforma integral que gestiona el ciclo completo de venta de servicios de telefonía móvil por call center: captación y gestión de ventas, administración de contratos, envío de documentación y entrega de equipos a los clientes. Integra los sistemas corporativos del operador y orquesta los procesos de activación, distribución y control. En producción desde hace más de una década.
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
-              <Chip>Java + PostgreSQL</Chip>
               <Chip>Integraciones corporativas</Chip>
               <Chip>13+ años en producción</Chip>
             </div>
@@ -262,16 +261,16 @@ function Casos() {
         <div className="mt-6 grid gap-6 md:grid-cols-2">
           {[
             {
+              eyebrow: "SECTOR ENERGÍA",
+              title: "Agente de IA para gestión de conocimiento.",
+              text: "Agente inteligente con IA generativa para consulta de conocimiento interno, complementado con agentes de voz y chat para consultas de gestión y obtención de datos en tiempo real.",
+              chips: ["n8n + OpenAI", "RAG", "Voz y chat", "Tiempo real"],
+            },
+            {
               eyebrow: "SECTOR FINANCIERO · URUGUAY Y PARAGUAY",
               title: "Análisis de riesgo crediticio automatizado.",
               text: "Robots que consultan fuentes oficiales de información crediticia en Uruguay y Paraguay e integran los resultados en los flujos de decisión del cliente.",
               chips: ["RPA multi-país", "Fuentes oficiales", "Decisión automatizada"],
-            },
-            {
-              eyebrow: "SECTOR ENERGÍA",
-              title: "Agente de IA para gestión de conocimiento.",
-              text: "Agente inteligente desarrollado para consulta de conocimiento interno con IA generativa.",
-              chips: ["n8n + OpenAI", "RAG", "Conocimiento interno"],
             },
           ].map((c, i) => (
             <Reveal key={c.title} delay={i * 90}>
