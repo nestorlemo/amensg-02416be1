@@ -299,7 +299,7 @@ function Nosotros() {
     { n: "6+", l: "Sectores" },
   ];
   const partners = [
-    { initials: "NL", name: "Néstor Lemo", role: "Director / Cofundador",
+    { initials: "NL", name: "Néstor Lemo", role: "Director Comercial / Cofundador",
       bio: "Ingeniero en Informática, lidera estrategia comercial y análisis de negocio." },
     { initials: "LB", name: "Liber Batalla", role: "Director Técnico / Cofundador",
       bio: "Ingeniero de Sistemas, lidera arquitectura de integraciones y desarrollo backend." },
