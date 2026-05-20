@@ -267,10 +267,10 @@ function Casos() {
               chips: ["n8n + OpenAI", "RAG", "Voz y chat", "Tiempo real"],
             },
             {
-              eyebrow: "SECTOR FINANCIERO · URUGUAY Y PARAGUAY",
-              title: "Análisis de riesgo crediticio automatizado.",
-              text: "Robots que consultan fuentes oficiales de información crediticia en Uruguay y Paraguay e integran los resultados en los flujos de decisión del cliente.",
-              chips: ["RPA multi-país", "Fuentes oficiales", "Decisión automatizada"],
+              eyebrow: "AUTOMATIZACIÓN · URUGUAY Y PARAGUAY",
+              title: "Robots de automatización de procesos.",
+              text: "Robots para extracción de datos, activación de servicios de telefonía móvil y análisis de riesgo crediticio en Uruguay y Paraguay, integrados a los flujos operativos del cliente.",
+              chips: ["RPA multi-país", "Extracción de datos", "Procesos críticos"],
             },
           ].map((c, i) => (
             <Reveal key={c.title} delay={i * 90}>
