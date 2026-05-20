@@ -301,7 +301,7 @@ function Nosotros() {
   const partners = [
     { initials: "NL", name: "Néstor Lemo", role: "Director / Cofundador",
       bio: "Ingeniero en Informática, lidera estrategia comercial y análisis de negocio." },
-    { initials: "LB", name: "Liber Batalla", role: "Director Técnico / Cofundador",
+    { initials: "LB", name: "Liber Batalla", role: "Ingeniero de Sistemas / Director Técnico / Cofundador",
       bio: "Arquitecto de software, lidera arquitectura de integraciones y desarrollo backend." },
   ];
   return (
