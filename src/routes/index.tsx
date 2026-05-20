@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
   ArrowRight, Sparkles, Brain, Workflow, Plug, Code2, Database, FileCheck2,
-  Repeat, Network, FileSpreadsheet, BookOpen, ClipboardCheck, BarChart3,
-  MessageCircle, Mail, MapPin, Phone, Cpu, Boxes, ShieldCheck, LineChart,
+  Repeat, Network, FileSpreadsheet, BookOpen, ClipboardCheck,
+  MessageCircle, Mail, MapPin, Phone, Cpu, ShieldCheck, LineChart,
   Search, PencilRuler, Hammer, Gauge,
 } from "lucide-react";
 import { Header } from "@/components/amensg/Header";
