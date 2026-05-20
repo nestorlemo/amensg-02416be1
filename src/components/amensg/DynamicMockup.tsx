@@ -31,17 +31,25 @@ const R = <T,>(a: T[]): T => a[Math.floor(Math.random() * a.length)];
 
 export function DynamicMockup() {
   const [cur, setCur] = useState(0);
+  const [playing, setPlaying] = useState(true);
   const autoRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const restartAuto = () => {
-    if (autoRef.current) clearInterval(autoRef.current);
+  const stopAuto = () => {
+    if (autoRef.current) { clearInterval(autoRef.current); autoRef.current = null; }
+  };
+  const startAuto = () => {
+    stopAuto();
     autoRef.current = setInterval(() => setCur((c) => (c + 1) % 4), 6500);
   };
 
   useEffect(() => {
-    restartAuto();
-    return () => { if (autoRef.current) clearInterval(autoRef.current); };
-  }, []);
+    if (playing) startAuto(); else stopAuto();
+    return stopAuto;
+  }, [playing]);
+
+  const goTo = (i: number) => { setCur(((i % 4) + 4) % 4); if (playing) startAuto(); };
+  const prev = () => goTo(cur - 1);
+  const next = () => goTo(cur + 1);
 
   const [badgeCls, badgeTxt] = BADGES[cur];
 
@@ -82,12 +90,44 @@ export function DynamicMockup() {
         </div>
       </div>
 
-      <div className="mt-6 flex flex-wrap justify-center gap-2">
+      {/* Transport controls */}
+      <div className="mt-5 flex items-center justify-center gap-2">
+        <button
+          type="button"
+          onClick={prev}
+          aria-label="Escena anterior"
+          className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-[#aebfd6] hover:text-white hover:border-white/20 transition-all"
+        >
+          <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
+        </button>
+        <button
+          type="button"
+          onClick={() => setPlaying((p) => !p)}
+          aria-label={playing ? "Pausar" : "Reproducir"}
+          className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#19C3FF]/30 bg-[#19C3FF]/10 text-[#19C3FF] hover:bg-[#19C3FF]/15 transition-all"
+        >
+          {playing ? (
+            <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1" /><rect x="14" y="5" width="4" height="14" rx="1" /></svg>
+          ) : (
+            <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="currentColor"><polygon points="7,5 19,12 7,19" /></svg>
+          )}
+        </button>
+        <button
+          type="button"
+          onClick={next}
+          aria-label="Escena siguiente"
+          className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-[#aebfd6] hover:text-white hover:border-white/20 transition-all"
+        >
+          <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+        </button>
+      </div>
+
+      <div className="mt-3 flex flex-wrap justify-center gap-2">
         {LABELS.map((l, i) => (
           <button
             key={l}
             type="button"
-            onClick={() => { setCur(i); restartAuto(); }}
+            onClick={() => goTo(i)}
             className={`inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-[11px] font-medium transition-all ${
               cur === i
                 ? "bg-[#19C3FF]/10 border-[#19C3FF]/40 text-white"
@@ -140,30 +180,34 @@ function WorkflowScene() {
 
   return (
     <div className="relative h-full p-5">
-      <svg className="absolute inset-0 h-full w-full pointer-events-none" viewBox="0 0 620 372" preserveAspectRatio="none">
-        {[
-          "M 70 150 L 175 150",
-          "M 175 150 L 280 150",
-          "M 280 150 L 385 95",
-          "M 280 150 L 385 215",
-          "M 470 95 L 560 150",
-          "M 470 215 L 560 150",
-        ].map((d, i) => (
-          <path key={i} d={d} stroke="rgba(255,255,255,0.13)" strokeWidth="1.8" fill="none" />
-        ))}
-        {["M 70 150 L 175 150", "M 175 150 L 280 150", "M 280 150 L 385 95", "M 470 95 L 560 150"].map((d, i) => (
-          <path
-            key={`l${i}`}
-            d={d}
-            stroke="#19C3FF"
-            strokeWidth="1.8"
-            fill="none"
-            style={{
-              opacity: i < litEdges ? 1 : 0,
-              transition: "opacity 0.6s ease",
-            }}
-          />
-        ))}
+      <svg className="absolute inset-0 h-full w-full pointer-events-none" preserveAspectRatio="none">
+        {(() => {
+          const paths = [
+            "M 96 123 C 120 123, 150 123, 147 123",
+            "M 201 123 C 225 123, 255 123, 252 123",
+            "M 306 123 C 335 123, 355 68, 357 68",
+            "M 306 123 C 335 123, 355 188, 357 188",
+            "M 411 68 C 470 68, 500 123, 532 123",
+            "M 411 188 C 470 188, 500 123, 532 123",
+          ];
+          return (
+            <>
+              {paths.map((d, i) => (
+                <path key={i} d={d} stroke="rgba(255,255,255,0.13)" strokeWidth="1.8" fill="none" />
+              ))}
+              {[paths[0], paths[1], paths[2], paths[4]].map((d, i) => (
+                <path
+                  key={`l${i}`}
+                  d={d}
+                  stroke="#19C3FF"
+                  strokeWidth="1.8"
+                  fill="none"
+                  style={{ opacity: i < litEdges ? 1 : 0, transition: "opacity 0.6s ease" }}
+                />
+              ))}
+            </>
+          );
+        })()}
       </svg>
 
       {nodes.map((n) => {
@@ -397,76 +441,82 @@ function IntegrationScene() {
   }, []);
 
   const systems = [
-    { top: 48, ico: "▤", iconBg: "bg-[#20E0B2]/15 text-[#20E0B2]", name: "ERP" },
-    { top: 108, ico: "◍", iconBg: "bg-[#19C3FF]/15 text-[#19C3FF]", name: "CRM" },
-    { top: 218, ico: "▦", iconBg: "bg-[#f0b840]/15 text-[#f0b840]", name: "Base de datos" },
-    { top: 278, ico: "▣", iconBg: "bg-[#8ba3c7]/15 text-[#8ba3c7]", name: "Sistemas legacy" },
+    { top: 30, ico: "▤", iconBg: "bg-[#20E0B2]/15 text-[#20E0B2]", name: "ERP" },
+    { top: 92, ico: "◍", iconBg: "bg-[#19C3FF]/15 text-[#19C3FF]", name: "CRM" },
+    { top: 222, ico: "▦", iconBg: "bg-[#f0b840]/15 text-[#f0b840]", name: "Base de datos" },
+    { top: 284, ico: "▣", iconBg: "bg-[#8ba3c7]/15 text-[#8ba3c7]", name: "Sistemas legacy" },
   ];
 
+  // Inner coordinate space: 660 x 352. Centered in scene.
+  // System box: left=14, w=118, h≈38 → right edge x=132, center y = top+19
+  // Hub: 84x84 centered at (330,176) → left edge x=288, right edge x=372
+  // Right boxes: left=526, w=120, center y = top+19
   const pipes = [
-    { d: "M 150 70 C 230 70, 230 186, 268 186", color: "#20E0B2" },
-    { d: "M 150 130 C 240 130, 240 186, 268 186", color: "#19C3FF" },
-    { d: "M 150 240 C 240 240, 240 186, 268 186", color: "#f0b840" },
-    { d: "M 150 300 C 230 300, 230 186, 268 186", color: "#8ba3c7" },
+    { d: "M 132 49 C 220 49, 220 176, 288 176", color: "#20E0B2" },
+    { d: "M 132 111 C 240 111, 240 176, 288 176", color: "#19C3FF" },
+    { d: "M 132 241 C 240 241, 240 176, 288 176", color: "#f0b840" },
+    { d: "M 132 303 C 220 303, 220 176, 288 176", color: "#8ba3c7" },
   ];
 
   return (
-    <div className="relative h-full">
-      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 620 372" preserveAspectRatio="none">
-        {pipes.map((p, i) => (
-          <path key={`pp${i}`} d={p.d} stroke={p.color} strokeWidth="5" strokeLinecap="round" fill="none" opacity="0.25" />
-        ))}
-        <path d="M 352 186 C 420 186, 430 110, 500 110" stroke="#19C3FF" strokeWidth="5" strokeLinecap="round" fill="none" opacity="0.25" />
-        <path d="M 352 186 C 420 186, 430 270, 500 270" stroke="#20E0B2" strokeWidth="5" strokeLinecap="round" fill="none" opacity="0.25" />
-        {pipes.map((p, i) => (
-          <path
-            key={`pl${i}-${pulse}-${pinged}`}
-            d={p.d}
-            stroke={p.color}
-            strokeWidth="5"
-            strokeLinecap="round"
-            fill="none"
-            opacity={pinged === i ? 0.95 : 0}
-            style={{
-              strokeDasharray: "14 320",
-              animation: pinged === i ? "intpulse 0.9s linear" : "none",
-            }}
-          />
-        ))}
-      </svg>
+    <div className="relative h-full overflow-hidden">
+      <div className="relative mx-auto h-full w-full max-w-[660px]">
+        <svg className="absolute inset-0 h-[352px] w-full pointer-events-none" viewBox="0 0 660 352" preserveAspectRatio="xMidYMid meet">
+          {pipes.map((p, i) => (
+            <path key={`pp${i}`} d={p.d} stroke={p.color} strokeWidth="4.5" strokeLinecap="round" fill="none" opacity="0.22" />
+          ))}
+          <path d="M 372 176 C 440 176, 460 69, 526 69" stroke="#19C3FF" strokeWidth="4.5" strokeLinecap="round" fill="none" opacity="0.22" />
+          <path d="M 372 176 C 440 176, 460 253, 526 253" stroke="#20E0B2" strokeWidth="4.5" strokeLinecap="round" fill="none" opacity="0.22" />
+          {pipes.map((p, i) => (
+            <path
+              key={`pl${i}-${pulse}-${pinged}`}
+              d={p.d}
+              stroke={p.color}
+              strokeWidth="4.5"
+              strokeLinecap="round"
+              fill="none"
+              opacity={pinged === i ? 0.95 : 0}
+              style={{
+                strokeDasharray: "14 320",
+                animation: pinged === i ? "intpulse 0.9s linear" : "none",
+              }}
+            />
+          ))}
+        </svg>
 
-      {systems.map((s, i) => (
+        {systems.map((s, i) => (
+          <div
+            key={s.name}
+            className={`absolute flex w-[118px] items-center gap-2 rounded-[10px] border bg-white/[0.04] px-2.5 py-2 transition-all ${
+              pinged === i ? "border-[#19C3FF] shadow-[0_0_18px_-4px_rgba(25,195,255,0.5)]" : "border-white/10"
+            }`}
+            style={{ left: 14, top: s.top, zIndex: 1 }}
+          >
+            <div className={`flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-md text-[12px] ${s.iconBg}`}>{s.ico}</div>
+            <div className="text-[10px] font-semibold leading-tight text-[#e6eefc]">{s.name}</div>
+          </div>
+        ))}
+
         <div
-          key={s.name}
-          className={`absolute left-3.5 flex w-[118px] items-center gap-2 rounded-[10px] border bg-white/[0.04] px-2.5 py-2 transition-all ${
-            pinged === i ? "border-[#19C3FF] shadow-[0_0_18px_-4px_rgba(25,195,255,0.5)]" : "border-white/10"
-          }`}
-          style={{ top: s.top, zIndex: 1 }}
+          className="absolute flex h-[84px] w-[84px] flex-col items-center justify-center rounded-[18px] bg-[#19C3FF]/13 border border-[#19C3FF]/40"
+          style={{ left: 288, top: 134, zIndex: 2 }}
         >
-          <div className={`flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-md text-[12px] ${s.iconBg}`}>{s.ico}</div>
-          <div className="text-[10px] font-semibold leading-tight text-[#e6eefc]">{s.name}</div>
+          <div className="text-[22px] text-[#19C3FF]">⇄</div>
+          <div className="mt-0.5 text-[10px] font-bold text-[#19C3FF]">amensg</div>
         </div>
-      ))}
 
-      <div
-        className="absolute left-1/2 top-1/2 flex h-[84px] w-[84px] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-[18px] bg-[#19C3FF]/13 border border-[#19C3FF]/40"
-        style={{ zIndex: 2 }}
-      >
-        <div className="text-[22px] text-[#19C3FF]">⇄</div>
-        <div className="mt-0.5 text-[10px] font-bold text-[#19C3FF]">amensg</div>
-      </div>
+        <div className="absolute w-[120px] rounded-[10px] border border-white/10 bg-white/[0.04] px-2.5 py-2" style={{ left: 526, top: 50, zIndex: 1 }}>
+          <div className="text-[10px] font-semibold text-[#e6eefc]">Dashboard</div>
+          <div className="mt-0.5 text-[8.5px] text-[#7088a8]">analítica en vivo</div>
+        </div>
+        <div className="absolute w-[120px] rounded-[10px] border border-white/10 bg-white/[0.04] px-2.5 py-2" style={{ left: 526, top: 234, zIndex: 1 }}>
+          <div className="text-[10px] font-semibold text-[#e6eefc]">App / API</div>
+          <div className="mt-0.5 text-[8.5px] text-[#7088a8]">datos unificados</div>
+        </div>
 
-      <div className="absolute right-3.5 w-[120px] rounded-[10px] border border-white/10 bg-white/[0.04] px-2.5 py-2" style={{ top: 78, zIndex: 1 }}>
-        <div className="text-[10px] font-semibold text-[#e6eefc]">Dashboard</div>
-        <div className="mt-0.5 text-[8.5px] text-[#7088a8]">analítica en vivo</div>
-      </div>
-      <div className="absolute right-3.5 w-[120px] rounded-[10px] border border-white/10 bg-white/[0.04] px-2.5 py-2" style={{ top: 238, zIndex: 1 }}>
-        <div className="text-[10px] font-semibold text-[#e6eefc]">App / API</div>
-        <div className="mt-0.5 text-[8.5px] text-[#7088a8]">datos unificados</div>
-      </div>
-
-      <div className="absolute bottom-0.5 left-0 right-0 text-center text-[9px] text-[#7088a8]">
-        AUTO-SYNC <b className="text-[#20E0B2]">ON</b> · última sincronización: hace 1 min
+        <div className="absolute bottom-1.5 left-0 right-0 text-center text-[9px] text-[#7088a8]">
+          AUTO-SYNC <b className="text-[#20E0B2]">ON</b> · última sincronización: hace 1 min
+        </div>
       </div>
 
       <style>{`@keyframes intpulse { from { stroke-dashoffset: 334; } to { stroke-dashoffset: 0; } }`}</style>
