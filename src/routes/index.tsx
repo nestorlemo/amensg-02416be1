@@ -1,18 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, useRef } from "react";
 import {
-  Menu, X, ArrowRight, Workflow, Bot, Network, Mail, MapPin,
-  CheckCircle2, AlertCircle,
+  Menu, X, ArrowRight, Workflow, Bot, Network, Layers, Mail, MapPin,
+  CheckCircle2, AlertCircle, Search, PenTool, Cog, Sparkles, Rocket, TrendingUp,
+  Repeat, GitMerge, FileSpreadsheet, Database, Clock, AlertTriangle, ShieldAlert, Brain,
+  Users, Building2, Headphones, Truck, MapPinned, ShoppingCart,
 } from "lucide-react";
 import { DynamicMockup } from "@/components/amensg/DynamicMockup";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "AMENSG IT Automation — Ingeniería de automatización desde 2011" },
-      { name: "description", content: "AMENSG SRL diseña, construye y mantiene sistemas empresariales, integraciones y agentes de IA. Montevideo, Uruguay. Desde 2011." },
-      { property: "og:title", content: "AMENSG IT Automation — Ingeniería de automatización desde 2011" },
-      { property: "og:description", content: "Sistemas empresariales, integraciones y agentes de IA para empresas en operación." },
+      { title: "AMENSG — Socios en Automatización Inteligente" },
+      { name: "description", content: "Automatización, integración de sistemas e IA aplicada a procesos reales de negocio. Desde 2011, en Montevideo, Uruguay." },
+      { property: "og:title", content: "AMENSG — Socios en Automatización Inteligente" },
+      { property: "og:description", content: "Automatización inteligente para alcanzar objetivos juntos." },
       { property: "og:type", content: "website" },
     ],
     links: [
@@ -77,17 +79,18 @@ function SiteHeader() {
   }, []);
 
   const links = [
+    { href: "#propuesta", label: "Propuesta" },
     { href: "#servicios", label: "Servicios" },
-    { href: "#casos", label: "Casos" },
-    { href: "#nosotros", label: "Nosotros" },
+    { href: "#caso", label: "Caso" },
+    { href: "#proceso", label: "Cómo trabajamos" },
     { href: "#contacto", label: "Contacto" },
   ];
 
   return (
-    <header className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${scrolled ? "bg-[#06101F]/70 backdrop-blur-xl border-b border-white/5" : "bg-transparent"}`}>
+    <header className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${scrolled ? "bg-[#06101F]/75 backdrop-blur-xl border-b border-white/5" : "bg-transparent"}`}>
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 md:px-8">
         <a href="#top" className="shrink-0"><LogoMark /></a>
-        <nav className="hidden md:flex items-center gap-9">
+        <nav className="hidden md:flex items-center gap-8">
           {links.map((l) => (
             <a key={l.href} href={l.href} className="text-sm font-medium text-white/70 hover:text-white transition-colors">
               {l.label}
@@ -96,7 +99,7 @@ function SiteHeader() {
         </nav>
         <div className="flex items-center gap-3">
           <a href="#contacto" className="hidden sm:inline-flex h-10 items-center rounded-full bg-white text-[#06101F] px-5 text-sm font-semibold hover:bg-[#19C3FF] transition-colors">
-            Agendar reunión
+            Agendar diagnóstico
           </a>
           <button aria-label="Menú" onClick={() => setOpen((v) => !v)} className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-md text-white hover:bg-white/10">
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -112,7 +115,7 @@ function SiteHeader() {
               </a>
             ))}
             <a href="#contacto" onClick={() => setOpen(false)} className="mt-2 inline-flex h-11 items-center justify-center rounded-full bg-white text-[#06101F] text-sm font-semibold">
-              Agendar reunión
+              Agendar diagnóstico
             </a>
           </nav>
         </div>
@@ -121,14 +124,10 @@ function SiteHeader() {
   );
 }
 
-/* ─────────────────────── Hero mockup is now DynamicMockup ───────────────── */
-
-
 /* ───────────────────────── Hero ───────────────────────── */
 function Hero() {
   return (
     <section id="top" className="relative overflow-hidden bg-[#06101F] pt-32 pb-20 md:pt-40 md:pb-28">
-      {/* animated mesh gradient */}
       <div aria-hidden className="pointer-events-none absolute inset-0 opacity-80">
         <div className="absolute -top-40 -right-32 h-[520px] w-[520px] rounded-full blur-3xl"
           style={{ background: "radial-gradient(closest-side, rgba(25,195,255,0.35), transparent 70%)", animation: "meshFloat 14s ease-in-out infinite" }} />
@@ -137,7 +136,6 @@ function Hero() {
         <div className="absolute top-1/3 left-1/2 h-[360px] w-[360px] -translate-x-1/2 rounded-full blur-3xl"
           style={{ background: "radial-gradient(closest-side, rgba(32,224,178,0.10), transparent 70%)", animation: "meshFloat 22s ease-in-out infinite" }} />
       </div>
-      {/* dot grid */}
       <div aria-hidden className="pointer-events-none absolute inset-0 opacity-[0.08]"
         style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.6) 1px, transparent 1px)", backgroundSize: "26px 26px" }} />
 
@@ -149,24 +147,26 @@ function Hero() {
                 <span className="absolute inset-0 animate-ping rounded-full bg-[#20E0B2] opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-[#20E0B2]" />
               </span>
-              DESDE 2011 · MONTEVIDEO, URUGUAY
+              SOCIOS EN AUTOMATIZACIÓN INTELIGENTE
             </div>
-            <p className="mt-7 text-[11px] font-semibold uppercase tracking-[2.2px] text-[#19C3FF]">— AI-POWERED AUTOMATION</p>
-            <h1 className="mt-3 font-extrabold text-white tracking-[-0.025em] leading-[1.02]" style={{ fontSize: "clamp(44px, 6.4vw, 80px)" }}>
-              Ingeniería de automatización para empresas en operación.
+            <h1 className="mt-7 font-extrabold text-white tracking-[-0.025em] leading-[1.04]" style={{ fontSize: "clamp(40px, 6vw, 74px)" }}>
+              Automatización inteligente para empresas en operación.
             </h1>
             <p className="mt-7 max-w-xl text-[17px] leading-relaxed text-white/65">
-              Diseñamos, construimos y mantenemos sistemas empresariales, integraciones y agentes de inteligencia artificial. Desde 2011.
+              Construimos plataformas, integraciones y agentes de IA sobre procesos reales. Ayudamos a reducir tareas manuales, conectar sistemas y alcanzar objetivos de negocio junto a un socio tecnológico.
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-3">
-              <a href="#servicios" className="inline-flex h-12 items-center gap-2 rounded-full px-6 text-sm font-semibold text-white shadow-[0_10px_30px_-10px_rgba(25,195,255,0.6)] transition-transform hover:-translate-y-0.5"
+              <a href="#contacto" className="inline-flex h-12 items-center gap-2 rounded-full px-6 text-sm font-semibold text-white shadow-[0_10px_30px_-10px_rgba(25,195,255,0.6)] transition-transform hover:-translate-y-0.5"
                 style={{ background: "linear-gradient(135deg, #0B1F3A 0%, #1769E0 100%)" }}>
-                Conocer servicios <ArrowRight className="h-4 w-4" />
+                Agendar diagnóstico <ArrowRight className="h-4 w-4" />
               </a>
-              <a href="#casos" className="inline-flex h-12 items-center rounded-full border border-white/15 px-6 text-sm font-semibold text-white hover:bg-white/5 transition-colors">
-                Ver casos
+              <a href="#caso" className="inline-flex h-12 items-center rounded-full border border-white/15 px-6 text-sm font-semibold text-white hover:bg-white/5 transition-colors">
+                Ver casos reales
               </a>
             </div>
+            <p className="mt-8 text-[13px] text-white/45">
+              Desde 2011 desarrollando soluciones empresariales sostenibles, integradas y en producción.
+            </p>
           </div>
         </Reveal>
 
@@ -185,33 +185,130 @@ function Hero() {
   );
 }
 
-/* ──────────────────────── Servicios ───────────────────── */
+/* ───────────── Section header helpers ───────────── */
+function Eyebrow({ children, light = false }: { children: React.ReactNode; light?: boolean }) {
+  return (
+    <p className={`text-[11px] font-semibold uppercase tracking-[2.2px] ${light ? "text-[#1769E0]" : "text-[#19C3FF]"}`}>
+      — {children}
+    </p>
+  );
+}
+
+/* ─────────────── 2. PROPUESTA DE VALOR ─────────────── */
+function Propuesta() {
+  const steps = [
+    { icon: Search, label: "Diagnóstico\ndel proceso" },
+    { icon: PenTool, label: "Diseño\nde solución" },
+    { icon: Cog, label: "Automatización\ne integración" },
+    { icon: Sparkles, label: "IA\naplicada" },
+    { icon: Rocket, label: "Puesta\nen producción" },
+    { icon: TrendingUp, label: "Evolución\ncontinua" },
+  ];
+  return (
+    <section id="propuesta" className="bg-[#F5F7FA] py-24 md:py-32">
+      <div className="mx-auto max-w-7xl px-5 md:px-8">
+        <Reveal>
+          <Eyebrow light>Propuesta de valor</Eyebrow>
+          <h2 className="mt-3 max-w-3xl font-extrabold tracking-[-0.025em] text-[#0B1F3A]" style={{ fontSize: "clamp(32px,4.2vw,52px)" }}>
+            Tecnología aplicada a objetivos reales de negocio.
+          </h2>
+          <p className="mt-6 max-w-2xl text-[16px] leading-relaxed text-[#5a6a82]">
+            Trabajamos junto a nuestros clientes para identificar oportunidades, automatizar procesos, integrar sistemas e incorporar inteligencia artificial donde realmente genera impacto operativo.
+          </p>
+        </Reveal>
+
+        <Reveal delay={100}>
+          <div className="mt-14 grid grid-cols-2 gap-y-10 gap-x-4 sm:grid-cols-3 lg:grid-cols-6 lg:gap-x-2">
+            {steps.map((s, i) => (
+              <div key={s.label} className="relative flex flex-col items-center text-center">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-[#0B1F3A]/10 bg-white text-[#1769E0] shadow-[0_8px_20px_-12px_rgba(11,31,58,0.25)]">
+                  <s.icon className="h-6 w-6" strokeWidth={1.6} />
+                </div>
+                <span className="mt-3 whitespace-pre-line text-[12.5px] font-semibold leading-tight text-[#0B1F3A]">
+                  {s.label}
+                </span>
+                {i < steps.length - 1 && (
+                  <div aria-hidden className="absolute right-[-8px] top-7 hidden h-px w-4 bg-gradient-to-r from-[#1769E0]/40 to-[#1769E0]/0 lg:block" />
+                )}
+              </div>
+            ))}
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ─────────────── 3. PROBLEMAS ─────────────── */
+function Problemas() {
+  const items = [
+    { icon: Repeat, t: "Procesos manuales repetitivos", d: "Automatizamos tareas operativas con reglas claras y trazabilidad." },
+    { icon: GitMerge, t: "Sistemas que no se comunican", d: "Conectamos plataformas, bases de datos y APIs para eliminar retrabajo." },
+    { icon: FileSpreadsheet, t: "Uso excesivo de planillas", d: "Reemplazamos planillas por flujos operativos sostenibles." },
+    { icon: Database, t: "Datos dispersos entre áreas", d: "Centralizamos información para decisiones más rápidas." },
+    { icon: Clock, t: "Tiempos operativos altos", d: "Reducimos cuellos de botella y aceleramos el ciclo de trabajo." },
+    { icon: AlertTriangle, t: "Errores por carga manual", d: "Validaciones automáticas que mejoran la calidad del dato." },
+    { icon: ShieldAlert, t: "Automatizaciones frágiles", d: "Construimos soluciones mantenibles, monitoreadas y en producción real." },
+    { icon: Brain, t: "IA difícil de aplicar al negocio", d: "Llevamos la IA al proceso real, no como capa aislada." },
+  ];
+  return (
+    <section className="bg-[#06101F] py-24 md:py-32">
+      <div className="mx-auto max-w-7xl px-5 md:px-8">
+        <Reveal>
+          <Eyebrow>Problemas que resolvemos</Eyebrow>
+          <h2 className="mt-3 max-w-3xl font-extrabold tracking-[-0.025em] text-white" style={{ fontSize: "clamp(32px,4.2vw,52px)" }}>
+            Donde la operación se traba, entramos nosotros.
+          </h2>
+        </Reveal>
+
+        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {items.map((it, i) => (
+            <Reveal key={it.t} delay={i * 60}>
+              <div className="h-full rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition-all hover:-translate-y-1 hover:border-[#19C3FF]/30 hover:bg-white/[0.05]">
+                <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-[#19C3FF]">
+                  <it.icon className="h-5 w-5" strokeWidth={1.6} />
+                </div>
+                <h3 className="mt-5 text-[15.5px] font-bold leading-snug text-white">{it.t}</h3>
+                <p className="mt-2 text-[13.5px] leading-relaxed text-white/60">{it.d}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─────────────── 4. SERVICIOS ─────────────── */
 function Servicios() {
   const items = [
-    { icon: Workflow, title: "Automatización de procesos",
-      text: "Automatizamos tareas operativas e integración entre sistemas, de RPA a orquestadores con IA." },
-    { icon: Bot, title: "Agentes de IA",
-      text: "Asistentes conversacionales, agentes de voz y soluciones de IA generativa para procesos reales." },
-    { icon: Network, title: "Integración de sistemas",
-      text: "Conectamos ERPs, bases de datos, APIs y plataformas corporativas en flujos mantenibles." },
+    { icon: Workflow, t: "Automatización de procesos",
+      d: "Diseñamos automatizaciones que reducen tareas manuales, aceleran procesos y mejoran la trazabilidad operativa." },
+    { icon: Network, t: "Integración de sistemas",
+      d: "Conectamos sistemas empresariales, APIs, bases de datos y plataformas existentes para eliminar silos de información." },
+    { icon: Bot, t: "Agentes de IA aplicados",
+      d: "Creamos agentes conectados al conocimiento, los datos y los procesos de la empresa para asistir, responder y ejecutar tareas con contexto." },
+    { icon: Layers, t: "Plataformas empresariales",
+      d: "Desarrollamos aplicaciones web y sistemas de gestión sostenibles, pensados para operación diaria y evolución continua." },
   ];
   return (
     <section id="servicios" className="bg-[#F5F7FA] py-24 md:py-32">
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <Reveal>
-          <h2 className="font-extrabold tracking-[-0.025em] text-[#0B1F3A]" style={{ fontSize: "clamp(34px,4.4vw,56px)" }}>
-            Lo que hacemos.
+          <Eyebrow light>Lo que hacemos</Eyebrow>
+          <h2 className="mt-3 max-w-3xl font-extrabold tracking-[-0.025em] text-[#0B1F3A]" style={{ fontSize: "clamp(32px,4.2vw,52px)" }}>
+            Automatización, integración e IA para operaciones reales.
           </h2>
         </Reveal>
-        <div className="mt-14 grid gap-6 md:grid-cols-3">
+        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {items.map((it, i) => (
-            <Reveal key={it.title} delay={i * 90}>
-              <div className="flex h-full flex-col rounded-2xl border border-[#0B1F3A]/10 bg-white p-8 transition-all hover:-translate-y-1 hover:border-[#19C3FF]/40 hover:shadow-[0_20px_40px_-20px_rgba(11,31,58,0.18)]">
-                <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl border border-[#0B1F3A]/10 text-[#0B1F3A]">
+            <Reveal key={it.t} delay={i * 80}>
+              <div className="flex h-full flex-col rounded-2xl border border-[#0B1F3A]/10 bg-white p-7 transition-all hover:-translate-y-1 hover:border-[#19C3FF]/40 hover:shadow-[0_20px_40px_-20px_rgba(11,31,58,0.18)]">
+                <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl border border-[#0B1F3A]/10 text-[#1769E0]">
                   <it.icon className="h-6 w-6" strokeWidth={1.5} />
                 </div>
-                <h3 className="mt-6 text-xl font-bold tracking-tight text-[#0B1F3A]">{it.title}</h3>
-                <p className="mt-3 text-[15px] leading-relaxed text-[#5a6a82]">{it.text}</p>
+                <h3 className="mt-6 text-[18px] font-bold tracking-tight text-[#0B1F3A]">{it.t}</h3>
+                <p className="mt-3 text-[14.5px] leading-relaxed text-[#5a6a82]">{it.d}</p>
               </div>
             </Reveal>
           ))}
@@ -221,124 +318,199 @@ function Servicios() {
   );
 }
 
-/* ────────────────────────── Casos ─────────────────────── */
-function Chip({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="inline-flex items-center rounded-full border border-white/12 bg-white/[0.04] px-3 py-1 text-xs font-medium text-white/75">
-      {children}
-    </span>
-  );
-}
+/* ─────────────── 5. CASO DESTACADO ─────────────── */
+function CasoDestacado() {
+  const metrics = [
+    { n: "200–300", l: "usuarios" },
+    { n: "4", l: "empresas" },
+    { n: "4", l: "call centers" },
+    { n: "13+", l: "años en producción" },
+  ];
+  const flow = [
+    { icon: Headphones, label: "Call Center" },
+    { icon: ShoppingCart, label: "Venta" },
+    { icon: Building2, label: "Backoffice" },
+    { icon: Truck, label: "Distribución" },
+    { icon: MapPinned, label: "Cadete" },
+    { icon: Users, label: "Cliente" },
+  ];
 
-function Casos() {
+  const [lit, setLit] = useState(-1);
+  const ref = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (!ref.current) return;
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) {
+        let i = 0;
+        const id = setInterval(() => {
+          setLit(i);
+          i++;
+          if (i > flow.length + 2) i = 0;
+        }, 700);
+        io.disconnect();
+        return () => clearInterval(id);
+      }
+    }, { threshold: 0.3 });
+    io.observe(ref.current);
+    return () => io.disconnect();
+  }, []);
+
   return (
-    <section id="casos" className="relative bg-[#06101F] py-24 md:py-32">
+    <section id="caso" className="bg-[#06101F] py-24 md:py-32">
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <Reveal>
-          <h2 className="max-w-3xl font-extrabold tracking-[-0.025em] text-white" style={{ fontSize: "clamp(34px,4.4vw,56px)" }}>
-            Proyectos donde la ingeniería sostuvo el negocio.
+          <Eyebrow>Caso destacado</Eyebrow>
+          <h2 className="mt-3 max-w-4xl font-extrabold tracking-[-0.025em] text-white" style={{ fontSize: "clamp(30px,4vw,48px)" }}>
+            Plataforma central de gestión comercial y operativa.
           </h2>
-        </Reveal>
-
-        <Reveal delay={80} className="mt-14">
-          <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 md:p-12 backdrop-blur-sm transition-colors hover:border-[#19C3FF]/30">
-            <span className="text-[11px] font-semibold uppercase tracking-[1.6px] text-[#19C3FF]">
-              SECTOR TELECOMUNICACIONES · 13+ AÑOS EN PRODUCCIÓN
-            </span>
-            <h3 className="mt-4 text-2xl md:text-3xl font-bold tracking-tight text-white">
-              Plataforma de gestión comercial para venta de servicios de telefonía móvil.
-            </h3>
-            <p className="mt-5 max-w-4xl text-[15px] leading-relaxed text-white/65">
-              Plataforma integral que gestiona el ciclo completo de venta de servicios de telefonía móvil por call center: captación y gestión de ventas, administración de contratos, envío de documentación y entrega de equipos a los clientes. Integra los sistemas corporativos del operador y orquesta los procesos de activación, distribución y control. En producción desde hace más de una década.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-2">
-              <Chip>Integraciones corporativas</Chip>
-              <Chip>13+ años en producción</Chip>
-            </div>
-          </article>
-        </Reveal>
-
-        <div className="mt-6 grid gap-6 md:grid-cols-2">
-          {[
-            {
-              eyebrow: "SECTOR ENERGÍA",
-              title: "Agente de IA para gestión de conocimiento.",
-              text: "Agente inteligente con IA generativa para consulta de conocimiento interno, complementado con agentes de voz y chat para consultas de gestión y obtención de datos en tiempo real.",
-              chips: ["n8n + OpenAI", "RAG", "Voz y chat", "Tiempo real"],
-            },
-            {
-              eyebrow: "AUTOMATIZACIÓN · URUGUAY Y PARAGUAY",
-              title: "Robots de automatización de procesos.",
-              text: "Robots para extracción de datos, activación de servicios de telefonía móvil y análisis de riesgo crediticio en Uruguay y Paraguay, integrados a los flujos operativos del cliente.",
-              chips: ["RPA multi-país", "Extracción de datos", "Procesos críticos"],
-            },
-          ].map((c, i) => (
-            <Reveal key={c.title} delay={i * 90}>
-              <article className="h-full rounded-2xl border border-white/10 bg-white/[0.03] p-8 backdrop-blur-sm transition-colors hover:border-[#19C3FF]/30">
-                <span className="text-[11px] font-semibold uppercase tracking-[1.6px] text-[#19C3FF]">{c.eyebrow}</span>
-                <h3 className="mt-3 text-xl font-bold tracking-tight text-white">{c.title}</h3>
-                <p className="mt-4 text-[14.5px] leading-relaxed text-white/65">{c.text}</p>
-                <div className="mt-5 flex flex-wrap gap-2">
-                  {c.chips.map((ch) => <Chip key={ch}>{ch}</Chip>)}
-                </div>
-              </article>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ───────────────────────── Nosotros ───────────────────── */
-function Nosotros() {
-  const stats = [
-    { n: "2011", l: "Fundación" },
-    { n: "13+", l: "Años" },
-    { n: "2", l: "Países" },
-    { n: "6+", l: "Sectores" },
-  ];
-  const partners = [
-    { initials: "NL", name: "Néstor Lemo", role: "Director Comercial / Cofundador",
-      bio: "Ingeniero en Informática, lidera estrategia comercial y análisis de negocio." },
-    { initials: "LB", name: "Liber Batalla", role: "Director Técnico / Cofundador",
-      bio: "Ingeniero de Sistemas, lidera arquitectura de integraciones y desarrollo backend." },
-  ];
-  return (
-    <section id="nosotros" className="bg-[#F5F7FA] py-24 md:py-32">
-      <div className="mx-auto max-w-7xl px-5 md:px-8">
-        <Reveal>
-          <h2 className="max-w-4xl font-extrabold tracking-[-0.025em] text-[#0B1F3A]" style={{ fontSize: "clamp(34px,4.4vw,56px)" }}>
-            Ingeniería al servicio del negocio, desde 2011.
-          </h2>
-          <p className="mt-7 max-w-3xl text-[17px] leading-relaxed text-[#5a6a82]">
-            Desde 2011 diseñamos, construimos y mantenemos sistemas empresariales para empresas medianas y grandes. Empezamos automatizando procesos con RPA, evolucionamos hacia plataformas en producción de largo plazo, y hoy incorporamos inteligencia artificial como evolución natural. Ingeniería con continuidad y compromiso de largo plazo.
+          <p className="mt-5 max-w-3xl text-[16px] leading-relaxed text-white/65">
+            Una solución empresarial en producción real, utilizada por cientos de usuarios y conectada con procesos críticos del negocio.
           </p>
         </Reveal>
 
         <Reveal delay={80}>
-          <div className="mt-14 grid grid-cols-2 gap-y-10 border-y border-[#0B1F3A]/10 py-10 md:grid-cols-4">
-            {stats.map((s) => (
-              <div key={s.l}>
-                <div className="font-extrabold tracking-[-0.03em] text-[#0B1F3A]" style={{ fontSize: "clamp(36px,4vw,56px)" }}>{s.n}</div>
-                <div className="mt-1 text-xs font-semibold uppercase tracking-[1.4px] text-[#5a6a82]">{s.l}</div>
+          <div className="mt-12 rounded-2xl border border-white/10 bg-white/[0.03] p-8 md:p-12 backdrop-blur-sm">
+            <p className="max-w-4xl text-[15.5px] leading-relaxed text-white/70">
+              AMENSG desarrolló y mantiene una aplicación central de gestión utilizada por entre <strong className="text-white">200 y 300 usuarios</strong>, distribuidos en <strong className="text-white">4 empresas</strong>, cada una con su propio call center. La plataforma soporta procesos críticos de ventas, backoffice, distribución, gestión de puntos de venta y entregas en campo mediante una web móvil utilizada por cadetes.
+            </p>
+
+            <div className="mt-10 grid grid-cols-2 gap-y-8 border-y border-white/10 py-8 md:grid-cols-4">
+              {metrics.map((m) => (
+                <div key={m.l}>
+                  <div className="font-extrabold tracking-[-0.03em] text-white" style={{ fontSize: "clamp(30px,3.4vw,46px)" }}>{m.n}</div>
+                  <div className="mt-1 text-[11px] font-semibold uppercase tracking-[1.4px] text-[#7088a8]">{m.l}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Flujo operativo animado */}
+            <div ref={ref} className="mt-12">
+              <div className="text-[11px] font-semibold uppercase tracking-[1.6px] text-[#19C3FF]">Flujo operativo</div>
+              <div className="mt-5 grid grid-cols-2 gap-y-6 sm:grid-cols-3 lg:grid-cols-6 lg:gap-x-2">
+                {flow.map((f, i) => {
+                  const active = lit === i;
+                  const done = lit > i && lit <= flow.length;
+                  return (
+                    <div key={f.label} className="relative flex flex-col items-center text-center">
+                      <div className={`flex h-14 w-14 items-center justify-center rounded-2xl border transition-all duration-500 ${
+                        active
+                          ? "border-[#19C3FF] bg-[#19C3FF]/12 text-[#19C3FF] shadow-[0_0_28px_-4px_rgba(25,195,255,0.6)] scale-105"
+                          : done
+                          ? "border-[#20E0B2]/40 bg-white/5 text-[#20E0B2]"
+                          : "border-white/12 bg-white/5 text-white/55"
+                      }`}>
+                        <f.icon className="h-6 w-6" strokeWidth={1.6} />
+                      </div>
+                      <span className="mt-3 text-[12px] font-semibold text-white/80">{f.label}</span>
+                      {i < flow.length - 1 && (
+                        <div aria-hidden className="absolute right-[-8px] top-7 hidden h-px w-4 bg-gradient-to-r from-[#19C3FF]/40 to-[#19C3FF]/0 lg:block" />
+                      )}
+                    </div>
+                  );
+                })}
               </div>
-            ))}
+            </div>
+
+            <p className="mt-12 max-w-3xl text-[15px] italic leading-relaxed text-white/55">
+              Este caso refleja nuestra capacidad de construir, mantener y evolucionar soluciones críticas que conectan personas, procesos y sistemas en la operación diaria.
+            </p>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ─────────────── 6. IA APLICADA ─────────────── */
+function IAAplicada() {
+  const bullets = [
+    "Agentes conectados al conocimiento de la empresa",
+    "Automatizaciones integradas con APIs y sistemas internos",
+    "RAG sobre documentación y datos corporativos",
+    "Asistentes conversacionales internos o para clientes",
+    "Flujos con n8n, OpenAI, Claude y otras tecnologías",
+    "Integración con web, email, WhatsApp o sistemas internos",
+  ];
+  const layers = [
+    { t: "Datos · Documentos · Sistemas", c: "from-[#1769E0]/30 to-[#1769E0]/5" },
+    { t: "Capa de integración", c: "from-[#19C3FF]/30 to-[#19C3FF]/5" },
+    { t: "Agente IA", c: "from-[#a78bfa]/30 to-[#a78bfa]/5" },
+    { t: "Usuarios · Procesos · Canales", c: "from-[#20E0B2]/30 to-[#20E0B2]/5" },
+  ];
+  return (
+    <section className="bg-[#F5F7FA] py-24 md:py-32">
+      <div className="mx-auto grid max-w-7xl gap-12 px-5 md:px-8 lg:grid-cols-2 lg:gap-16">
+        <Reveal>
+          <div>
+            <Eyebrow light>IA aplicada, no IA aislada</Eyebrow>
+            <h2 className="mt-3 font-extrabold tracking-[-0.025em] text-[#0B1F3A]" style={{ fontSize: "clamp(30px,3.8vw,48px)" }}>
+              IA aplicada sobre procesos reales.
+            </h2>
+            <p className="mt-6 text-[16px] leading-relaxed text-[#5a6a82]">
+              No incorporamos inteligencia artificial como una capa aislada. La integramos con sistemas, datos, reglas de negocio y procesos existentes para que genere valor operativo concreto.
+            </p>
+            <ul className="mt-8 space-y-3">
+              {bullets.map((b) => (
+                <li key={b} className="flex items-start gap-3 text-[14.5px] text-[#0B1F3A]/80">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#1769E0]" />
+                  {b}
+                </li>
+              ))}
+            </ul>
           </div>
         </Reveal>
 
-        <div className="mt-14 grid gap-6 md:grid-cols-2">
-          {partners.map((p, i) => (
-            <Reveal key={p.name} delay={i * 90}>
-              <div className="flex h-full gap-3 rounded-2xl border border-[#0B1F3A]/10 bg-white p-4 sm:gap-4 sm:p-5 md:gap-5 md:p-7">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[13px] font-bold text-white sm:h-12 sm:w-12 sm:text-sm md:h-14 md:w-14 md:text-base"
-                  style={{ background: "linear-gradient(135deg,#0B1F3A,#1769E0)" }}>
-                  {p.initials}
+        <Reveal delay={120}>
+          <div className="relative space-y-3 rounded-2xl border border-[#0B1F3A]/10 bg-white p-6 shadow-[0_30px_60px_-30px_rgba(11,31,58,0.25)]">
+            <div className="text-[11px] font-semibold uppercase tracking-[1.4px] text-[#5a6a82]">Arquitectura simplificada</div>
+            {layers.map((l, i) => (
+              <div key={l.t} className="flex items-center gap-3 animate-fade-up" style={{ animationDelay: `${i * 120}ms` }}>
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#0B1F3A] text-[11px] font-bold text-white">{i + 1}</div>
+                <div className={`flex-1 rounded-xl border border-[#0B1F3A]/10 bg-gradient-to-r ${l.c} px-5 py-4 text-[14px] font-semibold text-[#0B1F3A]`}>
+                  {l.t}
                 </div>
-                <div className="min-w-0 flex-1">
-                  <div className="text-[15px] font-bold leading-snug text-[#0B1F3A] [overflow-wrap:anywhere] sm:text-[15.5px] md:text-base md:leading-tight">{p.name}</div>
-                  <div className="mt-0.5 text-[13px] font-medium text-[#5a6a82] sm:text-[13.5px] md:mt-1 md:text-sm">{p.role}</div>
-                  <p className="mt-1.5 text-[13.5px] leading-snug text-[#5a6a82] [text-wrap:pretty] sm:text-[14px] md:mt-2 md:text-[14.5px] md:leading-relaxed">{p.bio}</p>
+              </div>
+            ))}
+            <div className="mt-4 text-center text-[11px] text-[#5a6a82]/70">
+              Cada capa se construye con tecnología existente del cliente.
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ─────────────── 7. TECNOLOGÍAS ─────────────── */
+function Tecnologias() {
+  const groups = [
+    { t: "Core empresarial", items: ["Java", "PostgreSQL", "APIs REST", "SQL / NoSQL"] },
+    { t: "Automatización e integración", items: ["n8n", "RPA", "Webhooks", "Integraciones corporativas"] },
+    { t: "IA aplicada", items: ["OpenAI", "Claude", "RAG", "Agentes conversacionales", "Voz y chat"] },
+    { t: "Operación y evolución", items: ["AWS", "GitHub", "Monitoreo", "Mantenimiento evolutivo"] },
+  ];
+  return (
+    <section className="bg-[#06101F] py-24 md:py-32">
+      <div className="mx-auto max-w-7xl px-5 md:px-8">
+        <Reveal>
+          <Eyebrow>Tecnologías</Eyebrow>
+          <h2 className="mt-3 max-w-3xl font-extrabold tracking-[-0.025em] text-white" style={{ fontSize: "clamp(30px,3.8vw,48px)" }}>
+            Tecnologías que conectan estrategia, operación e inteligencia.
+          </h2>
+        </Reveal>
+
+        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {groups.map((g, i) => (
+            <Reveal key={g.t} delay={i * 100}>
+              <div className="h-full rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+                <div className="text-[11px] font-semibold uppercase tracking-[1.6px] text-[#19C3FF]">Capa {i + 1}</div>
+                <h3 className="mt-2 text-[16px] font-bold text-white">{g.t}</h3>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {g.items.map((it) => (
+                    <span key={it} className="rounded-full border border-white/12 bg-white/[0.04] px-3 py-1.5 text-[12.5px] font-medium text-white/80">
+                      {it}
+                    </span>
+                  ))}
                 </div>
               </div>
             </Reveal>
@@ -349,9 +521,91 @@ function Nosotros() {
   );
 }
 
-/* ─────────────────── Contact Form (client-side) ───────── */
+/* ─────────────── 8. CÓMO TRABAJAMOS ─────────────── */
+function Proceso() {
+  const steps = [
+    "Entendemos el objetivo",
+    "Relevamos el proceso real",
+    "Diseñamos una solución viable",
+    "Construimos e integramos",
+    "Acompañamos la puesta en producción",
+    "Evolucionamos junto al negocio",
+  ];
+  return (
+    <section id="proceso" className="bg-[#F5F7FA] py-24 md:py-32">
+      <div className="mx-auto max-w-7xl px-5 md:px-8">
+        <Reveal>
+          <Eyebrow light>Cómo trabajamos</Eyebrow>
+          <h2 className="mt-3 max-w-3xl font-extrabold tracking-[-0.025em] text-[#0B1F3A]" style={{ fontSize: "clamp(30px,3.8vw,48px)" }}>
+            Trabajamos junto a tu empresa.
+          </h2>
+          <p className="mt-6 max-w-2xl text-[16px] leading-relaxed text-[#5a6a82]">
+            Nos involucramos en el proceso, entendemos la operación y construimos soluciones sostenibles junto a los equipos del cliente. Nuestro objetivo no es solo entregar software, sino ayudar a alcanzar resultados concretos.
+          </p>
+        </Reveal>
+
+        <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {steps.map((s, i) => (
+            <Reveal key={s} delay={i * 70}>
+              <div className="flex h-full items-start gap-4 rounded-2xl border border-[#0B1F3A]/10 bg-white p-6 transition-all hover:border-[#19C3FF]/40">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#0B1F3A] text-[14px] font-bold text-white">
+                  {String(i + 1).padStart(2, "0")}
+                </div>
+                <p className="mt-1.5 text-[15px] font-semibold leading-snug text-[#0B1F3A]">{s}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+
+        <Reveal delay={200}>
+          <p className="mt-14 max-w-3xl text-[18px] font-medium italic leading-relaxed text-[#0B1F3A]">
+            “Más que entregar tecnología, acompañamos la evolución operativa de nuestros clientes.”
+          </p>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ─────────────── 9. POR QUÉ AMENSG ─────────────── */
+function PorQue() {
+  const reasons = [
+    "Experiencia desde 2011",
+    "Soluciones reales en producción",
+    "Conocimiento de procesos empresariales",
+    "Capacidad de integrar sistemas existentes",
+    "Automatización con visión de negocio",
+    "IA aplicada con criterio operativo",
+    "Relación cercana y de largo plazo",
+  ];
+  return (
+    <section className="bg-[#06101F] py-24 md:py-32">
+      <div className="mx-auto max-w-7xl px-5 md:px-8">
+        <Reveal>
+          <Eyebrow>Por qué elegir AMENSG</Eyebrow>
+          <h2 className="mt-3 max-w-3xl font-extrabold tracking-[-0.025em] text-white" style={{ fontSize: "clamp(30px,3.8vw,48px)" }}>
+            Socios tecnológicos, no proveedores.
+          </h2>
+        </Reveal>
+
+        <div className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {reasons.map((r, i) => (
+            <Reveal key={r} delay={i * 60}>
+              <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-5 py-4">
+                <CheckCircle2 className="h-5 w-5 shrink-0 text-[#19C3FF]" />
+                <span className="text-[14.5px] font-medium text-white/85">{r}</span>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─────────────── 10. CONTACTO ─────────────── */
 function ContactBlock() {
-  const [f, setF] = useState({ nombre: "", empresa: "", email: "", mensaje: "" });
+  const [f, setF] = useState({ nombre: "", empresa: "", email: "", telefono: "", proceso: "", mensaje: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [sent, setSent] = useState(false);
 
@@ -369,7 +623,7 @@ function ContactBlock() {
     setErrors(e);
     if (Object.keys(e).length === 0) {
       setSent(true);
-      setF({ nombre: "", empresa: "", email: "", mensaje: "" });
+      setF({ nombre: "", empresa: "", email: "", telefono: "", proceso: "", mensaje: "" });
     }
   }
 
@@ -377,8 +631,8 @@ function ContactBlock() {
   const lbl = "block text-[11px] font-semibold uppercase tracking-[1.2px] text-white/60 mb-1.5";
 
   return (
-    <div className="grid gap-12 lg:grid-cols-2">
-      <form onSubmit={submit} className="space-y-4" noValidate>
+    <div className="grid gap-12 lg:grid-cols-5 lg:gap-16">
+      <form onSubmit={submit} className="space-y-4 lg:col-span-3" noValidate>
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block">
             <span className={lbl}>Nombre</span>
@@ -390,22 +644,30 @@ function ContactBlock() {
             <input className={inp} value={f.empresa} onChange={(e) => setF({ ...f, empresa: e.target.value })} placeholder="Tu empresa" />
             {errors.empresa && <span className="mt-1 block text-xs text-red-400">{errors.empresa}</span>}
           </label>
+          <label className="block">
+            <span className={lbl}>Email</span>
+            <input type="email" className={inp} value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} placeholder="nombre@empresa.com" />
+            {errors.email && <span className="mt-1 block text-xs text-red-400">{errors.email}</span>}
+          </label>
+          <label className="block">
+            <span className={lbl}>Teléfono</span>
+            <input className={inp} value={f.telefono} onChange={(e) => setF({ ...f, telefono: e.target.value })} placeholder="Opcional" />
+          </label>
         </div>
         <label className="block">
-          <span className={lbl}>Email</span>
-          <input type="email" className={inp} value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} placeholder="nombre@empresa.com" />
-          {errors.email && <span className="mt-1 block text-xs text-red-400">{errors.email}</span>}
+          <span className={lbl}>¿Qué proceso te gustaría mejorar?</span>
+          <input className={inp} value={f.proceso} onChange={(e) => setF({ ...f, proceso: e.target.value })} placeholder="Ej: gestión de ventas, integración entre sistemas, agente de soporte…" />
         </label>
         <label className="block">
           <span className={lbl}>Mensaje</span>
           <textarea rows={5} className={`${inp} h-auto py-3 resize-y`} value={f.mensaje} onChange={(e) => setF({ ...f, mensaje: e.target.value })}
-            placeholder="Contanos brevemente tu caso." />
+            placeholder="Contanos el proceso, sistemas involucrados y qué te gustaría mejorar." />
           {errors.mensaje && <span className="mt-1 block text-xs text-red-400">{errors.mensaje}</span>}
         </label>
         <button type="submit"
           className="inline-flex h-12 items-center gap-2 rounded-full px-6 text-sm font-semibold text-white shadow-[0_10px_30px_-10px_rgba(25,195,255,0.6)] hover:-translate-y-0.5 transition-transform"
           style={{ background: "linear-gradient(135deg,#0B1F3A 0%, #1769E0 100%)" }}>
-          Enviar consulta
+          Agendar diagnóstico de automatización
         </button>
         {sent && (
           <div className="flex items-start gap-2 rounded-lg border border-[#20E0B2]/40 bg-[#20E0B2]/10 px-4 py-3 text-sm text-white">
@@ -421,11 +683,11 @@ function ContactBlock() {
         )}
       </form>
 
-      <div className="space-y-6">
+      <div className="space-y-6 lg:col-span-2">
         <div>
           <h3 className="text-2xl font-bold tracking-tight text-white">Hablemos.</h3>
           <p className="mt-3 text-[15px] leading-relaxed text-white/65">
-            Contanos qué proceso querés mejorar. Te respondemos en menos de 24 horas hábiles.
+            Coordinemos una primera conversación para analizar procesos, sistemas involucrados y oportunidades concretas de automatización e IA.
           </p>
         </div>
         <div className="space-y-3">
@@ -443,37 +705,29 @@ function ContactBlock() {
   );
 }
 
-/* ─────────────── Tecnologías + Contacto + Footer ──────── */
-function TechContactFooter() {
-  const techs = ["Java", "PostgreSQL", "n8n", "OpenAI", "Claude", "AWS", "GitHub", "APIs REST", "SQL/NoSQL"];
+function Contacto() {
   return (
     <section id="contacto" className="bg-[#06101F] pt-24 md:pt-32">
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <Reveal>
-          <p className="text-[11px] font-semibold uppercase tracking-[2px] text-[#19C3FF]">— TECNOLOGÍAS</p>
-          <h2 className="mt-3 font-extrabold tracking-[-0.025em] text-white" style={{ fontSize: "clamp(28px,3.4vw,44px)" }}>
-            El stack con el que construimos.
+          <Eyebrow>Contacto</Eyebrow>
+          <h2 className="mt-3 max-w-3xl font-extrabold tracking-[-0.025em] text-white" style={{ fontSize: "clamp(30px,3.8vw,48px)" }}>
+            Identifiquemos juntos oportunidades de automatización.
           </h2>
-          <div className="mt-7 flex flex-wrap gap-2.5">
-            {techs.map((t) => (
-              <span key={t} className="rounded-full border border-white/12 bg-white/[0.04] px-4 py-2 text-sm font-medium text-white/80">
-                {t}
-              </span>
-            ))}
-          </div>
+          <p className="mt-5 max-w-2xl text-[16px] leading-relaxed text-white/65">
+            Te respondemos en menos de 24 horas hábiles.
+          </p>
         </Reveal>
 
-        <div className="mt-20 md:mt-28">
-          <Reveal>
-            <ContactBlock />
-          </Reveal>
+        <div className="mt-16">
+          <Reveal><ContactBlock /></Reveal>
         </div>
       </div>
 
       <footer className="mt-24 border-t border-white/5 py-8">
         <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-4 px-5 md:flex-row md:items-center md:px-8">
           <LogoMark />
-          <p className="text-xs text-white/50">© 2026 AMENSG SRL — Montevideo, Uruguay. Desde 2011.</p>
+          <p className="text-xs text-white/50">© 2026 AMENSG SRL — Socios en Automatización Inteligente · Montevideo, Uruguay · Desde 2011.</p>
         </div>
       </footer>
     </section>
@@ -487,12 +741,16 @@ function LandingPage() {
       <SiteHeader />
       <main>
         <Hero />
+        <Propuesta />
+        <Problemas />
         <Servicios />
-        <Casos />
-        <Nosotros />
-        <TechContactFooter />
+        <CasoDestacado />
+        <IAAplicada />
+        <Tecnologias />
+        <Proceso />
+        <PorQue />
+        <Contacto />
       </main>
-
     </div>
   );
 }
