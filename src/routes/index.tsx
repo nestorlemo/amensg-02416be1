@@ -335,7 +335,7 @@ function Nosotros() {
                   style={{ background: "linear-gradient(135deg,#0B1F3A,#1769E0)" }}>
                   {p.initials}
                 </div>
-                <div className="min-w-1 flex-1">
+                <div className="min-w-0 flex-1">
                   <div className="text-[15px] font-bold leading-snug text-[#0B1F3A] sm:text-base sm:leading-tight">{p.name}</div>
                   <div className="mt-0.5 text-[13px] font-medium text-[#5a6a82] sm:text-sm">{p.role}</div>
                   <p className="mt-1.5 text-[13.5px] leading-snug text-[#5a6a82] sm:mt-2 sm:text-[14.5px] sm:leading-relaxed">{p.bio}</p>
