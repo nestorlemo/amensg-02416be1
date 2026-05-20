@@ -180,30 +180,34 @@ function WorkflowScene() {
 
   return (
     <div className="relative h-full p-5">
-      <svg className="absolute inset-0 h-full w-full pointer-events-none" viewBox="0 0 620 372" preserveAspectRatio="none">
-        {[
-          "M 70 150 L 175 150",
-          "M 175 150 L 280 150",
-          "M 280 150 L 385 95",
-          "M 280 150 L 385 215",
-          "M 470 95 L 560 150",
-          "M 470 215 L 560 150",
-        ].map((d, i) => (
-          <path key={i} d={d} stroke="rgba(255,255,255,0.13)" strokeWidth="1.8" fill="none" />
-        ))}
-        {["M 70 150 L 175 150", "M 175 150 L 280 150", "M 280 150 L 385 95", "M 470 95 L 560 150"].map((d, i) => (
-          <path
-            key={`l${i}`}
-            d={d}
-            stroke="#19C3FF"
-            strokeWidth="1.8"
-            fill="none"
-            style={{
-              opacity: i < litEdges ? 1 : 0,
-              transition: "opacity 0.6s ease",
-            }}
-          />
-        ))}
+      <svg className="absolute inset-0 h-full w-full pointer-events-none" preserveAspectRatio="none">
+        {(() => {
+          const paths = [
+            "M 96 123 C 120 123, 150 123, 147 123",
+            "M 201 123 C 225 123, 255 123, 252 123",
+            "M 306 123 C 335 123, 355 68, 357 68",
+            "M 306 123 C 335 123, 355 188, 357 188",
+            "M 411 68 C 470 68, 500 123, 532 123",
+            "M 411 188 C 470 188, 500 123, 532 123",
+          ];
+          return (
+            <>
+              {paths.map((d, i) => (
+                <path key={i} d={d} stroke="rgba(255,255,255,0.13)" strokeWidth="1.8" fill="none" />
+              ))}
+              {[paths[0], paths[1], paths[2], paths[4]].map((d, i) => (
+                <path
+                  key={`l${i}`}
+                  d={d}
+                  stroke="#19C3FF"
+                  strokeWidth="1.8"
+                  fill="none"
+                  style={{ opacity: i < litEdges ? 1 : 0, transition: "opacity 0.6s ease" }}
+                />
+              ))}
+            </>
+          );
+        })()}
       </svg>
 
       {nodes.map((n) => {
