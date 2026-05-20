@@ -1,783 +1,603 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState, useRef } from "react";
 import {
-  ArrowRight, Sparkles, Brain, Workflow, Plug, Code2, Database, FileCheck2,
-  Repeat, Network, FileSpreadsheet, BookOpen, ClipboardCheck,
-  MessageCircle, Mail, MapPin, Phone, ShieldCheck, LineChart,
-  Search, PencilRuler, Hammer, Gauge,
+  Menu, X, ArrowRight, Workflow, Bot, Network, Mail, MapPin,
+  MessageCircle, CheckCircle2, AlertCircle,
 } from "lucide-react";
-import { Header } from "@/components/amensg/Header";
-import { Logo } from "@/components/amensg/Logo";
-import { CoreDiagram } from "@/components/amensg/CoreDiagram";
-import { ContactForm } from "@/components/amensg/ContactForm";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "AMENSG IT Automation | IA, automatización e integración de sistemas" },
-      {
-        name: "description",
-        content:
-          "AMENSG SRL diseña soluciones de automatización inteligente, agentes de IA, integración de sistemas y software empresarial para optimizar procesos reales de negocio.",
-      },
-      {
-        name: "keywords",
-        content:
-          "automatización, inteligencia artificial, agentes IA, integración de sistemas, software empresarial, Montevideo, Uruguay, n8n, SAP, OpenAI",
-      },
-      { property: "og:title", content: "AMENSG IT Automation | IA, automatización e integración de sistemas" },
-      { property: "og:description", content: "Automatización inteligente, agentes de IA e integración de sistemas para procesos empresariales." },
+      { title: "AMENSG IT Automation — Ingeniería de automatización desde 2011" },
+      { name: "description", content: "AMENSG SRL diseña, construye y mantiene sistemas empresariales, integraciones y agentes de IA. Montevideo, Uruguay. Desde 2011." },
+      { property: "og:title", content: "AMENSG IT Automation — Ingeniería de automatización desde 2011" },
+      { property: "og:description", content: "Sistemas empresariales, integraciones y agentes de IA para empresas en operación." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "/" },
     ],
     links: [
-      { rel: "canonical", href: "/" },
       { rel: "icon", href: "/favicon.ico" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap",
-      },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" },
     ],
   }),
   component: LandingPage,
 });
 
-function LandingPage() {
+/* ───────────────────────── Logo ───────────────────────── */
+function LogoMark({ className = "" }: { className?: string }) {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <Header />
-      <main>
-        <Hero />
-        <Problems />
-        <Services />
-        <Architecture />
-        <ExampleWorkflow />
-        <Cases />
-        <Sectors />
-        <Process />
-        <Team />
-        <Tech />
-        <FinalCTA />
-        <Contact />
-      </main>
-      <Footer />
+    <span className={`inline-flex items-center gap-2.5 ${className}`}>
+      <svg viewBox="0 0 100 110" className="h-7 w-auto text-white">
+        <path d="M 50 5 L 93 30 L 93 80 L 50 105 L 7 80 L 7 30 Z" fill="none" stroke="currentColor" strokeWidth="6" strokeLinejoin="round" />
+        <line x1="27" y1="73" x2="73" y2="37" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+        <circle cx="27" cy="73" r="7" fill="currentColor" />
+        <circle cx="50" cy="55" r="9" fill="#19C3FF" />
+        <circle cx="73" cy="37" r="7" fill="currentColor" />
+      </svg>
+      <span className="text-[22px] font-extrabold tracking-tight text-white lowercase">amensg</span>
+    </span>
+  );
+}
+
+/* ───────────────────── Scroll reveal hook ─────────────── */
+function useReveal() {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [shown, setShown] = useState(false);
+  useEffect(() => {
+    if (!ref.current) return;
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => { if (e.isIntersecting) { setShown(true); io.disconnect(); } });
+    }, { threshold: 0.12 });
+    io.observe(ref.current);
+    return () => io.disconnect();
+  }, []);
+  return { ref, cls: shown ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4" };
+}
+
+function Reveal({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
+  const { ref, cls } = useReveal();
+  return (
+    <div ref={ref} style={{ transitionDelay: `${delay}ms` }} className={`transition-all duration-700 ease-out ${cls} ${className}`}>
+      {children}
     </div>
   );
 }
 
-/* ───────────────────────── HERO ───────────────────────── */
+/* ──────────────────────── Header ──────────────────────── */
+function SiteHeader() {
+  const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 16);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
+  const links = [
+    { href: "#servicios", label: "Servicios" },
+    { href: "#casos", label: "Casos" },
+    { href: "#nosotros", label: "Nosotros" },
+    { href: "#contacto", label: "Contacto" },
+  ];
+
+  return (
+    <header className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${scrolled ? "bg-[#06101F]/70 backdrop-blur-xl border-b border-white/5" : "bg-transparent"}`}>
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 md:px-8">
+        <a href="#top" className="shrink-0"><LogoMark /></a>
+        <nav className="hidden md:flex items-center gap-9">
+          {links.map((l) => (
+            <a key={l.href} href={l.href} className="text-sm font-medium text-white/70 hover:text-white transition-colors">
+              {l.label}
+            </a>
+          ))}
+        </nav>
+        <div className="flex items-center gap-3">
+          <a href="#contacto" className="hidden sm:inline-flex h-10 items-center rounded-full bg-white text-[#06101F] px-5 text-sm font-semibold hover:bg-[#19C3FF] transition-colors">
+            Agendar reunión
+          </a>
+          <button aria-label="Menú" onClick={() => setOpen((v) => !v)} className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-md text-white hover:bg-white/10">
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
+      </div>
+      {open && (
+        <div className="md:hidden border-t border-white/5 bg-[#06101F]/95 backdrop-blur-xl">
+          <nav className="flex flex-col px-5 py-3">
+            {links.map((l) => (
+              <a key={l.href} href={l.href} onClick={() => setOpen(false)} className="py-3 text-sm font-medium text-white/80 hover:text-white">
+                {l.label}
+              </a>
+            ))}
+            <a href="#contacto" onClick={() => setOpen(false)} className="mt-2 inline-flex h-11 items-center justify-center rounded-full bg-white text-[#06101F] text-sm font-semibold">
+              Agendar reunión
+            </a>
+          </nav>
+        </div>
+      )}
+    </header>
+  );
+}
+
+/* ─────────────────────── App mockup ───────────────────── */
+function AppMockup() {
+  return (
+    <div
+      className="relative w-full max-w-[720px] mx-auto rounded-[14px] overflow-hidden border border-white/10 bg-[#0d1b2f]"
+      style={{
+        transform: "perspective(1400px) rotateY(-7deg) rotateX(3deg)",
+        boxShadow: "0 30px 80px -15px rgba(25,195,255,0.28), 0 0 0 1px rgba(255,255,255,0.04)",
+      }}
+    >
+      {/* titlebar */}
+      <div className="flex h-[38px] items-center gap-2 border-b border-white/5 bg-[#0a1626] px-3.5">
+        <span className="h-[11px] w-[11px] rounded-full bg-[#ff5f57]" />
+        <span className="h-[11px] w-[11px] rounded-full bg-[#febc2e]" />
+        <span className="h-[11px] w-[11px] rounded-full bg-[#28c840]" />
+        <span className="ml-3 font-mono text-[11px] text-[#8ba3c7] truncate">amensg — plataforma de gestión comercial</span>
+        <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-[#20E0B2]/10 px-2.5 py-1 text-[10px] font-semibold tracking-[1px] text-[#20E0B2]">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#20E0B2] animate-pulse" /> EN PRODUCCIÓN
+        </span>
+      </div>
+      <div className="flex h-[380px]">
+        {/* sidebar */}
+        <aside className="w-[185px] border-r border-white/5 bg-[#0a1626] py-3.5">
+          <div className="px-4 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-[1.2px] text-[#5a7090]">Gestión comercial</div>
+          {[
+            ["Monitoreo", false], ["Ventas", false], ["Backoffice", false],
+            ["Activaciones", true], ["Distribución", false],
+          ].map(([label, active]) => (
+            <div key={String(label)} className={`text-[12.5px] py-1.5 ${active ? "pl-[22px] text-white border-l-2 border-[#19C3FF] bg-gradient-to-r from-[#19C3FF]/15 to-transparent" : "pl-6 text-[#aebfd6]"}`}>
+              {label}
+            </div>
+          ))}
+          <div className="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-[1.2px] text-[#5a7090]">Operaciones</div>
+          {["Stock", "Liquidaciones", "Atención a clientes", "Reportes"].map((l) => (
+            <div key={l} className="pl-6 py-1.5 text-[12.5px] text-[#aebfd6]">{l}</div>
+          ))}
+        </aside>
+        {/* content */}
+        <div className="flex-1 bg-[#0d1b2f] p-4">
+          <div className="mb-3.5 flex items-center gap-2">
+            <span className="rounded-md bg-[#19C3FF] px-2.5 py-1 text-[11px] font-semibold text-[#06101F]">Actualizar</span>
+            <span className="rounded-md border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-[#aebfd6]">Exportar</span>
+            <span className="rounded-md border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-[#aebfd6]">Filtros</span>
+          </div>
+          <div className="mb-4 flex gap-2.5">
+            {[
+              { num: "1.247", lbl: "Activaciones hoy", cls: "text-white" },
+              { num: "98,4%", lbl: "Tasa de éxito", cls: "text-[#19C3FF]" },
+              { num: "312", lbl: "Entregas en curso", cls: "text-[#20E0B2]" },
+            ].map((s) => (
+              <div key={s.lbl} className="flex-1 rounded-lg border border-white/5 bg-white/[0.03] px-3 py-2.5">
+                <div className={`text-[19px] font-bold ${s.cls}`}>{s.num}</div>
+                <div className="mt-0.5 text-[10px] uppercase tracking-[0.5px] text-[#7088a8]">{s.lbl}</div>
+              </div>
+            ))}
+          </div>
+          <table className="w-full border-collapse">
+            <thead>
+              <tr>
+                {["ID", "Servicio", "Activación", "Entrega", "Estado"].map((h) => (
+                  <th key={h} className="border-b border-white/10 px-2 py-1.5 text-left text-[10px] font-semibold uppercase tracking-[0.5px] text-[#5a7090]">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                ["924799", "Fibra Premium", "17/03", "Documentación", "ok", "Activo"],
+                ["915135", "Plan Móvil", "17/03", "Equipo enviado", "ok", "Activo"],
+                ["921887", "Fibra Básico", "16/03", "En reparto", "proc", "Proceso"],
+                ["988085", "Plan Móvil", "16/03", "Pendiente", "pend", "En cola"],
+                ["916042", "Fibra Premium", "16/03", "Documentación", "ok", "Activo"],
+                ["989642", "Plan Móvil", "16/03", "Equipo enviado", "ok", "Activo"],
+              ].map((r, i) => (
+                <tr key={i}>
+                  <td className="border-b border-white/[0.04] px-2 py-1.5 text-[11.5px] text-[#aebfd6] blur-[3px] opacity-70">{r[0]}</td>
+                  <td className="border-b border-white/[0.04] px-2 py-1.5 text-[11.5px] text-[#aebfd6]">{r[1]}</td>
+                  <td className="border-b border-white/[0.04] px-2 py-1.5 text-[11.5px] text-[#aebfd6]">{r[2]}</td>
+                  <td className="border-b border-white/[0.04] px-2 py-1.5 text-[11.5px] text-[#aebfd6]">{r[3]}</td>
+                  <td className="border-b border-white/[0.04] px-2 py-1.5">
+                    <span className={`rounded px-2 py-0.5 text-[10px] font-semibold ${
+                      r[4] === "ok" ? "text-[#20E0B2] bg-[#20E0B2]/10"
+                      : r[4] === "proc" ? "text-[#19C3FF] bg-[#19C3FF]/10"
+                      : "text-[#f0b840] bg-[#f0b840]/10"
+                    }`}>{r[5]}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ───────────────────────── Hero ───────────────────────── */
 function Hero() {
   return (
-    <section id="inicio" className="relative overflow-hidden bg-hero-gradient text-white pt-28 md:pt-32 pb-20 md:pb-28">
-      <div className="absolute inset-0 bg-grid opacity-60" />
-      <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-cyan-bright/20 blur-3xl" />
-      <div className="absolute bottom-0 left-0 h-72 w-72 rounded-full bg-teal-accent/10 blur-3xl" />
-
-      <div className="relative mx-auto max-w-7xl px-5 sm:px-8 grid lg:grid-cols-12 gap-12 items-center">
-        <div className="lg:col-span-6 animate-fade-up">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass-card text-xs font-medium text-cyan-bright">
-            <Sparkles className="h-3.5 w-3.5" /> AI-Powered Automation
-          </div>
-          <h1 className="mt-5 text-4xl sm:text-5xl lg:text-[3.6rem] leading-[1.05] font-bold text-white">
-            IA y automatización para{" "}
-            <span className="text-gradient-cyan">procesos empresariales</span>{" "}
-            que no pueden fallar
-          </h1>
-          <p className="mt-6 text-base md:text-lg text-white/75 max-w-xl leading-relaxed">
-            En AMENSG diseñamos agentes de IA, integraciones y software a medida para
-            automatizar procesos operativos, conectar sistemas existentes y reducir tareas
-            manuales en empresas.
-          </p>
-
-          <div className="mt-8 flex flex-wrap gap-3">
-            <a
-              href="#contacto"
-              className="inline-flex items-center gap-2 h-12 px-6 rounded-full bg-white text-navy-deep font-semibold hover:bg-cyan-bright hover:text-navy-deep transition shadow-[0_12px_40px_-12px_rgba(25,195,255,0.6)]"
-            >
-              Analizar mi proceso <ArrowRight className="h-4 w-4" />
-            </a>
-            <a
-              href="#servicios"
-              className="inline-flex items-center gap-2 h-12 px-6 rounded-full border border-white/25 text-white hover:bg-white/10 transition font-medium"
-            >
-              Ver servicios
-            </a>
-          </div>
-
-          <dl className="mt-10 grid grid-cols-3 gap-px max-w-xl rounded-2xl overflow-hidden border border-white/10 bg-white/[0.04]">
-            {[
-              { k: "+10", v: "años de experiencia" },
-              { k: "100%", v: "integrado con tus sistemas" },
-              { k: "24/7", v: "procesos sin intervención" },
-            ].map((s) => (
-              <div key={s.v} className="bg-navy-deep/40 px-4 py-4">
-                <dt className="text-2xl font-bold text-white font-display leading-none">{s.k}</dt>
-                <dd className="mt-1.5 text-[11px] text-white/65 leading-snug">{s.v}</dd>
-              </div>
-            ))}
-          </dl>
-        </div>
-
-        <div className="lg:col-span-6 animate-fade-up" style={{ animationDelay: "0.15s" }}>
-          <CoreDiagram />
-        </div>
+    <section id="top" className="relative overflow-hidden bg-[#06101F] pt-32 pb-20 md:pt-40 md:pb-28">
+      {/* animated mesh gradient */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 opacity-80">
+        <div className="absolute -top-40 -right-32 h-[520px] w-[520px] rounded-full blur-3xl"
+          style={{ background: "radial-gradient(closest-side, rgba(25,195,255,0.35), transparent 70%)", animation: "meshFloat 14s ease-in-out infinite" }} />
+        <div className="absolute -bottom-40 -left-20 h-[480px] w-[480px] rounded-full blur-3xl"
+          style={{ background: "radial-gradient(closest-side, rgba(11,31,58,0.9), transparent 70%)", animation: "meshFloat 18s ease-in-out infinite reverse" }} />
+        <div className="absolute top-1/3 left-1/2 h-[360px] w-[360px] -translate-x-1/2 rounded-full blur-3xl"
+          style={{ background: "radial-gradient(closest-side, rgba(32,224,178,0.10), transparent 70%)", animation: "meshFloat 22s ease-in-out infinite" }} />
       </div>
-    </section>
-  );
-}
+      {/* dot grid */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 opacity-[0.08]"
+        style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.6) 1px, transparent 1px)", backgroundSize: "26px 26px" }} />
 
-/* ───────────────────────── PROBLEMS ───────────────────────── */
-
-function Problems() {
-  const items = [
-    { icon: Repeat, text: "Tareas repetitivas que consumen horas operativas" },
-    { icon: Network, text: "Sistemas internos que no se comunican entre sí" },
-    { icon: FileSpreadsheet, text: "Datos dispersos en planillas, plataformas y bases de datos" },
-    { icon: FileCheck2, text: "Procesos de activación, validación o facturación con errores manuales" },
-    { icon: BookOpen, text: "Conocimiento interno difícil de consultar o reutilizar" },
-    { icon: ClipboardCheck, text: "Reportes y controles que dependen de personas clave" },
-  ];
-  return (
-    <Section id="problemas" eyebrow="Problemas que resolvemos">
-      <SectionHeading>
-        Procesos complejos, sistemas desconectados y trabajo manual{" "}
-        <span className="text-tech-blue">no deberían frenar la operación</span>
-      </SectionHeading>
-      <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {items.map(({ icon: Icon, text }) => (
-          <div key={text} className="group p-6 rounded-2xl border border-border bg-card hover:border-tech-blue/40 hover:shadow-[0_18px_40px_-24px_rgba(23,105,224,0.35)] transition-all">
-            <div className="h-11 w-11 rounded-xl bg-surface flex items-center justify-center text-tech-blue group-hover:bg-tech-blue group-hover:text-white transition">
-              <Icon className="h-5 w-5" />
-            </div>
-            <p className="mt-4 text-[15px] leading-relaxed text-foreground/85">{text}</p>
-          </div>
-        ))}
-      </div>
-    </Section>
-  );
-}
-
-/* ───────────────────────── SERVICES ───────────────────────── */
-
-function Services() {
-  const services = [
-    { icon: Workflow, title: "Automatización inteligente de procesos",
-      desc: "Automatizamos tareas operativas, administrativas y de control, reduciendo intervención manual y mejorando la trazabilidad." },
-    { icon: Brain, title: "Agentes de inteligencia artificial para empresas",
-      desc: "Diseñamos asistentes y agentes de IA capaces de consultar conocimiento, responder preguntas, ejecutar flujos y asistir a equipos internos." },
-    { icon: Plug, title: "Integración de sistemas empresariales",
-      desc: "Conectamos ERP, SAP, APIs, bases de datos, plataformas web y herramientas internas para que la información fluya sin fricción." },
-    { icon: Code2, title: "Desarrollo y mantenimiento de software",
-      desc: "Construimos y evolucionamos aplicaciones empresariales, plataformas web y soluciones a medida con foco en estabilidad y continuidad operativa." },
-    { icon: Database, title: "Gestión y explotación de datos",
-      desc: "Estructuramos, procesamos y transformamos datos para generar reportes, controles, análisis y automatizaciones basadas en información confiable." },
-    { icon: FileCheck2, title: "Procesos de activación, validación y facturación",
-      desc: "Automatizamos flujos operativos de alto volumen vinculados a activaciones, validaciones, conciliaciones y facturación." },
-  ];
-  return (
-    <Section id="servicios" eyebrow="Servicios" tone="surface">
-      <SectionHeading>
-        Soluciones para automatizar, integrar y{" "}
-        <span className="text-tech-blue">escalar operaciones</span>
-      </SectionHeading>
-      <p className="mt-4 max-w-2xl text-muted-foreground text-[15px]">
-        Combinamos automatización, IA, integración y desarrollo para resolver procesos completos, no tareas aisladas.
-      </p>
-
-      <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {services.map(({ icon: Icon, title, desc }) => (
-          <article key={title} className="relative p-7 rounded-2xl bg-card border border-border hover:-translate-y-0.5 hover:shadow-[0_22px_50px_-25px_rgba(11,31,58,0.25)] transition-all overflow-hidden">
-            <div className="absolute -top-12 -right-12 h-32 w-32 rounded-full bg-tech-blue/5" />
-            <div className="relative h-12 w-12 rounded-xl bg-gradient-to-br from-tech-blue to-cyan-bright text-white flex items-center justify-center shadow-[0_10px_24px_-10px_rgba(23,105,224,0.6)]">
-              <Icon className="h-5 w-5" />
-            </div>
-            <h3 className="relative mt-5 text-lg font-semibold text-foreground leading-snug">{title}</h3>
-            <p className="relative mt-2.5 text-sm text-muted-foreground leading-relaxed">{desc}</p>
-          </article>
-        ))}
-      </div>
-    </Section>
-  );
-}
-
-/* ───────────────────────── ARCHITECTURE ───────────────────────── */
-
-function Architecture() {
-  const pillars = [
-    {
-      ref: "Entrada del flujo",
-      refDetail: "ERP · BD · Web · WhatsApp → CORE",
-      title: "Cómo entran los datos al CORE",
-      icon: Plug,
-      color: "from-tech-blue to-cyan-bright",
-      desc: "Habilitamos el primer tramo del diagrama: que cada sistema que ya usás pueda dialogar con AMENSG sin migraciones forzadas.",
-      deliverable: "Conectores, APIs intermedias y sincronizaciones documentadas para cada origen.",
-      tags: ["REST / GraphQL", "SAP", "SQL", "CSV / Excel", "Webhooks"],
-    },
-    {
-      ref: "Nodo · Orquestación",
-      refDetail: "Pieza central del CORE",
-      title: "Qué hay dentro del nodo Orquestación",
-      icon: Workflow,
-      color: "from-cyan-bright to-teal-accent",
-      desc: "El nodo de orquestación del CORE no es una caja mágica: son flujos versionados con reintentos, manejo de excepciones y reproceso.",
-      deliverable: "Workflows productivos con logs, alertas, idempotencia y control de reintentos.",
-      tags: ["n8n", "Workers", "Colas", "Jobs programados"],
-    },
-    {
-      ref: "Nodo · Agentes de IA",
-      refDetail: "Pieza superior del CORE",
-      title: "Qué hay dentro del nodo Agentes de IA",
-      icon: Brain,
-      color: "from-teal-accent to-tech-blue",
-      desc: "Los agentes del CORE no responden por responder: usan herramientas reales del flujo para consultar datos y disparar acciones.",
-      deliverable: "Agentes con tools sobre tus APIs, RAG sobre datos propios y métricas de calidad.",
-      tags: ["OpenAI", "RAG", "Agentes con tools", "Embeddings"],
-    },
-    {
-      ref: "Salida del flujo",
-      refDetail: "Sostiene los resultados operativos",
-      title: "Cómo sostenemos los resultados en el tiempo",
-      icon: ShieldCheck,
-      color: "from-tech-blue to-navy",
-      desc: "Los resultados del lado derecho del diagrama sólo se mantienen si la solución es observable, versionada y transferible.",
-      deliverable: "Observabilidad, control de versiones, entornos separados y handover documentado.",
-      tags: ["Logs y métricas", "Git / CI-CD", "Dev / Prod", "Documentación"],
-    },
-  ];
-
-  return (
-    <Section id="arquitectura" eyebrow="Cómo construimos" tone="navy">
-      <SectionHeading invert>
-        Cada pilar es una parte concreta del{" "}
-        <span className="text-gradient-cyan">diagrama AMENSG CORE</span>
-      </SectionHeading>
-      <p className="mt-4 max-w-2xl text-white/70 text-[15px]">
-        Tomamos los nodos y flechas del diagrama y mostramos qué construimos en cada uno: nada de capas
-        decorativas, sólo el trabajo real detrás de que funcione en producción.
-      </p>
-
-      <div className="mt-12 grid md:grid-cols-2 gap-5">
-        {pillars.map((p) => {
-          const Icon = p.icon;
-          return (
-            <article
-              key={p.title}
-              className="group relative p-6 md:p-7 rounded-2xl glass-card hover:-translate-y-0.5 transition-all"
-            >
-              <div className="flex items-center justify-between gap-3 mb-4">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cyan-bright/10 border border-cyan-bright/30 text-[10px] tracking-[0.18em] uppercase text-cyan-bright font-semibold">
-                  {p.ref}
-                </span>
-                <span className="text-[11px] text-white/45 truncate">{p.refDetail}</span>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div
-                  className={`h-12 w-12 shrink-0 rounded-xl bg-gradient-to-br ${p.color} flex items-center justify-center text-white shadow-lg`}
-                >
-                  <Icon className="h-5 w-5" />
-                </div>
-                <div className="min-w-0">
-                  <h3 className="text-white font-semibold text-lg leading-snug">{p.title}</h3>
-                  <p className="mt-2 text-sm text-white/70 leading-relaxed">{p.desc}</p>
-                </div>
-              </div>
-
-              <div className="mt-5 pl-16">
-                <div className="flex items-start gap-2 text-[13px] text-white/85">
-                  <FileCheck2 className="h-4 w-4 mt-0.5 text-teal-accent shrink-0" />
-                  <span><span className="text-white/60">Entregamos: </span>{p.deliverable}</span>
-                </div>
-                <div className="mt-4 flex flex-wrap gap-1.5">
-                  {p.tags.map((t) => (
-                    <span
-                      key={t}
-                      className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] text-white/80"
-                    >
-                      {t}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </article>
-          );
-        })}
-      </div>
-    </Section>
-  );
-}
-
-/* ───────────────────────── EXAMPLE WORKFLOW ───────────────────────── */
-
-function ExampleWorkflow() {
-  const steps = [
-    {
-      pillar: "Integración",
-      title: "Ingreso del pedido",
-      desc: "Llega una solicitud por WhatsApp Business y queda capturada como evento estructurado.",
-      stack: ["WhatsApp API", "Webhook", "Zod"],
-      color: "from-tech-blue to-cyan-bright",
-    },
-    {
-      pillar: "Integración",
-      title: "Consulta a sistemas reales",
-      desc: "Se busca el cliente en el ERP, el stock en la base y el precio vigente en la plataforma interna.",
-      stack: ["SAP / ERP", "SQL", "REST"],
-      color: "from-tech-blue to-cyan-bright",
-    },
-    {
-      pillar: "IA aplicada",
-      title: "Decisión del agente",
-      desc: "Un agente con tools interpreta el pedido, valida reglas de negocio y arma la respuesta sobre el catálogo propio.",
-      stack: ["OpenAI", "RAG", "Tools"],
-      color: "from-teal-accent to-tech-blue",
-    },
-    {
-      pillar: "Orquestación",
-      title: "Acción automatizada",
-      desc: "Se genera el pedido en el ERP, se notifica al equipo comercial y se confirma al cliente por el mismo canal.",
-      stack: ["n8n", "Workers", "Colas"],
-      color: "from-cyan-bright to-teal-accent",
-    },
-    {
-      pillar: "Operación",
-      title: "Trazabilidad y métricas",
-      desc: "Cada paso queda registrado con su input, output y latencia, listo para auditar o reprocesar.",
-      stack: ["Logs", "Métricas", "Reproceso"],
-      color: "from-tech-blue to-navy",
-    },
-  ];
-
-  return (
-    <Section id="ejemplo" eyebrow="Ejemplo end-to-end" tone="surface">
-      <SectionHeading>
-        Cómo se ven integración, automatización e IA{" "}
-        <span className="text-tech-blue">trabajando juntas</span>
-      </SectionHeading>
-      <p className="mt-4 max-w-2xl text-muted-foreground text-[15px]">
-        Un flujo de ejemplo simplificado: un pedido entrante recorre el CORE de punta a punta, tocando los
-        mismos pilares descritos arriba.
-      </p>
-
-      <ol className="mt-12 relative space-y-5 md:space-y-0 md:grid md:grid-cols-5 md:gap-4">
-        <div className="hidden md:block absolute top-7 left-[8%] right-[8%] h-px bg-gradient-to-r from-tech-blue/30 via-cyan-bright/50 to-teal-accent/30" />
-        {steps.map((s, i) => (
-          <li key={s.title} className="relative">
-            <div className="relative p-5 rounded-2xl bg-card border border-border h-full hover:-translate-y-0.5 transition-all shadow-sm">
-              <div className="flex items-center gap-3">
-                <div
-                  className={`h-9 w-9 shrink-0 rounded-full bg-gradient-to-br ${s.color} text-white font-bold flex items-center justify-center text-sm shadow-md`}
-                >
-                  {i + 1}
-                </div>
-                <span className="text-[10px] tracking-[0.2em] uppercase font-semibold text-tech-blue">
-                  {s.pillar}
-                </span>
-              </div>
-              <h3 className="mt-4 text-[15px] font-semibold text-foreground leading-snug">{s.title}</h3>
-              <p className="mt-2 text-[13px] text-muted-foreground leading-relaxed">{s.desc}</p>
-              <div className="mt-4 flex flex-wrap gap-1.5">
-                {s.stack.map((t) => (
-                  <span
-                    key={t}
-                    className="px-2 py-0.5 rounded-md bg-muted text-[10.5px] font-mono text-foreground/75 border border-border"
-                  >
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </li>
-        ))}
-      </ol>
-
-      <p className="mt-8 text-center text-[12px] text-muted-foreground">
-        Mismo patrón aplicable a onboarding, facturación, soporte interno, conciliaciones y más.
-      </p>
-    </Section>
-  );
-}
-
-/* ───────────────────────── CASES ───────────────────────── */
-
-function Cases() {
-  const cases = [
-    { title: "Automatización de activaciones y facturación",
-      problem: "Procesos manuales de validación, activación y facturación con alto volumen operativo.",
-      solution: "Automatización de controles, generación de archivos, validación de inconsistencias e integración con sistemas internos.",
-      impact: "Menor carga operativa, reducción de errores y mayor trazabilidad." },
-    { title: "Agente de IA para consulta de conocimiento interno",
-      problem: "Información dispersa en documentos, reuniones y procedimientos difíciles de consultar.",
-      solution: "Agente de IA conectado a una base de conocimiento, capaz de responder preguntas y guiar usuarios.",
-      impact: "Mejor acceso al conocimiento, capacitación más rápida y menor dependencia de referentes clave." },
-    { title: "Integración de plataformas empresariales",
-      problem: "Sistemas aislados, procesos duplicados y planillas manuales.",
-      solution: "Integración mediante APIs, bases de datos, automatizaciones y backend de soporte.",
-      impact: "Flujo de información más confiable, menos reprocesos y mejor control operativo." },
-    { title: "Prototipado funcional desde relevamientos",
-      problem: "Las necesidades del negocio tardan en convertirse en soluciones visibles.",
-      solution: "Pipeline que transforma relevamientos, reuniones y documentación en prototipos funcionales validables.",
-      impact: "Menor tiempo entre idea, validación y evolución de producto." },
-  ];
-
-  return (
-    <Section id="casos" eyebrow="Casos de uso" tone="surface">
-      <SectionHeading>
-        Resultados sobre <span className="text-tech-blue">procesos reales</span>
-      </SectionHeading>
-      <div className="mt-12 grid md:grid-cols-2 gap-6">
-        {cases.map((c, i) => (
-          <article key={c.title} className="p-7 rounded-2xl bg-card border border-border hover:border-tech-blue/40 transition">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] tracking-[0.25em] uppercase text-tech-blue font-semibold">Caso 0{i+1}</span>
-              <LineChart className="h-4 w-4 text-tech-blue/60" />
-            </div>
-            <h3 className="mt-3 text-lg font-semibold text-foreground">{c.title}</h3>
-            <dl className="mt-5 space-y-3 text-sm">
-              <CaseRow label="Problema" value={c.problem} />
-              <CaseRow label="Solución" value={c.solution} />
-              <CaseRow label="Impacto" value={c.impact} accent />
-            </dl>
-          </article>
-        ))}
-      </div>
-    </Section>
-  );
-}
-function CaseRow({ label, value, accent = false }: { label: string; value: string; accent?: boolean }) {
-  return (
-    <div className="grid grid-cols-[100px_1fr] gap-3 items-start">
-      <dt className={`text-[11px] uppercase tracking-wider font-semibold pt-0.5 ${accent ? "text-teal-accent" : "text-muted-foreground"}`}>{label}</dt>
-      <dd className="text-foreground/85 leading-relaxed">{value}</dd>
-    </div>
-  );
-}
-
-/* ───────────────────────── SECTORS ───────────────────────── */
-
-function Sectors() {
-  const sectors = [
-    "Retail", "Servicios corporativos", "Operaciones administrativas",
-    "Plataformas web", "Integración de datos", "Procesos de facturación",
-    "Back-office", "Logística",
-  ];
-  return (
-    <Section id="experiencia" eyebrow="Áreas de aplicación">
-      <SectionHeading>
-        Experiencia en procesos críticos y <span className="text-tech-blue">operaciones empresariales</span>
-      </SectionHeading>
-      <p className="mt-4 max-w-2xl text-muted-foreground text-[15px]">
-        Trabajamos sobre procesos administrativos, operativos y de gestión que combinan sistemas,
-        datos y personas: activaciones, validaciones, facturación, reportes e integraciones.
-      </p>
-      <div className="mt-10 flex flex-wrap gap-2.5">
-        {sectors.map((s) => (
-          <span key={s} className="px-4 py-2 rounded-full border border-border bg-card text-sm font-medium text-foreground/80 hover:border-tech-blue hover:text-tech-blue transition">
-            {s}
-          </span>
-        ))}
-      </div>
-    </Section>
-  );
-}
-
-/* ───────────────────────── PROCESS ───────────────────────── */
-
-function Process() {
-  const steps = [
-    { icon: Search, title: "Relevamos el proceso", desc: "Entendemos cómo trabaja hoy la operación, qué sistemas intervienen y dónde están los cuellos de botella." },
-    { icon: PencilRuler, title: "Diseñamos la solución", desc: "Definimos automatizaciones, integraciones, agentes IA, datos y componentes técnicos necesarios." },
-    { icon: Hammer, title: "Construimos e integramos", desc: "Implementamos soluciones mantenibles, conectadas a los sistemas existentes y preparadas para operar." },
-    { icon: Gauge, title: "Medimos y evolucionamos", desc: "Ajustamos, escalamos y mejoramos la solución con foco en resultados operativos." },
-  ];
-  return (
-    <Section id="proceso" eyebrow="Cómo trabajamos" tone="surface">
-      <SectionHeading>
-        Un método <span className="text-tech-blue">claro, técnico y enfocado</span> en resultados
-      </SectionHeading>
-      <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {steps.map(({ icon: Icon, title, desc }, i) => (
-          <div key={title} className="relative p-6 rounded-2xl bg-card border border-border">
-            <div className="flex items-center justify-between">
-              <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-tech-blue to-cyan-bright text-white flex items-center justify-center">
-                <Icon className="h-5 w-5" />
-              </div>
-              <span className="text-3xl font-bold text-tech-blue/15 font-display">0{i+1}</span>
-            </div>
-            <h3 className="mt-5 text-base font-semibold text-foreground">{title}</h3>
-            <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{desc}</p>
-          </div>
-        ))}
-      </div>
-    </Section>
-  );
-}
-
-/* ───────────────────────── TEAM ───────────────────────── */
-
-function Team() {
-  const team = [
-    {
-      name: "Néstor Lemo",
-      role: "Director / Ingeniería e Innovación",
-      bio: "Ingeniero en Informática y Director de AMENSG IT Automation. Especialista en automatización de procesos, integración de sistemas empresariales y soluciones basadas en inteligencia artificial generativa.",
-      tag: null as string | null,
-      seed: 1,
-    },
-    {
-      name: "Liber",
-      role: "Socio / Tecnología y Proyectos",
-      bio: "Perfil técnico orientado al desarrollo, implementación y evolución de soluciones tecnológicas empresariales.",
-      tag: "Rol a validar",
-      seed: 2,
-    },
-    {
-      name: "Jorge",
-      role: "Socio / Operaciones y Gestión",
-      bio: "Perfil orientado a gestión operativa, coordinación y continuidad de servicios tecnológicos.",
-      tag: "Rol a validar",
-      seed: 3,
-    },
-  ];
-
-  return (
-    <Section id="equipo" eyebrow="Equipo">
-      <SectionHeading>
-        Un equipo técnico con foco en <span className="text-tech-blue">procesos reales</span>
-      </SectionHeading>
-      <p className="mt-4 max-w-2xl text-muted-foreground text-[15px]">
-        AMENSG combina experiencia en ingeniería informática, desarrollo de software, integración, automatización
-        e inteligencia artificial aplicada a empresas.
-      </p>
-      <div className="mt-12 grid md:grid-cols-3 gap-6">
-        {team.map((m) => (
-          <article key={m.name} className="p-6 rounded-2xl bg-card border border-border hover:border-tech-blue/40 transition">
-            <Avatar seed={m.seed} />
-            <h3 className="mt-5 text-lg font-semibold text-foreground">{m.name}</h3>
-            <p className="text-sm text-tech-blue font-medium">{m.role}</p>
-            <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{m.bio}</p>
-            {m.tag && (
-              <span className="mt-4 inline-block text-[10px] uppercase tracking-wider font-semibold px-2.5 py-1 rounded-full bg-cyan-bright/10 text-tech-blue border border-cyan-bright/30">
-                {m.tag}
+      <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-5 md:px-8 lg:grid-cols-2 lg:gap-10">
+        <Reveal>
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1.5 text-[11px] font-medium tracking-wide text-white/75">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inset-0 animate-ping rounded-full bg-[#20E0B2] opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-[#20E0B2]" />
               </span>
-            )}
-          </article>
-        ))}
-      </div>
-    </Section>
-  );
-}
-
-function Avatar({ seed }: { seed: number }) {
-  // Abstract geometric avatar — no real photos
-  const palettes = [
-    ["oklch(0.58 0.18 253)", "oklch(0.78 0.15 220)"],
-    ["oklch(0.30 0.09 252)", "oklch(0.82 0.15 175)"],
-    ["oklch(0.78 0.15 220)", "oklch(0.82 0.15 175)"],
-  ];
-  const [c1, c2] = palettes[(seed - 1) % palettes.length];
-  return (
-    <div className="h-16 w-16 rounded-2xl relative overflow-hidden">
-      <svg viewBox="0 0 64 64" className="absolute inset-0 h-full w-full">
-        <defs>
-          <linearGradient id={`g${seed}`} x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor={c1} />
-            <stop offset="1" stopColor={c2} />
-          </linearGradient>
-        </defs>
-        <rect width="64" height="64" rx="14" fill={`url(#g${seed})`} />
-        <g fill="none" stroke="white" strokeOpacity="0.55" strokeWidth="1.4">
-          <circle cx="22" cy="26" r="6" />
-          <circle cx="44" cy="38" r="6" />
-          <line x1="22" y1="26" x2="44" y2="38" />
-          <line x1="22" y1="26" x2="44" y2="14" />
-          <circle cx="44" cy="14" r="3" fill="white" fillOpacity="0.6" stroke="none" />
-        </g>
-      </svg>
-    </div>
-  );
-}
-
-/* ───────────────────────── TECH ───────────────────────── */
-
-function Tech() {
-  const tech = ["OpenAI", "n8n", "SAP", "APIs", "Bases de datos", "Java", "Web Apps", "RAG", "Embeddings", "Qdrant", "Google Workspace", "WhatsApp", "Microsoft Teams"];
-  return (
-    <Section id="tecnologias" eyebrow="Tecnologías" tone="surface">
-      <SectionHeading>
-        Stack para <span className="text-tech-blue">soluciones empresariales</span>
-      </SectionHeading>
-      <div className="mt-10 flex flex-wrap gap-2.5">
-        {tech.map((t) => (
-          <span key={t} className="px-4 py-2 rounded-lg bg-card border border-border text-sm font-medium text-foreground/85 hover:border-tech-blue hover:text-tech-blue transition">
-            {t}
-          </span>
-        ))}
-      </div>
-    </Section>
-  );
-}
-
-/* ───────────────────────── FINAL CTA ───────────────────────── */
-
-function FinalCTA() {
-  return (
-    <section className="py-20 md:py-24 px-5 sm:px-8">
-      <div className="relative mx-auto max-w-6xl rounded-3xl bg-gradient-to-br from-navy-deep via-navy to-tech-blue/80 text-white p-10 md:p-16 overflow-hidden">
-        <div className="absolute inset-0 bg-grid opacity-25" />
-        <div className="absolute -top-24 -right-24 h-80 w-80 rounded-full bg-cyan-bright/30 blur-3xl" />
-        <div className="relative max-w-2xl">
-          <h2 className="text-3xl md:text-4xl font-bold leading-tight">
-            ¿Qué proceso de tu empresa <span className="text-gradient-cyan">podríamos automatizar?</span>
-          </h2>
-          <p className="mt-5 text-white/75 text-[15px] md:text-base leading-relaxed">
-            Podemos ayudarte a identificar oportunidades concretas de automatización, integración o
-            aplicación de IA en procesos operativos existentes.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <a href="#contacto" className="inline-flex items-center gap-2 h-12 px-6 rounded-full bg-white text-navy-deep font-semibold hover:bg-cyan-bright transition">
-              Solicitar diagnóstico <ArrowRight className="h-4 w-4" />
-            </a>
-            <a
-              href="https://wa.me/59898809241"
-              target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 h-12 px-6 rounded-full border border-white/25 text-white hover:bg-white/10 transition font-medium"
-            >
-              <MessageCircle className="h-4 w-4" /> Escribir por WhatsApp
-            </a>
+              DESDE 2011 · MONTEVIDEO, URUGUAY
+            </div>
+            <p className="mt-7 text-[11px] font-semibold uppercase tracking-[2.2px] text-[#19C3FF]">— AI-POWERED AUTOMATION</p>
+            <h1 className="mt-3 font-extrabold text-white tracking-[-0.025em] leading-[1.02]" style={{ fontSize: "clamp(44px, 6.4vw, 80px)" }}>
+              Ingeniería de automatización para empresas en operación.
+            </h1>
+            <p className="mt-7 max-w-xl text-[17px] leading-relaxed text-white/65">
+              Diseñamos, construimos y mantenemos sistemas empresariales, integraciones y agentes de inteligencia artificial. Desde 2011.
+            </p>
+            <div className="mt-9 flex flex-wrap items-center gap-3">
+              <a href="#servicios" className="inline-flex h-12 items-center gap-2 rounded-full px-6 text-sm font-semibold text-white shadow-[0_10px_30px_-10px_rgba(25,195,255,0.6)] transition-transform hover:-translate-y-0.5"
+                style={{ background: "linear-gradient(135deg, #0B1F3A 0%, #1769E0 100%)" }}>
+                Conocer servicios <ArrowRight className="h-4 w-4" />
+              </a>
+              <a href="#casos" className="inline-flex h-12 items-center rounded-full border border-white/15 px-6 text-sm font-semibold text-white hover:bg-white/5 transition-colors">
+                Ver casos
+              </a>
+            </div>
           </div>
+        </Reveal>
+
+        <Reveal delay={120} className="lg:pl-4">
+          <AppMockup />
+        </Reveal>
+      </div>
+
+      <style>{`
+        @keyframes meshFloat {
+          0%,100% { transform: translate(0,0) scale(1); }
+          50% { transform: translate(30px,-20px) scale(1.08); }
+        }
+      `}</style>
+    </section>
+  );
+}
+
+/* ──────────────────────── Servicios ───────────────────── */
+function Servicios() {
+  const items = [
+    { icon: Workflow, title: "Automatización de procesos",
+      text: "Automatizamos tareas operativas e integración entre sistemas, de RPA a orquestadores con IA." },
+    { icon: Bot, title: "Agentes de IA",
+      text: "Asistentes conversacionales, agentes de voz y soluciones de IA generativa para procesos reales." },
+    { icon: Network, title: "Integración de sistemas",
+      text: "Conectamos ERPs, bases de datos, APIs y plataformas corporativas en flujos mantenibles." },
+  ];
+  return (
+    <section id="servicios" className="bg-[#F5F7FA] py-24 md:py-32">
+      <div className="mx-auto max-w-7xl px-5 md:px-8">
+        <Reveal>
+          <h2 className="font-extrabold tracking-[-0.025em] text-[#0B1F3A]" style={{ fontSize: "clamp(34px,4.4vw,56px)" }}>
+            Lo que hacemos.
+          </h2>
+        </Reveal>
+        <div className="mt-14 grid gap-6 md:grid-cols-3">
+          {items.map((it, i) => (
+            <Reveal key={it.title} delay={i * 90}>
+              <div className="flex h-full flex-col rounded-2xl border border-[#0B1F3A]/10 bg-white p-8 transition-all hover:-translate-y-1 hover:border-[#19C3FF]/40 hover:shadow-[0_20px_40px_-20px_rgba(11,31,58,0.18)]">
+                <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl border border-[#0B1F3A]/10 text-[#0B1F3A]">
+                  <it.icon className="h-6 w-6" strokeWidth={1.5} />
+                </div>
+                <h3 className="mt-6 text-xl font-bold tracking-tight text-[#0B1F3A]">{it.title}</h3>
+                <p className="mt-3 text-[15px] leading-relaxed text-[#5a6a82]">{it.text}</p>
+              </div>
+            </Reveal>
+          ))}
         </div>
       </div>
     </section>
   );
 }
 
-/* ───────────────────────── CONTACT ───────────────────────── */
-
-function Contact() {
+/* ────────────────────────── Casos ─────────────────────── */
+function Chip({ children }: { children: React.ReactNode }) {
   return (
-    <Section id="contacto" eyebrow="Contacto">
-      <div className="grid lg:grid-cols-12 gap-10">
-        <div className="lg:col-span-5">
-          <h2 className="text-3xl md:text-4xl font-bold leading-tight">
-            Conversemos sobre tu <span className="text-tech-blue">proceso</span>
+    <span className="inline-flex items-center rounded-full border border-white/12 bg-white/[0.04] px-3 py-1 text-xs font-medium text-white/75">
+      {children}
+    </span>
+  );
+}
+
+function Casos() {
+  return (
+    <section id="casos" className="relative bg-[#06101F] py-24 md:py-32">
+      <div className="mx-auto max-w-7xl px-5 md:px-8">
+        <Reveal>
+          <h2 className="max-w-3xl font-extrabold tracking-[-0.025em] text-white" style={{ fontSize: "clamp(34px,4.4vw,56px)" }}>
+            Proyectos donde la ingeniería sostuvo el negocio.
           </h2>
-          <p className="mt-4 text-muted-foreground text-[15px] leading-relaxed">
-            Contanos qué sistemas usás, qué tareas querés reducir y cómo medís hoy el resultado.
-            Te respondemos con una propuesta concreta.
-          </p>
+        </Reveal>
 
-          <ul className="mt-8 space-y-4">
-            <ContactItem icon={Mail} label="Email" value="nestorlemo@gmail.com" href="mailto:nestorlemo@gmail.com" />
-            <ContactItem icon={Phone} label="WhatsApp" value="+598 98 809 241" href="https://wa.me/59898809241" />
-            <ContactItem icon={MapPin} label="Ubicación" value="Montevideo, Uruguay" />
-          </ul>
-        </div>
-        <div className="lg:col-span-7">
-          <div className="p-6 md:p-8 rounded-2xl border border-border bg-card shadow-[0_24px_60px_-30px_rgba(11,31,58,0.18)]">
-            <ContactForm />
-          </div>
+        <Reveal delay={80} className="mt-14">
+          <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 md:p-12 backdrop-blur-sm transition-colors hover:border-[#19C3FF]/30">
+            <span className="text-[11px] font-semibold uppercase tracking-[1.6px] text-[#19C3FF]">
+              SECTOR TELECOMUNICACIONES · 13+ AÑOS EN PRODUCCIÓN
+            </span>
+            <h3 className="mt-4 text-2xl md:text-3xl font-bold tracking-tight text-white">
+              Plataforma de gestión comercial para venta de servicios celulares.
+            </h3>
+            <p className="mt-5 max-w-4xl text-[15px] leading-relaxed text-white/65">
+              Plataforma integral que gestiona el ciclo completo de venta de servicios celulares por call center: captación y gestión de ventas, administración de contratos, envío de documentación y entrega de equipos a los clientes. Integra los sistemas corporativos del operador y orquesta los procesos de activación, distribución y control. Construida en Java sobre PostgreSQL, en producción desde hace más de una década.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-2">
+              <Chip>Java + PostgreSQL</Chip>
+              <Chip>Integraciones corporativas</Chip>
+              <Chip>13+ años en producción</Chip>
+            </div>
+          </article>
+        </Reveal>
+
+        <div className="mt-6 grid gap-6 md:grid-cols-2">
+          {[
+            {
+              eyebrow: "SECTOR FINANCIERO · URUGUAY Y PARAGUAY",
+              title: "Análisis de riesgo crediticio automatizado.",
+              text: "Robots que consultan fuentes oficiales de información crediticia en Uruguay y Paraguay e integran los resultados en los flujos de decisión del cliente.",
+              chips: ["RPA multi-país", "Fuentes oficiales", "Decisión automatizada"],
+            },
+            {
+              eyebrow: "SECTOR ENERGÍA",
+              title: "Agente de IA para gestión de conocimiento.",
+              text: "Agente inteligente desarrollado en un hackathon de innovación para consulta de conocimiento interno con IA generativa.",
+              chips: ["n8n + OpenAI", "RAG", "Conocimiento interno"],
+            },
+          ].map((c, i) => (
+            <Reveal key={c.title} delay={i * 90}>
+              <article className="h-full rounded-2xl border border-white/10 bg-white/[0.03] p-8 backdrop-blur-sm transition-colors hover:border-[#19C3FF]/30">
+                <span className="text-[11px] font-semibold uppercase tracking-[1.6px] text-[#19C3FF]">{c.eyebrow}</span>
+                <h3 className="mt-3 text-xl font-bold tracking-tight text-white">{c.title}</h3>
+                <p className="mt-4 text-[14.5px] leading-relaxed text-white/65">{c.text}</p>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {c.chips.map((ch) => <Chip key={ch}>{ch}</Chip>)}
+                </div>
+              </article>
+            </Reveal>
+          ))}
         </div>
       </div>
-    </Section>
+    </section>
   );
 }
 
-function ContactItem({ icon: Icon, label, value, href }: { icon: typeof Mail; label: string; value: string; href?: string }) {
-  const inner = (
-    <div className="flex items-center gap-4 group">
-      <div className="h-11 w-11 rounded-xl bg-surface text-tech-blue flex items-center justify-center group-hover:bg-tech-blue group-hover:text-white transition">
-        <Icon className="h-5 w-5" />
-      </div>
-      <div>
-        <div className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">{label}</div>
-        <div className="text-sm font-medium text-foreground">{value}</div>
-      </div>
-    </div>
-  );
-  return <li>{href ? <a href={href} target="_blank" rel="noopener noreferrer">{inner}</a> : inner}</li>;
-}
-
-/* ───────────────────────── FOOTER ───────────────────────── */
-
-function Footer() {
+/* ───────────────────────── Nosotros ───────────────────── */
+function Nosotros() {
+  const stats = [
+    { n: "2011", l: "Fundación" },
+    { n: "13+", l: "Años" },
+    { n: "2", l: "Países" },
+    { n: "6+", l: "Sectores" },
+  ];
+  const partners = [
+    { initials: "NL", name: "Néstor Lemo", role: "Director / Cofundador",
+      bio: "Ingeniero en Informática, lidera estrategia comercial, análisis de negocio y relacionamiento con clientes." },
+    { initials: "L", name: "Liber", role: "Director Técnico / Cofundador",
+      bio: "Arquitecto de software, lidera arquitectura de integraciones y desarrollo backend." },
+  ];
   return (
-    <footer className="bg-navy-deep text-white/80 pt-16 pb-8 px-5 sm:px-8 relative overflow-hidden">
-      <div className="absolute inset-0 bg-grid opacity-15" />
-      <div className="relative mx-auto max-w-7xl grid md:grid-cols-4 gap-10">
-        <div className="md:col-span-2">
-          <Logo variant="light" className="h-9 w-auto" />
-          <p className="mt-4 text-sm text-white/65 max-w-sm">
-            AI-Powered Automation. Automatización inteligente, integración de sistemas y agentes de IA
-            para procesos empresariales reales.
+    <section id="nosotros" className="bg-[#F5F7FA] py-24 md:py-32">
+      <div className="mx-auto max-w-7xl px-5 md:px-8">
+        <Reveal>
+          <h2 className="max-w-4xl font-extrabold tracking-[-0.025em] text-[#0B1F3A]" style={{ fontSize: "clamp(34px,4.4vw,56px)" }}>
+            Ingeniería al servicio del negocio, desde 2011.
+          </h2>
+          <p className="mt-7 max-w-3xl text-[17px] leading-relaxed text-[#5a6a82]">
+            Desde 2011 diseñamos, construimos y mantenemos sistemas empresariales para empresas medianas y grandes. Empezamos automatizando procesos con RPA, evolucionamos hacia plataformas en producción de largo plazo, y hoy incorporamos inteligencia artificial como evolución natural. Ingeniería con continuidad y compromiso de largo plazo.
           </p>
-        </div>
-        <div>
-          <h4 className="text-white text-sm font-semibold mb-4">Navegación</h4>
-          <ul className="space-y-2 text-sm">
-            {[
-              ["#servicios", "Servicios"],
-              ["#arquitectura", "Arquitectura"],
-              ["#casos", "Casos"],
-              ["#proceso", "Cómo trabajamos"],
-              ["#equipo", "Equipo"],
-              ["#contacto", "Contacto"],
-            ].map(([href, label]) => (
-              <li key={href}><a href={href} className="text-white/65 hover:text-cyan-bright transition">{label}</a></li>
+        </Reveal>
+
+        <Reveal delay={80}>
+          <div className="mt-14 grid grid-cols-2 gap-y-10 border-y border-[#0B1F3A]/10 py-10 md:grid-cols-4">
+            {stats.map((s) => (
+              <div key={s.l}>
+                <div className="font-extrabold tracking-[-0.03em] text-[#0B1F3A]" style={{ fontSize: "clamp(36px,4vw,56px)" }}>{s.n}</div>
+                <div className="mt-1 text-xs font-semibold uppercase tracking-[1.4px] text-[#5a6a82]">{s.l}</div>
+              </div>
             ))}
-          </ul>
-        </div>
-        <div>
-          <h4 className="text-white text-sm font-semibold mb-4">Contacto</h4>
-          <ul className="space-y-2 text-sm text-white/65">
-            <li><a href="mailto:nestorlemo@gmail.com" className="hover:text-cyan-bright transition">nestorlemo@gmail.com</a></li>
-            <li><a href="https://wa.me/59898809241" className="hover:text-cyan-bright transition">+598 98 809 241</a></li>
-            <li>Montevideo, Uruguay</li>
-          </ul>
+          </div>
+        </Reveal>
+
+        <div className="mt-14 grid gap-6 md:grid-cols-2">
+          {partners.map((p, i) => (
+            <Reveal key={p.name} delay={i * 90}>
+              <div className="flex h-full gap-5 rounded-2xl border border-[#0B1F3A]/10 bg-white p-7">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-white font-bold"
+                  style={{ background: "linear-gradient(135deg,#0B1F3A,#1769E0)" }}>
+                  {p.initials}
+                </div>
+                <div>
+                  <div className="text-base font-bold text-[#0B1F3A]">{p.name} <span className="font-medium text-[#5a6a82]">— {p.role}</span></div>
+                  <p className="mt-2 text-[14.5px] leading-relaxed text-[#5a6a82]">{p.bio}</p>
+                </div>
+              </div>
+            </Reveal>
+          ))}
         </div>
       </div>
-      <div className="relative mx-auto max-w-7xl mt-12 pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-3">
-        <p className="text-xs text-white/50">© 2026 AMENSG SRL. Todos los derechos reservados.</p>
-        <p className="text-xs text-white/40">AMENSG IT Automation · AI-Powered Automation</p>
-      </div>
-    </footer>
+    </section>
   );
 }
 
-/* ───────────────────────── PRIMITIVES ───────────────────────── */
+/* ─────────────────── Contact Form (client-side) ───────── */
+function ContactBlock() {
+  const [f, setF] = useState({ nombre: "", empresa: "", email: "", mensaje: "" });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [sent, setSent] = useState(false);
 
-function Section({
-  id, eyebrow, children, tone = "default",
-}: { id?: string; eyebrow?: string; children: React.ReactNode; tone?: "default" | "surface" | "navy" }) {
-  const bg =
-    tone === "surface" ? "bg-surface"
-    : tone === "navy"  ? "bg-navy-deep text-white relative overflow-hidden"
-    : "bg-background";
+  function validate() {
+    const e: Record<string, string> = {};
+    if (f.nombre.trim().length < 2) e.nombre = "Ingresá tu nombre.";
+    if (f.empresa.trim().length < 1) e.empresa = "Ingresá tu empresa.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) e.email = "Email inválido.";
+    if (f.mensaje.trim().length < 10) e.mensaje = "Contanos brevemente tu caso.";
+    return e;
+  }
+  function submit(ev: React.FormEvent) {
+    ev.preventDefault();
+    const e = validate();
+    setErrors(e);
+    if (Object.keys(e).length === 0) {
+      setSent(true);
+      setF({ nombre: "", empresa: "", email: "", mensaje: "" });
+    }
+  }
+
+  const inp = "w-full h-11 rounded-lg border border-white/10 bg-white/[0.04] px-4 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#19C3FF] focus:ring-2 focus:ring-[#19C3FF]/30 transition";
+  const lbl = "block text-[11px] font-semibold uppercase tracking-[1.2px] text-white/60 mb-1.5";
+
   return (
-    <section id={id} className={`${bg} py-20 md:py-28 px-5 sm:px-8`}>
-      {tone === "navy" && <div className="absolute inset-0 bg-grid opacity-20 pointer-events-none" />}
-      <div className="relative mx-auto max-w-7xl">
-        {eyebrow && (
-          <div className={`inline-flex items-center gap-2 text-[11px] tracking-[0.25em] uppercase font-semibold ${
-            tone === "navy" ? "text-cyan-bright" : "text-tech-blue"
-          }`}>
-            <span className="h-px w-8 bg-current opacity-60" />
-            {eyebrow}
+    <div className="grid gap-12 lg:grid-cols-2">
+      <form onSubmit={submit} className="space-y-4" noValidate>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="block">
+            <span className={lbl}>Nombre</span>
+            <input className={inp} value={f.nombre} onChange={(e) => setF({ ...f, nombre: e.target.value })} placeholder="Tu nombre" />
+            {errors.nombre && <span className="mt-1 block text-xs text-red-400">{errors.nombre}</span>}
+          </label>
+          <label className="block">
+            <span className={lbl}>Empresa</span>
+            <input className={inp} value={f.empresa} onChange={(e) => setF({ ...f, empresa: e.target.value })} placeholder="Tu empresa" />
+            {errors.empresa && <span className="mt-1 block text-xs text-red-400">{errors.empresa}</span>}
+          </label>
+        </div>
+        <label className="block">
+          <span className={lbl}>Email</span>
+          <input type="email" className={inp} value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} placeholder="nombre@empresa.com" />
+          {errors.email && <span className="mt-1 block text-xs text-red-400">{errors.email}</span>}
+        </label>
+        <label className="block">
+          <span className={lbl}>Mensaje</span>
+          <textarea rows={5} className={`${inp} h-auto py-3 resize-y`} value={f.mensaje} onChange={(e) => setF({ ...f, mensaje: e.target.value })}
+            placeholder="Contanos brevemente tu caso." />
+          {errors.mensaje && <span className="mt-1 block text-xs text-red-400">{errors.mensaje}</span>}
+        </label>
+        <button type="submit"
+          className="inline-flex h-12 items-center gap-2 rounded-full px-6 text-sm font-semibold text-white shadow-[0_10px_30px_-10px_rgba(25,195,255,0.6)] hover:-translate-y-0.5 transition-transform"
+          style={{ background: "linear-gradient(135deg,#0B1F3A 0%, #1769E0 100%)" }}>
+          Enviar consulta
+        </button>
+        {sent && (
+          <div className="flex items-start gap-2 rounded-lg border border-[#20E0B2]/40 bg-[#20E0B2]/10 px-4 py-3 text-sm text-white">
+            <CheckCircle2 className="mt-0.5 h-4 w-4 text-[#20E0B2]" />
+            Gracias. Recibimos tu mensaje y te respondemos a la brevedad.
           </div>
         )}
-        {children}
+        {!sent && Object.keys(errors).length > 0 && (
+          <div className="flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/5 px-4 py-3 text-xs text-white/70">
+            <AlertCircle className="mt-0.5 h-4 w-4 text-red-400" />
+            Revisá los campos marcados.
+          </div>
+        )}
+      </form>
+
+      <div className="space-y-6">
+        <div>
+          <h3 className="text-2xl font-bold tracking-tight text-white">Hablemos.</h3>
+          <p className="mt-3 text-[15px] leading-relaxed text-white/65">
+            Contanos qué proceso querés mejorar. Te respondemos en menos de 24 horas hábiles.
+          </p>
+        </div>
+        <div className="space-y-3">
+          <a href="mailto:contacto@amensg.com" className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-5 py-4 hover:border-[#19C3FF]/40 transition-colors">
+            <Mail className="h-5 w-5 text-[#19C3FF]" />
+            <span className="text-sm text-white">contacto@amensg.com</span>
+          </a>
+          <a href="https://wa.me/59898809241" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-5 py-4 hover:border-[#19C3FF]/40 transition-colors">
+            <MessageCircle className="h-5 w-5 text-[#20E0B2]" />
+            <span className="text-sm text-white">WhatsApp +598 98 809 241</span>
+          </a>
+          <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-5 py-4">
+            <MapPin className="h-5 w-5 text-white/60" />
+            <span className="text-sm text-white/80">Montevideo, Uruguay</span>
+          </div>
+        </div>
       </div>
+    </div>
+  );
+}
+
+/* ─────────────── Tecnologías + Contacto + Footer ──────── */
+function TechContactFooter() {
+  const techs = ["Java", "PostgreSQL", "n8n", "OpenAI", "AWS", "GitHub", "APIs REST", "SQL/NoSQL", "AutoHotkey"];
+  return (
+    <section id="contacto" className="bg-[#06101F] pt-24 md:pt-32">
+      <div className="mx-auto max-w-7xl px-5 md:px-8">
+        <Reveal>
+          <p className="text-[11px] font-semibold uppercase tracking-[2px] text-[#19C3FF]">— TECNOLOGÍAS</p>
+          <h2 className="mt-3 font-extrabold tracking-[-0.025em] text-white" style={{ fontSize: "clamp(28px,3.4vw,44px)" }}>
+            El stack con el que construimos.
+          </h2>
+          <div className="mt-7 flex flex-wrap gap-2.5">
+            {techs.map((t) => (
+              <span key={t} className="rounded-full border border-white/12 bg-white/[0.04] px-4 py-2 text-sm font-medium text-white/80">
+                {t}
+              </span>
+            ))}
+          </div>
+        </Reveal>
+
+        <div className="mt-20 md:mt-28">
+          <Reveal>
+            <ContactBlock />
+          </Reveal>
+        </div>
+      </div>
+
+      <footer className="mt-24 border-t border-white/5 py-8">
+        <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-4 px-5 md:flex-row md:items-center md:px-8">
+          <LogoMark />
+          <p className="text-xs text-white/50">© 2026 AMENSG SRL — Montevideo, Uruguay. Desde 2011.</p>
+        </div>
+      </footer>
     </section>
   );
 }
 
-function SectionHeading({ children, invert = false }: { children: React.ReactNode; invert?: boolean }) {
+/* ──────────────────────── Landing ─────────────────────── */
+function LandingPage() {
   return (
-    <h2 className={`mt-4 text-3xl md:text-4xl lg:text-[2.6rem] font-bold leading-[1.15] max-w-3xl ${invert ? "text-white" : "text-foreground"}`}>
-      {children}
-    </h2>
+    <div className="min-h-screen bg-[#06101F]" style={{ fontFamily: "'Inter', ui-sans-serif, system-ui, sans-serif" }}>
+      <SiteHeader />
+      <main>
+        <Hero />
+        <Servicios />
+        <Casos />
+        <Nosotros />
+        <TechContactFooter />
+      </main>
+
+      {/* Floating WhatsApp */}
+      <a
+        href="https://wa.me/59898809241"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Contactar por WhatsApp"
+        className="fixed bottom-6 right-6 z-40 inline-flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_15px_40px_-10px_rgba(37,211,102,0.7)] hover:scale-105 transition-transform"
+      >
+        <MessageCircle className="h-7 w-7" />
+      </a>
+    </div>
   );
 }
