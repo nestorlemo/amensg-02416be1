@@ -178,9 +178,17 @@ function WorkflowScene() {
   // map node index in `order` to which edge lights up after entering it
   const litEdges = step; // number of lit edges so far (0..4)
 
+  // Logical canvas
+  const CW = 620;
+  const CH = 270;
+  const X = (px: number) => `${((px / CW) * 100).toFixed(3)}%`;
+  const Y = (py: number) => `${((py / CH) * 100).toFixed(3)}%`;
+  const W = (w: number) => `${((w / CW) * 100).toFixed(3)}%`;
+
   return (
-    <div className="relative h-full p-5">
-      <svg className="absolute inset-0 h-full w-full pointer-events-none" preserveAspectRatio="none">
+    <div className="flex h-full items-center justify-center px-3">
+      <div className="relative w-full max-w-[620px]" style={{ aspectRatio: `${CW} / ${CH}` }}>
+      <svg className="absolute inset-0 h-full w-full pointer-events-none" viewBox={`0 0 ${CW} ${CH}`} preserveAspectRatio="none">
         {(() => {
           const paths = [
             "M 96 123 C 120 123, 150 123, 147 123",
@@ -193,7 +201,7 @@ function WorkflowScene() {
           return (
             <>
               {paths.map((d, i) => (
-                <path key={i} d={d} stroke="rgba(255,255,255,0.13)" strokeWidth="1.8" fill="none" />
+                <path key={i} d={d} stroke="rgba(255,255,255,0.13)" strokeWidth="1.8" fill="none" vectorEffect="non-scaling-stroke" />
               ))}
               {[paths[0], paths[1], paths[2], paths[4]].map((d, i) => (
                 <path
@@ -202,6 +210,7 @@ function WorkflowScene() {
                   stroke="#19C3FF"
                   strokeWidth="1.8"
                   fill="none"
+                  vectorEffect="non-scaling-stroke"
                   style={{ opacity: i < litEdges ? 1 : 0, transition: "opacity 0.6s ease" }}
                 />
               ))}
@@ -220,10 +229,11 @@ function WorkflowScene() {
         return (
           <div
             key={n.id}
-            className="absolute w-[78px] transition-all duration-300"
+            className="absolute transition-all duration-300"
             style={{
-              left: n.x,
-              top: n.y,
+              left: X(n.x),
+              top: Y(n.y),
+              width: W(78),
               opacity: visible ? 1 : 0,
               transform: visible ? "scale(1)" : "scale(0.8)",
             }}
@@ -267,24 +277,25 @@ function WorkflowScene() {
       {/* branch labels */}
       <div
         className="absolute text-[8px] font-semibold px-1.5 py-0.5 rounded text-[#20E0B2] bg-[#20E0B2]/15 transition-opacity"
-        style={{ left: 340, top: 74, opacity: step >= 3 ? 1 : 0 }}
+        style={{ left: X(340), top: Y(74), opacity: step >= 3 ? 1 : 0 }}
       >
         true
       </div>
       <div
         className="absolute text-[8px] font-semibold px-1.5 py-0.5 rounded text-[#7088a8] bg-white/[0.06] transition-opacity"
-        style={{ left: 340, top: 200, opacity: step >= 3 ? 1 : 0 }}
+        style={{ left: X(340), top: Y(200), opacity: step >= 3 ? 1 : 0 }}
       >
         false
       </div>
 
       {/* sub: OpenAI under w2 */}
       <div
-        className="absolute w-12 transition-opacity duration-300"
-        style={{ left: 253, top: 215, opacity: step >= 2 ? 1 : 0 }}
+        className="absolute transition-opacity duration-300"
+        style={{ left: X(253), top: Y(215), width: W(48), opacity: step >= 2 ? 1 : 0 }}
       >
         <div className="mx-auto flex h-9 w-9 items-center justify-center rounded-[10px] border border-white/10 bg-white/[0.04] text-sm text-[#7e9fc4]">◎</div>
         <div className="mt-0.5 text-center text-[8px] text-[#7088a8]">OpenAI</div>
+      </div>
       </div>
     </div>
   );
