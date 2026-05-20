@@ -330,15 +330,15 @@ function Nosotros() {
         <div className="mt-14 grid gap-6 md:grid-cols-2">
           {partners.map((p, i) => (
             <Reveal key={p.name} delay={i * 90}>
-              <div className="flex h-full gap-3 rounded-2xl border border-[#0B1F3A]/10 bg-white p-4 sm:gap-5 sm:p-7">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[13px] font-bold text-white sm:h-14 sm:w-14 sm:text-base"
+              <div className="flex h-full gap-3 rounded-2xl border border-[#0B1F3A]/10 bg-white p-4 sm:gap-4 sm:p-5 md:gap-5 md:p-7">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[13px] font-bold text-white sm:h-12 sm:w-12 sm:text-sm md:h-14 md:w-14 md:text-base"
                   style={{ background: "linear-gradient(135deg,#0B1F3A,#1769E0)" }}>
                   {p.initials}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="text-[15px] font-bold leading-snug text-[#0B1F3A] sm:text-base sm:leading-tight">{p.name}</div>
-                  <div className="mt-0.5 text-[13px] font-medium text-[#5a6a82] sm:text-sm">{p.role}</div>
-                  <p className="mt-1.5 text-[13.5px] leading-snug text-[#5a6a82] sm:mt-2 sm:text-[14.5px] sm:leading-relaxed">{p.bio}</p>
+                  <div className="text-[15px] font-bold leading-snug text-[#0B1F3A] [overflow-wrap:anywhere] sm:text-[15.5px] md:text-base md:leading-tight">{p.name}</div>
+                  <div className="mt-0.5 text-[13px] font-medium text-[#5a6a82] sm:text-[13.5px] md:mt-1 md:text-sm">{p.role}</div>
+                  <p className="mt-1.5 text-[13.5px] leading-snug text-[#5a6a82] [text-wrap:pretty] sm:text-[14px] md:mt-2 md:text-[14.5px] md:leading-relaxed">{p.bio}</p>
                 </div>
               </div>
             </Reveal>
