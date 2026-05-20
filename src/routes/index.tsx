@@ -301,8 +301,8 @@ function Nosotros() {
   const partners = [
     { initials: "NL", name: "Néstor Lemo", role: "Director / Cofundador",
       bio: "Ingeniero en Informática, lidera estrategia comercial y análisis de negocio." },
-    { initials: "LB", name: "Liber Batalla", role: "Ingeniero de Sistemas / Director Técnico / Cofundador",
-      bio: "Arquitecto de software, lidera arquitectura de integraciones y desarrollo backend." },
+    { initials: "LB", name: "Liber Batalla", role: "Director Técnico / Cofundador",
+      bio: "Ingeniero de Sistemas, lidera arquitectura de integraciones y desarrollo backend." },
   ];
   return (
     <section id="nosotros" className="bg-[#F5F7FA] py-24 md:py-32">
