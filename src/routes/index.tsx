@@ -246,13 +246,12 @@ function Casos() {
               SECTOR TELECOMUNICACIONES · 13+ AÑOS EN PRODUCCIÓN
             </span>
             <h3 className="mt-4 text-2xl md:text-3xl font-bold tracking-tight text-white">
-              Plataforma de gestión comercial para venta de servicios celulares.
+              Plataforma de gestión comercial para venta de servicios de telefonía móvil.
             </h3>
             <p className="mt-5 max-w-4xl text-[15px] leading-relaxed text-white/65">
-              Plataforma integral que gestiona el ciclo completo de venta de servicios celulares por call center: captación y gestión de ventas, administración de contratos, envío de documentación y entrega de equipos a los clientes. Integra los sistemas corporativos del operador y orquesta los procesos de activación, distribución y control. Construida en Java sobre PostgreSQL, en producción desde hace más de una década.
+              Plataforma integral que gestiona el ciclo completo de venta de servicios de telefonía móvil por call center: captación y gestión de ventas, administración de contratos, envío de documentación y entrega de equipos a los clientes. Integra los sistemas corporativos del operador y orquesta los procesos de activación, distribución y control. En producción desde hace más de una década.
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
-              <Chip>Java + PostgreSQL</Chip>
               <Chip>Integraciones corporativas</Chip>
               <Chip>13+ años en producción</Chip>
             </div>
