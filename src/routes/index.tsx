@@ -257,7 +257,7 @@ function Problemas() {
         <Reveal>
           <Eyebrow>Problemas que resolvemos</Eyebrow>
           <h2 className="mt-3 max-w-3xl font-extrabold tracking-[-0.025em] text-white" style={{ fontSize: "clamp(32px,4.2vw,52px)" }}>
-            Encontramos oportunidad donde otros ven fricción.
+            Convertimos procesos en ventajas reales.
           </h2>
         </Reveal>
 
