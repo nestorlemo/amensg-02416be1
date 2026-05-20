@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, useRef } from "react";
 import {
   Menu, X, ArrowRight, Workflow, Bot, Network, Mail, MapPin,
-  MessageCircle, CheckCircle2, AlertCircle,
+  CheckCircle2, AlertCircle,
 } from "lucide-react";
 import { DynamicMockup } from "@/components/amensg/DynamicMockup";
 
@@ -433,10 +433,6 @@ function ContactBlock() {
             <Mail className="h-5 w-5 text-[#19C3FF]" />
             <span className="text-sm text-white">contacto@amensg.com</span>
           </a>
-          <a href="https://wa.me/59898809241" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-5 py-4 hover:border-[#19C3FF]/40 transition-colors">
-            <MessageCircle className="h-5 w-5 text-[#20E0B2]" />
-            <span className="text-sm text-white">WhatsApp +598 98 809 241</span>
-          </a>
           <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-5 py-4">
             <MapPin className="h-5 w-5 text-white/60" />
             <span className="text-sm text-white/80">Montevideo, Uruguay</span>
@@ -497,16 +493,6 @@ function LandingPage() {
         <TechContactFooter />
       </main>
 
-      {/* Floating WhatsApp */}
-      <a
-        href="https://wa.me/59898809241"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Contactar por WhatsApp"
-        className="fixed bottom-6 right-6 z-40 inline-flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_15px_40px_-10px_rgba(37,211,102,0.7)] hover:scale-105 transition-transform"
-      >
-        <MessageCircle className="h-7 w-7" />
-      </a>
     </div>
   );
 }
