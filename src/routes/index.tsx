@@ -206,35 +206,43 @@ function Services() {
 function Architecture() {
   const pillars = [
     {
-      title: "Integración con sistemas existentes",
+      ref: "Entrada del flujo",
+      refDetail: "ERP · BD · Web · WhatsApp → CORE",
+      title: "Cómo entran los datos al CORE",
       icon: Plug,
       color: "from-tech-blue to-cyan-bright",
-      desc: "Conectamos ERPs, bases de datos, APIs y archivos sin reemplazar lo que ya funciona.",
-      deliverable: "Conectores, APIs y sincronizaciones estables y documentadas.",
+      desc: "Habilitamos el primer tramo del diagrama: que cada sistema que ya usás pueda dialogar con AMENSG sin migraciones forzadas.",
+      deliverable: "Conectores, APIs intermedias y sincronizaciones documentadas para cada origen.",
       tags: ["REST / GraphQL", "SAP", "SQL", "CSV / Excel", "Webhooks"],
     },
     {
-      title: "Motor de automatización",
+      ref: "Nodo · Orquestación",
+      refDetail: "Pieza central del CORE",
+      title: "Qué hay dentro del nodo Orquestación",
       icon: Workflow,
       color: "from-cyan-bright to-teal-accent",
-      desc: "Flujos versionados con reintentos, control de errores y manejo de excepciones reales.",
-      deliverable: "Workflows productivos con logs, alertas y reproceso controlado.",
+      desc: "El nodo de orquestación del CORE no es una caja mágica: son flujos versionados con reintentos, manejo de excepciones y reproceso.",
+      deliverable: "Workflows productivos con logs, alertas, idempotencia y control de reintentos.",
       tags: ["n8n", "Workers", "Colas", "Jobs programados"],
     },
     {
-      title: "IA aplicada al proceso",
+      ref: "Nodo · Agentes de IA",
+      refDetail: "Pieza superior del CORE",
+      title: "Qué hay dentro del nodo Agentes de IA",
       icon: Brain,
       color: "from-teal-accent to-tech-blue",
-      desc: "Agentes y modelos integrados al flujo, no asistentes sueltos: ejecutan acciones reales.",
-      deliverable: "Agentes con herramientas, RAG sobre datos propios y evaluación medible.",
+      desc: "Los agentes del CORE no responden por responder: usan herramientas reales del flujo para consultar datos y disparar acciones.",
+      deliverable: "Agentes con tools sobre tus APIs, RAG sobre datos propios y métricas de calidad.",
       tags: ["OpenAI", "RAG", "Agentes con tools", "Embeddings"],
     },
     {
-      title: "Operación y calidad",
+      ref: "Salida del flujo",
+      refDetail: "Sostiene los resultados operativos",
+      title: "Cómo sostenemos los resultados en el tiempo",
       icon: ShieldCheck,
       color: "from-tech-blue to-navy",
-      desc: "Construimos para mantener: trazabilidad, control de cambios y entornos separados.",
-      deliverable: "Observabilidad, control de versiones, despliegues controlados y handover claro.",
+      desc: "Los resultados del lado derecho del diagrama sólo se mantienen si la solución es observable, versionada y transferible.",
+      deliverable: "Observabilidad, control de versiones, entornos separados y handover documentado.",
       tags: ["Logs y métricas", "Git / CI-CD", "Dev / Prod", "Documentación"],
     },
   ];
@@ -242,12 +250,12 @@ function Architecture() {
   return (
     <Section id="arquitectura" eyebrow="Cómo construimos" tone="navy">
       <SectionHeading invert>
-        Cuatro pilares técnicos detrás de cada{" "}
-        <span className="text-gradient-cyan">solución productiva</span>
+        Cada pilar es una parte concreta del{" "}
+        <span className="text-gradient-cyan">diagrama AMENSG CORE</span>
       </SectionHeading>
       <p className="mt-4 max-w-2xl text-white/70 text-[15px]">
-        No vendemos demos: entregamos software mantenible, integrado con tu operación y preparado para crecer
-        sin volverse una caja negra.
+        Tomamos los nodos y flechas del diagrama y mostramos qué construimos en cada uno: nada de capas
+        decorativas, sólo el trabajo real detrás de que funcione en producción.
       </p>
 
       <div className="mt-12 grid md:grid-cols-2 gap-5">
@@ -258,6 +266,13 @@ function Architecture() {
               key={p.title}
               className="group relative p-6 md:p-7 rounded-2xl glass-card hover:-translate-y-0.5 transition-all"
             >
+              <div className="flex items-center justify-between gap-3 mb-4">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cyan-bright/10 border border-cyan-bright/30 text-[10px] tracking-[0.18em] uppercase text-cyan-bright font-semibold">
+                  {p.ref}
+                </span>
+                <span className="text-[11px] text-white/45 truncate">{p.refDetail}</span>
+              </div>
+
               <div className="flex items-start gap-4">
                 <div
                   className={`h-12 w-12 shrink-0 rounded-xl bg-gradient-to-br ${p.color} flex items-center justify-center text-white shadow-lg`}
