@@ -204,55 +204,89 @@ function Services() {
 /* ───────────────────────── ARCHITECTURE ───────────────────────── */
 
 function Architecture() {
-  const layers = [
-    { title: "Canales", color: "from-tech-blue to-cyan-bright", icon: MessageCircle,
-      items: ["Web", "WhatsApp", "Teams", "Email"] },
-    { title: "Orquestación", color: "from-cyan-bright to-teal-accent", icon: Workflow,
-      items: ["n8n", "Backend", "APIs"] },
-    { title: "Inteligencia", color: "from-teal-accent to-tech-blue", icon: Cpu,
-      items: ["OpenAI", "RAG", "Agentes IA", "Embeddings"] },
-    { title: "Sistemas", color: "from-tech-blue to-navy", icon: Database,
-      items: ["SAP", "Bases de datos", "Plataformas internas", "Archivos", "Reportes"] },
-    { title: "Resultado", color: "from-teal-accent to-cyan-bright", icon: ShieldCheck,
-      items: ["Automatización", "Trazabilidad", "Menos errores", "Mejor operación"] },
+  const pillars = [
+    {
+      title: "Integración con sistemas existentes",
+      icon: Plug,
+      color: "from-tech-blue to-cyan-bright",
+      desc: "Conectamos ERPs, bases de datos, APIs y archivos sin reemplazar lo que ya funciona.",
+      deliverable: "Conectores, APIs y sincronizaciones estables y documentadas.",
+      tags: ["REST / GraphQL", "SAP", "SQL", "CSV / Excel", "Webhooks"],
+    },
+    {
+      title: "Motor de automatización",
+      icon: Workflow,
+      color: "from-cyan-bright to-teal-accent",
+      desc: "Flujos versionados con reintentos, control de errores y manejo de excepciones reales.",
+      deliverable: "Workflows productivos con logs, alertas y reproceso controlado.",
+      tags: ["n8n", "Workers", "Colas", "Jobs programados"],
+    },
+    {
+      title: "IA aplicada al proceso",
+      icon: Brain,
+      color: "from-teal-accent to-tech-blue",
+      desc: "Agentes y modelos integrados al flujo, no asistentes sueltos: ejecutan acciones reales.",
+      deliverable: "Agentes con herramientas, RAG sobre datos propios y evaluación medible.",
+      tags: ["OpenAI", "RAG", "Agentes con tools", "Embeddings"],
+    },
+    {
+      title: "Operación y calidad",
+      icon: ShieldCheck,
+      color: "from-tech-blue to-navy",
+      desc: "Construimos para mantener: trazabilidad, control de cambios y entornos separados.",
+      deliverable: "Observabilidad, control de versiones, despliegues controlados y handover claro.",
+      tags: ["Logs y métricas", "Git / CI-CD", "Dev / Prod", "Documentación"],
+    },
   ];
+
   return (
-    <Section id="arquitectura" eyebrow="Arquitectura" tone="navy">
+    <Section id="arquitectura" eyebrow="Cómo construimos" tone="navy">
       <SectionHeading invert>
-        Una arquitectura pensada para <span className="text-gradient-cyan">integrarse con la operación real</span>
+        Cuatro pilares técnicos detrás de cada{" "}
+        <span className="text-gradient-cyan">solución productiva</span>
       </SectionHeading>
       <p className="mt-4 max-w-2xl text-white/70 text-[15px]">
-        Nuestras soluciones combinan IA, orquestación, backend e integración para convivir con los sistemas
-        que la empresa ya utiliza.
+        No vendemos demos: entregamos software mantenible, integrado con tu operación y preparado para crecer
+        sin volverse una caja negra.
       </p>
 
-      <div className="mt-12 space-y-4">
-        {layers.map((l, idx) => {
-          const Icon = l.icon;
+      <div className="mt-12 grid md:grid-cols-2 gap-5">
+        {pillars.map((p) => {
+          const Icon = p.icon;
           return (
-            <div key={l.title} className="relative">
-              <div className="flex flex-col md:flex-row md:items-center gap-4 p-5 md:p-6 rounded-2xl glass-card">
-                <div className="flex items-center gap-4 md:w-64 shrink-0">
-                  <div className={`h-11 w-11 rounded-xl bg-gradient-to-br ${l.color} flex items-center justify-center text-white shadow-lg`}>
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <div className="text-[10px] tracking-[0.3em] uppercase text-cyan-bright/80 font-semibold">Capa {idx + 1}</div>
-                    <div className="text-white font-semibold">{l.title}</div>
-                  </div>
+            <article
+              key={p.title}
+              className="group relative p-6 md:p-7 rounded-2xl glass-card hover:-translate-y-0.5 transition-all"
+            >
+              <div className="flex items-start gap-4">
+                <div
+                  className={`h-12 w-12 shrink-0 rounded-xl bg-gradient-to-br ${p.color} flex items-center justify-center text-white shadow-lg`}
+                >
+                  <Icon className="h-5 w-5" />
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {l.items.map((i) => (
-                    <span key={i} className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs text-white/90">{i}</span>
+                <div className="min-w-0">
+                  <h3 className="text-white font-semibold text-lg leading-snug">{p.title}</h3>
+                  <p className="mt-2 text-sm text-white/70 leading-relaxed">{p.desc}</p>
+                </div>
+              </div>
+
+              <div className="mt-5 pl-16">
+                <div className="flex items-start gap-2 text-[13px] text-white/85">
+                  <FileCheck2 className="h-4 w-4 mt-0.5 text-teal-accent shrink-0" />
+                  <span><span className="text-white/60">Entregamos: </span>{p.deliverable}</span>
+                </div>
+                <div className="mt-4 flex flex-wrap gap-1.5">
+                  {p.tags.map((t) => (
+                    <span
+                      key={t}
+                      className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] text-white/80"
+                    >
+                      {t}
+                    </span>
                   ))}
                 </div>
               </div>
-              {idx < layers.length - 1 && (
-                <div className="flex justify-center py-1">
-                  <div className="h-6 w-px bg-gradient-to-b from-cyan-bright/60 to-transparent" />
-                </div>
-              )}
-            </div>
+            </article>
           );
         })}
       </div>
