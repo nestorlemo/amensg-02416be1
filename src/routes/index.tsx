@@ -4,6 +4,7 @@ import {
   Menu, X, ArrowRight, Workflow, Bot, Network, Mail, MapPin,
   MessageCircle, CheckCircle2, AlertCircle,
 } from "lucide-react";
+import { DynamicMockup } from "@/components/amensg/DynamicMockup";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -120,100 +121,8 @@ function SiteHeader() {
   );
 }
 
-/* ─────────────────────── App mockup ───────────────────── */
-function AppMockup() {
-  return (
-    <div
-      className="relative w-full max-w-[720px] mx-auto rounded-[14px] overflow-hidden border border-white/10 bg-[#0d1b2f]"
-      style={{
-        transform: "perspective(1400px) rotateY(-7deg) rotateX(3deg)",
-        boxShadow: "0 30px 80px -15px rgba(25,195,255,0.28), 0 0 0 1px rgba(255,255,255,0.04)",
-      }}
-    >
-      {/* titlebar */}
-      <div className="flex h-[38px] items-center gap-2 border-b border-white/5 bg-[#0a1626] px-3.5">
-        <span className="h-[11px] w-[11px] rounded-full bg-[#ff5f57]" />
-        <span className="h-[11px] w-[11px] rounded-full bg-[#febc2e]" />
-        <span className="h-[11px] w-[11px] rounded-full bg-[#28c840]" />
-        <span className="ml-3 font-mono text-[11px] text-[#8ba3c7] truncate">amensg — plataforma de gestión comercial</span>
-        <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-[#20E0B2]/10 px-2.5 py-1 text-[10px] font-semibold tracking-[1px] text-[#20E0B2]">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#20E0B2] animate-pulse" /> EN PRODUCCIÓN
-        </span>
-      </div>
-      <div className="flex h-[380px]">
-        {/* sidebar */}
-        <aside className="w-[185px] border-r border-white/5 bg-[#0a1626] py-3.5">
-          <div className="px-4 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-[1.2px] text-[#5a7090]">Gestión comercial</div>
-          {[
-            ["Monitoreo", false], ["Ventas", false], ["Backoffice", false],
-            ["Activaciones", true], ["Distribución", false],
-          ].map(([label, active]) => (
-            <div key={String(label)} className={`text-[12.5px] py-1.5 ${active ? "pl-[22px] text-white border-l-2 border-[#19C3FF] bg-gradient-to-r from-[#19C3FF]/15 to-transparent" : "pl-6 text-[#aebfd6]"}`}>
-              {label}
-            </div>
-          ))}
-          <div className="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-[1.2px] text-[#5a7090]">Operaciones</div>
-          {["Stock", "Liquidaciones", "Atención a clientes", "Reportes"].map((l) => (
-            <div key={l} className="pl-6 py-1.5 text-[12.5px] text-[#aebfd6]">{l}</div>
-          ))}
-        </aside>
-        {/* content */}
-        <div className="flex-1 bg-[#0d1b2f] p-4">
-          <div className="mb-3.5 flex items-center gap-2">
-            <span className="rounded-md bg-[#19C3FF] px-2.5 py-1 text-[11px] font-semibold text-[#06101F]">Actualizar</span>
-            <span className="rounded-md border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-[#aebfd6]">Exportar</span>
-            <span className="rounded-md border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-[#aebfd6]">Filtros</span>
-          </div>
-          <div className="mb-4 flex gap-2.5">
-            {[
-              { num: "1.247", lbl: "Activaciones hoy", cls: "text-white" },
-              { num: "98,4%", lbl: "Tasa de éxito", cls: "text-[#19C3FF]" },
-              { num: "312", lbl: "Entregas en curso", cls: "text-[#20E0B2]" },
-            ].map((s) => (
-              <div key={s.lbl} className="flex-1 rounded-lg border border-white/5 bg-white/[0.03] px-3 py-2.5">
-                <div className={`text-[19px] font-bold ${s.cls}`}>{s.num}</div>
-                <div className="mt-0.5 text-[10px] uppercase tracking-[0.5px] text-[#7088a8]">{s.lbl}</div>
-              </div>
-            ))}
-          </div>
-          <table className="w-full border-collapse">
-            <thead>
-              <tr>
-                {["ID", "Servicio", "Activación", "Entrega", "Estado"].map((h) => (
-                  <th key={h} className="border-b border-white/10 px-2 py-1.5 text-left text-[10px] font-semibold uppercase tracking-[0.5px] text-[#5a7090]">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                ["924799", "Fibra Premium", "17/03", "Documentación", "ok", "Activo"],
-                ["915135", "Plan Móvil", "17/03", "Equipo enviado", "ok", "Activo"],
-                ["921887", "Fibra Básico", "16/03", "En reparto", "proc", "Proceso"],
-                ["988085", "Plan Móvil", "16/03", "Pendiente", "pend", "En cola"],
-                ["916042", "Fibra Premium", "16/03", "Documentación", "ok", "Activo"],
-                ["989642", "Plan Móvil", "16/03", "Equipo enviado", "ok", "Activo"],
-              ].map((r, i) => (
-                <tr key={i}>
-                  <td className="border-b border-white/[0.04] px-2 py-1.5 text-[11.5px] text-[#aebfd6] blur-[3px] opacity-70">{r[0]}</td>
-                  <td className="border-b border-white/[0.04] px-2 py-1.5 text-[11.5px] text-[#aebfd6]">{r[1]}</td>
-                  <td className="border-b border-white/[0.04] px-2 py-1.5 text-[11.5px] text-[#aebfd6]">{r[2]}</td>
-                  <td className="border-b border-white/[0.04] px-2 py-1.5 text-[11.5px] text-[#aebfd6]">{r[3]}</td>
-                  <td className="border-b border-white/[0.04] px-2 py-1.5">
-                    <span className={`rounded px-2 py-0.5 text-[10px] font-semibold ${
-                      r[4] === "ok" ? "text-[#20E0B2] bg-[#20E0B2]/10"
-                      : r[4] === "proc" ? "text-[#19C3FF] bg-[#19C3FF]/10"
-                      : "text-[#f0b840] bg-[#f0b840]/10"
-                    }`}>{r[5]}</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-}
+/* ─────────────────────── Hero mockup is now DynamicMockup ───────────────── */
+
 
 /* ───────────────────────── Hero ───────────────────────── */
 function Hero() {
@@ -262,7 +171,7 @@ function Hero() {
         </Reveal>
 
         <Reveal delay={120} className="lg:pl-4">
-          <AppMockup />
+          <DynamicMockup />
         </Reveal>
       </div>
 
@@ -392,8 +301,8 @@ function Nosotros() {
   ];
   const partners = [
     { initials: "NL", name: "Néstor Lemo", role: "Director / Cofundador",
-      bio: "Ingeniero en Informática, lidera estrategia comercial, análisis de negocio y relacionamiento con clientes." },
-    { initials: "L", name: "Liber", role: "Director Técnico / Cofundador",
+      bio: "Ingeniero en Informática, lidera estrategia comercial y análisis de negocio." },
+    { initials: "LB", name: "Liber Batalla", role: "Director Técnico / Cofundador",
       bio: "Arquitecto de software, lidera arquitectura de integraciones y desarrollo backend." },
   ];
   return (
