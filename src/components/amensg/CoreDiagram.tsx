@@ -1,99 +1,145 @@
-import {
-  Database, Cable, Globe, MessageSquare, Workflow, FileBarChart2, Users, Server,
-} from "lucide-react";
+import { Database, Server, Globe, MessageSquare, Brain, Workflow, Plug, ShieldCheck, LineChart, Gauge } from "lucide-react";
 
-const NODES = [
-  { label: "SAP / ERP", icon: Server,        angle: -90 },
-  { label: "APIs",      icon: Cable,         angle: -45 },
-  { label: "Bases de datos", icon: Database, angle: 0   },
-  { label: "Web Apps",  icon: Globe,         angle: 45  },
-  { label: "WhatsApp / Teams", icon: MessageSquare, angle: 90 },
-  { label: "Procesos",  icon: Workflow,      angle: 135 },
-  { label: "Reportes",  icon: FileBarChart2, angle: 180 },
-  { label: "Usuarios",  icon: Users,         angle: -135 },
-];
-
+/**
+ * AMENSG flow diagram
+ *
+ * Left column  : sistemas y canales que ya existen en la empresa.
+ * Center stack : el núcleo AMENSG (IA + orquestación + integración).
+ * Right column : resultados operativos concretos.
+ *
+ * Las líneas SVG animadas representan el flujo de datos / acciones
+ * entrando al núcleo y saliendo como resultados.
+ */
 export function CoreDiagram() {
-  // SVG canvas 560x560, center 280,280, radius 220 for nodes
-  const cx = 280, cy = 280, r = 215;
+  const inputs = [
+    { icon: Server, label: "ERP / SAP" },
+    { icon: Database, label: "Bases de datos" },
+    { icon: Globe, label: "Plataformas web" },
+    { icon: MessageSquare, label: "WhatsApp · Teams" },
+  ];
+  const outputs = [
+    { icon: ShieldCheck, label: "Menos errores" },
+    { icon: Gauge, label: "Menos trabajo manual" },
+    { icon: LineChart, label: "Trazabilidad" },
+    { icon: Workflow, label: "Procesos automatizados" },
+  ];
+  const core = [
+    { icon: Brain, label: "Agentes de IA" },
+    { icon: Plug, label: "Integración" },
+    { icon: Workflow, label: "Orquestación" },
+  ];
+
   return (
-    <div className="relative w-full max-w-[560px] mx-auto aspect-square">
-      <svg viewBox="0 0 560 560" className="absolute inset-0 w-full h-full">
+    <div className="relative w-full max-w-[620px] mx-auto">
+      {/* SVG flow lines (desktop) */}
+      <svg
+        viewBox="0 0 620 360"
+        className="absolute inset-0 w-full h-full hidden md:block pointer-events-none"
+        aria-hidden
+      >
         <defs>
-          <radialGradient id="coreGrad" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="oklch(0.78 0.15 220)" stopOpacity="0.85" />
-            <stop offset="60%" stopColor="oklch(0.58 0.18 253)" stopOpacity="0.55" />
-            <stop offset="100%" stopColor="oklch(0.22 0.07 252)" stopOpacity="0" />
-          </radialGradient>
-          <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="oklch(0.78 0.15 220)" stopOpacity="0.9" />
-            <stop offset="100%" stopColor="oklch(0.82 0.15 175)" stopOpacity="0.4" />
+          <linearGradient id="flowIn" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="oklch(0.78 0.15 220)" stopOpacity="0.15" />
+            <stop offset="100%" stopColor="oklch(0.78 0.15 220)" stopOpacity="0.9" />
+          </linearGradient>
+          <linearGradient id="flowOut" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="oklch(0.82 0.15 175)" stopOpacity="0.9" />
+            <stop offset="100%" stopColor="oklch(0.82 0.15 175)" stopOpacity="0.15" />
           </linearGradient>
         </defs>
 
-        {/* outer rings */}
-        <circle cx={cx} cy={cy} r={r}     fill="none" stroke="oklch(1 0 0 / 0.08)" />
-        <circle cx={cx} cy={cy} r={r-60}  fill="none" stroke="oklch(1 0 0 / 0.06)" />
-        <circle cx={cx} cy={cy} r={r-120} fill="none" stroke="oklch(1 0 0 / 0.05)" />
+        {/* Input lines: 4 nodes on left -> single core point */}
+        {[60, 140, 220, 300].map((y, i) => (
+          <path
+            key={`in-${i}`}
+            d={`M 150 ${y} C 230 ${y}, 240 180, 310 180`}
+            stroke="url(#flowIn)"
+            strokeWidth="1.4"
+            fill="none"
+            strokeDasharray="5 7"
+            className="animate-flow"
+            style={{ animationDelay: `${i * 0.25}s` }}
+          />
+        ))}
 
-        {/* glow */}
-        <circle cx={cx} cy={cy} r={150} fill="url(#coreGrad)" />
-
-        {/* connecting lines */}
-        {NODES.map((n, i) => {
-          const rad = (n.angle * Math.PI) / 180;
-          const x = cx + Math.cos(rad) * r;
-          const y = cy + Math.sin(rad) * r;
-          return (
-            <g key={i}>
-              <line
-                x1={cx} y1={cy} x2={x} y2={y}
-                stroke="url(#lineGrad)"
-                strokeWidth={1.2}
-                strokeDasharray="4 6"
-                className="animate-flow"
-                style={{ animationDelay: `${i * 0.25}s` }}
-              />
-              <circle cx={x} cy={y} r={4} fill="oklch(0.82 0.15 175)" className="animate-pulse-dot" style={{ animationDelay: `${i*0.2}s` }} />
-            </g>
-          );
-        })}
+        {/* Output lines: core point -> 4 nodes on right */}
+        {[60, 140, 220, 300].map((y, i) => (
+          <path
+            key={`out-${i}`}
+            d={`M 310 180 C 380 180, 390 ${y}, 470 ${y}`}
+            stroke="url(#flowOut)"
+            strokeWidth="1.4"
+            fill="none"
+            strokeDasharray="5 7"
+            className="animate-flow"
+            style={{ animationDelay: `${0.5 + i * 0.25}s` }}
+          />
+        ))}
       </svg>
 
-      {/* Center core */}
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-        <div className="px-6 py-5 rounded-2xl glass-card text-center shadow-[0_20px_60px_-20px_rgba(23,105,224,0.5)]">
-          <div className="text-[10px] tracking-[0.3em] text-cyan-bright/90 font-semibold">AMENSG</div>
-          <div className="mt-1 text-2xl font-bold text-white">CORE</div>
-          <div className="mt-1 text-[11px] text-white/70 whitespace-nowrap">
-            IA · Integración · Automatización
+      <div className="relative grid grid-cols-2 md:grid-cols-[1fr_auto_1fr] gap-5 md:gap-8 items-center">
+        {/* INPUT */}
+        <div className="space-y-2.5">
+          <div className="text-[10px] tracking-[0.25em] uppercase text-cyan-bright/80 font-semibold mb-3">
+            Lo que ya existe
           </div>
+          {inputs.map(({ icon: Icon, label }) => (
+            <div
+              key={label}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl glass-card text-white/90"
+            >
+              <span className="h-8 w-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-cyan-bright shrink-0">
+                <Icon className="h-4 w-4" />
+              </span>
+              <span className="text-[13px] font-medium truncate">{label}</span>
+            </div>
+          ))}
         </div>
-      </div>
 
-      {/* Node labels */}
-      {NODES.map((n, i) => {
-        const rad = (n.angle * Math.PI) / 180;
-        const x = 50 + (Math.cos(rad) * r * 100) / 560;
-        const y = 50 + (Math.sin(rad) * r * 100) / 560;
-        const Icon = n.icon;
-        return (
-          <div
-            key={i}
-            className="absolute -translate-x-1/2 -translate-y-1/2 z-20"
-            style={{ left: `${x}%`, top: `${y}%` }}
-          >
-            <div className="flex flex-col items-center gap-1.5">
-              <div className="h-11 w-11 rounded-xl glass-card flex items-center justify-center text-cyan-bright shadow-lg">
-                <Icon className="h-5 w-5" />
-              </div>
-              <div className="text-[11px] font-medium text-white/85 whitespace-nowrap bg-navy-deep/40 backdrop-blur px-2 py-0.5 rounded">
-                {n.label}
+        {/* CORE */}
+        <div className="col-span-2 md:col-span-1 order-first md:order-none flex justify-center">
+          <div className="relative">
+            <div className="absolute -inset-6 rounded-3xl bg-gradient-to-br from-tech-blue/30 via-cyan-bright/20 to-teal-accent/20 blur-2xl" />
+            <div className="relative w-[220px] rounded-2xl glass-card p-5 text-center shadow-[0_20px_60px_-20px_rgba(23,105,224,0.55)]">
+              <div className="text-[10px] tracking-[0.3em] text-cyan-bright font-semibold">AMENSG</div>
+              <div className="mt-1 text-2xl font-bold text-white font-display">CORE</div>
+              <div className="mt-4 space-y-1.5">
+                {core.map(({ icon: Icon, label }) => (
+                  <div
+                    key={label}
+                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[12px] text-white/90"
+                  >
+                    <Icon className="h-3.5 w-3.5 text-cyan-bright shrink-0" />
+                    <span className="font-medium">{label}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
-        );
-      })}
+        </div>
+
+        {/* OUTPUT */}
+        <div className="space-y-2.5">
+          <div className="text-[10px] tracking-[0.25em] uppercase text-teal-accent/90 font-semibold mb-3 md:text-right">
+            Resultado operativo
+          </div>
+          {outputs.map(({ icon: Icon, label }) => (
+            <div
+              key={label}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl glass-card text-white/90"
+            >
+              <span className="h-8 w-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-teal-accent shrink-0">
+                <Icon className="h-4 w-4" />
+              </span>
+              <span className="text-[13px] font-medium truncate">{label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <p className="relative mt-6 text-center text-[11px] text-white/50 tracking-wide">
+        Conectamos los sistemas que ya usás · sumamos IA y automatización · devolvemos resultados operativos
+      </p>
     </div>
   );
 }

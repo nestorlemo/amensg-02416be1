@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
   ArrowRight, Sparkles, Brain, Workflow, Plug, Code2, Database, FileCheck2,
-  Repeat, Network, FileSpreadsheet, BookOpen, ClipboardCheck, BarChart3,
-  MessageCircle, Mail, MapPin, Phone, Cpu, Boxes, ShieldCheck, LineChart,
+  Repeat, Network, FileSpreadsheet, BookOpen, ClipboardCheck,
+  MessageCircle, Mail, MapPin, Phone, Cpu, ShieldCheck, LineChart,
   Search, PencilRuler, Hammer, Gauge,
 } from "lucide-react";
 import { Header } from "@/components/amensg/Header";
@@ -51,7 +51,6 @@ function LandingPage() {
         <Hero />
         <Problems />
         <Services />
-        <Solutions />
         <Architecture />
         <Cases />
         <Sectors />
@@ -99,25 +98,25 @@ function Hero() {
               Analizar mi proceso <ArrowRight className="h-4 w-4" />
             </a>
             <a
-              href="#soluciones"
+              href="#servicios"
               className="inline-flex items-center gap-2 h-12 px-6 rounded-full border border-white/25 text-white hover:bg-white/10 transition font-medium"
             >
-              Ver soluciones
+              Ver servicios
             </a>
           </div>
 
-          <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-xl">
+          <dl className="mt-10 grid grid-cols-3 gap-px max-w-xl rounded-2xl overflow-hidden border border-white/10 bg-white/[0.04]">
             {[
-              "Más de una década de experiencia",
-              "Automatización + integración + IA",
-              "Soluciones mantenibles",
-            ].map((t) => (
-              <div key={t} className="flex items-start gap-2 text-sm text-white/80">
-                <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-teal-accent shrink-0" />
-                <span>{t}</span>
+              { k: "+10", v: "años de experiencia" },
+              { k: "100%", v: "integrado con tus sistemas" },
+              { k: "24/7", v: "procesos sin intervención" },
+            ].map((s) => (
+              <div key={s.v} className="bg-navy-deep/40 px-4 py-4">
+                <dt className="text-2xl font-bold text-white font-display leading-none">{s.k}</dt>
+                <dd className="mt-1.5 text-[11px] text-white/65 leading-snug">{s.v}</dd>
               </div>
             ))}
-          </div>
+          </dl>
         </div>
 
         <div className="lg:col-span-6 animate-fade-up" style={{ animationDelay: "0.15s" }}>
@@ -195,53 +194,6 @@ function Services() {
             </div>
             <h3 className="relative mt-5 text-lg font-semibold text-foreground leading-snug">{title}</h3>
             <p className="relative mt-2.5 text-sm text-muted-foreground leading-relaxed">{desc}</p>
-          </article>
-        ))}
-      </div>
-    </Section>
-  );
-}
-
-/* ───────────────────────── SOLUTIONS ───────────────────────── */
-
-function Solutions() {
-  const items = [
-    { tag: "IA aplicada", title: "Agentes de IA para conocimiento organizacional",
-      desc: "Convertimos documentación, reuniones y conocimiento interno en asistentes consultables que ayudan a responder preguntas, guiar procesos y acelerar la capacitación de equipos.",
-      icon: Brain },
-    { tag: "Automatización", title: "Automatización de procesos operativos",
-      desc: "Diseñamos flujos que ejecutan validaciones, generan archivos, conectan sistemas, envían alertas y reducen tareas manuales repetitivas.",
-      icon: Workflow },
-    { tag: "Integración", title: "Integración con sistemas existentes",
-      desc: "No reemplazamos todo: conectamos lo que ya existe. Integramos plataformas internas, bases de datos, APIs, ERP y herramientas corporativas.",
-      icon: Plug },
-    { tag: "Producto", title: "Prototipos y soluciones empresariales con IA",
-      desc: "Transformamos relevamientos y necesidades de negocio en prototipos funcionales, validables y evolucionables.",
-      icon: Boxes },
-  ];
-
-  return (
-    <Section id="soluciones" eyebrow="Soluciones destacadas">
-      <SectionHeading>
-        Soluciones <span className="text-tech-blue">aplicadas a operaciones reales</span>
-      </SectionHeading>
-
-      <div className="mt-12 grid md:grid-cols-2 gap-6">
-        {items.map(({ tag, title, desc, icon: Icon }, i) => (
-          <article key={title} className="relative p-8 rounded-3xl bg-gradient-to-br from-navy-deep to-navy text-white overflow-hidden group">
-            <div className="absolute inset-0 bg-grid opacity-30" />
-            <div className="absolute -bottom-16 -right-16 h-56 w-56 rounded-full bg-tech-blue/30 blur-3xl group-hover:bg-cyan-bright/30 transition" />
-            <div className="relative flex items-start gap-4">
-              <div className="h-12 w-12 rounded-xl glass-card flex items-center justify-center text-cyan-bright shrink-0">
-                <Icon className="h-5 w-5" />
-              </div>
-              <div>
-                <span className="inline-block text-[10px] tracking-[0.2em] uppercase text-cyan-bright/90 font-semibold">{tag}</span>
-                <h3 className="mt-2 text-xl font-semibold leading-snug">{title}</h3>
-                <p className="mt-3 text-sm text-white/75 leading-relaxed">{desc}</p>
-              </div>
-            </div>
-            <div className="relative mt-6 text-[11px] text-white/40 font-mono">0{i + 1} / 04</div>
           </article>
         ))}
       </div>
@@ -367,17 +319,18 @@ function CaseRow({ label, value, accent = false }: { label: string; value: strin
 
 function Sectors() {
   const sectors = [
-    "Telecomunicaciones", "Retail", "Servicios", "Operaciones corporativas",
-    "Plataformas web", "Automatización administrativa", "Integración de datos", "Procesos de facturación",
+    "Retail", "Servicios corporativos", "Operaciones administrativas",
+    "Plataformas web", "Integración de datos", "Procesos de facturación",
+    "Back-office", "Logística",
   ];
   return (
-    <Section id="experiencia" eyebrow="Clientes y experiencia">
+    <Section id="experiencia" eyebrow="Áreas de aplicación">
       <SectionHeading>
         Experiencia en procesos críticos y <span className="text-tech-blue">operaciones empresariales</span>
       </SectionHeading>
       <p className="mt-4 max-w-2xl text-muted-foreground text-[15px]">
-        Hemos trabajado en procesos vinculados a telecomunicaciones, retail, servicios, plataformas web,
-        activaciones, facturación, datos e integración de sistemas.
+        Trabajamos sobre procesos administrativos, operativos y de gestión que combinan sistemas,
+        datos y personas: activaciones, validaciones, facturación, reportes e integraciones.
       </p>
       <div className="mt-10 flex flex-wrap gap-2.5">
         {sectors.map((s) => (
@@ -386,9 +339,6 @@ function Sectors() {
           </span>
         ))}
       </div>
-      <p className="mt-6 text-xs text-muted-foreground">
-        Los logos y nombres de clientes pueden incorporarse cuando se cuente con autorización para su uso público.
-      </p>
     </Section>
   );
 }
@@ -629,7 +579,7 @@ function Footer() {
           <ul className="space-y-2 text-sm">
             {[
               ["#servicios", "Servicios"],
-              ["#soluciones", "Soluciones"],
+              ["#arquitectura", "Arquitectura"],
               ["#casos", "Casos"],
               ["#proceso", "Cómo trabajamos"],
               ["#equipo", "Equipo"],
