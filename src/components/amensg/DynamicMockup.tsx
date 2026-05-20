@@ -31,17 +31,25 @@ const R = <T,>(a: T[]): T => a[Math.floor(Math.random() * a.length)];
 
 export function DynamicMockup() {
   const [cur, setCur] = useState(0);
+  const [playing, setPlaying] = useState(true);
   const autoRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const restartAuto = () => {
-    if (autoRef.current) clearInterval(autoRef.current);
+  const stopAuto = () => {
+    if (autoRef.current) { clearInterval(autoRef.current); autoRef.current = null; }
+  };
+  const startAuto = () => {
+    stopAuto();
     autoRef.current = setInterval(() => setCur((c) => (c + 1) % 4), 6500);
   };
 
   useEffect(() => {
-    restartAuto();
-    return () => { if (autoRef.current) clearInterval(autoRef.current); };
-  }, []);
+    if (playing) startAuto(); else stopAuto();
+    return stopAuto;
+  }, [playing]);
+
+  const goTo = (i: number) => { setCur(((i % 4) + 4) % 4); if (playing) startAuto(); };
+  const prev = () => goTo(cur - 1);
+  const next = () => goTo(cur + 1);
 
   const [badgeCls, badgeTxt] = BADGES[cur];
 
@@ -82,12 +90,44 @@ export function DynamicMockup() {
         </div>
       </div>
 
-      <div className="mt-6 flex flex-wrap justify-center gap-2">
+      {/* Transport controls */}
+      <div className="mt-5 flex items-center justify-center gap-2">
+        <button
+          type="button"
+          onClick={prev}
+          aria-label="Escena anterior"
+          className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-[#aebfd6] hover:text-white hover:border-white/20 transition-all"
+        >
+          <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
+        </button>
+        <button
+          type="button"
+          onClick={() => setPlaying((p) => !p)}
+          aria-label={playing ? "Pausar" : "Reproducir"}
+          className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#19C3FF]/30 bg-[#19C3FF]/10 text-[#19C3FF] hover:bg-[#19C3FF]/15 transition-all"
+        >
+          {playing ? (
+            <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1" /><rect x="14" y="5" width="4" height="14" rx="1" /></svg>
+          ) : (
+            <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="currentColor"><polygon points="7,5 19,12 7,19" /></svg>
+          )}
+        </button>
+        <button
+          type="button"
+          onClick={next}
+          aria-label="Escena siguiente"
+          className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-[#aebfd6] hover:text-white hover:border-white/20 transition-all"
+        >
+          <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+        </button>
+      </div>
+
+      <div className="mt-3 flex flex-wrap justify-center gap-2">
         {LABELS.map((l, i) => (
           <button
             key={l}
             type="button"
-            onClick={() => { setCur(i); restartAuto(); }}
+            onClick={() => goTo(i)}
             className={`inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-[11px] font-medium transition-all ${
               cur === i
                 ? "bg-[#19C3FF]/10 border-[#19C3FF]/40 text-white"
