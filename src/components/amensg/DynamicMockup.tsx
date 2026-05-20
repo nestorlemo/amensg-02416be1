@@ -213,9 +213,10 @@ function WorkflowScene() {
       {nodes.map((n) => {
         const idx = order.indexOf(n.id);
         const state = idx >= 0 ? nodeState(idx) : step >= 4 ? "active" : "";
-        const visible = idx >= 0 ? step >= idx : step >= 4; // w4 (branch false) appears with step 3
+        const visible = idx >= 0 ? step >= idx : step >= 4;
         const isActive = state === "active";
         const isDone = state === "done";
+        const isAgent = n.id === "w2";
         return (
           <div
             key={n.id}
@@ -228,15 +229,33 @@ function WorkflowScene() {
             }}
           >
             <div
-              className={`mx-auto flex h-[54px] w-[54px] items-center justify-center rounded-[13px] border text-[21px] transition-all ${
+              className={`relative mx-auto flex h-[54px] w-[54px] items-center justify-center rounded-[13px] border transition-all ${
+                isAgent ? "text-[18px]" : "text-[21px]"
+              } ${
                 isActive
                   ? "border-[#19C3FF] bg-[#19C3FF]/12 text-[#19C3FF] shadow-[0_0_22px_-4px_rgba(25,195,255,0.5)]"
                   : isDone
                     ? "border-[#20E0B2]/45 bg-white/5 text-[#20E0B2]"
-                    : "border-white/12 bg-white/5 text-[#cfe4f7]"
+                    : isAgent
+                      ? "border-[#a78bfa]/40 bg-[#a78bfa]/8 text-[#c4b5fd]"
+                      : "border-white/12 bg-white/5 text-[#cfe4f7]"
               }`}
             >
-              {n.icon}
+              {isAgent ? (
+                <>
+                  <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="4" y="8" width="16" height="11" rx="2.5" />
+                    <path d="M12 3v5" />
+                    <circle cx="12" cy="3" r="1.2" fill="currentColor" />
+                    <circle cx="9" cy="13" r="1.1" fill="currentColor" />
+                    <circle cx="15" cy="13" r="1.1" fill="currentColor" />
+                    <path d="M9 16.5h6" />
+                  </svg>
+                  <span className="absolute -top-1.5 -right-1.5 rounded-[5px] bg-[#a78bfa] px-1 py-[1px] text-[7px] font-bold text-[#1a0f2e] leading-none">AI</span>
+                </>
+              ) : (
+                n.icon
+              )}
             </div>
             <div className="mt-1.5 text-center text-[9.5px] font-medium leading-tight text-[#aebfd6] whitespace-pre-line">
               {n.label}
@@ -428,46 +447,64 @@ function IntegrationScene() {
   const [pinged, setPinged] = useState(-1);
   const [pulse, setPulse] = useState(0);
 
+  // Logical coord space: 660 x 352 (matches SVG viewBox + container ratio)
+  const X = (px: number) => `${((px / 660) * 100).toFixed(3)}%`;
+  const Y = (py: number) => `${((py / 352) * 100).toFixed(3)}%`;
+  const W = (w: number) => `${((w / 660) * 100).toFixed(3)}%`;
+  const H = (h: number) => `${((h / 352) * 100).toFixed(3)}%`;
+
+  const left = [
+    { top: 30, ico: "▤", iconBg: "bg-[#20E0B2]/15 text-[#20E0B2]", name: "ERP", color: "#20E0B2" },
+    { top: 92, ico: "◍", iconBg: "bg-[#19C3FF]/15 text-[#19C3FF]", name: "CRM", color: "#19C3FF" },
+    { top: 222, ico: "▦", iconBg: "bg-[#f0b840]/15 text-[#f0b840]", name: "Base de datos", color: "#f0b840" },
+    { top: 284, ico: "▣", iconBg: "bg-[#8ba3c7]/15 text-[#8ba3c7]", name: "Sistemas legacy", color: "#8ba3c7" },
+  ];
+
+  const right = [
+    { top: 18, ico: "▥", iconBg: "bg-[#19C3FF]/15 text-[#19C3FF]", name: "Dashboard", sub: "analítica en vivo", color: "#19C3FF", external: false },
+    { top: 98, ico: "☁", iconBg: "bg-[#a78bfa]/15 text-[#a78bfa]", name: "APIs externas", sub: "proveedores · SaaS", color: "#a78bfa", external: true },
+    { top: 200, ico: "◇", iconBg: "bg-[#20E0B2]/15 text-[#20E0B2]", name: "App / API", sub: "datos unificados", color: "#20E0B2", external: false },
+    { top: 280, ico: "⚡", iconBg: "bg-[#a78bfa]/15 text-[#a78bfa]", name: "Webhooks", sub: "servicios externos", color: "#a78bfa", external: true },
+  ];
+
+  // Hub: 84x84 centered at (330, 176). Left edge x=288, right edge x=372.
+  // Left boxes: right edge x=132, center y = top+19
+  // Right boxes: left edge x=526, center y = top+19
+  const leftPipes = left.map((s) => {
+    const y = s.top + 19;
+    return { d: `M 132 ${y} C 220 ${y}, 230 176, 288 176`, color: s.color };
+  });
+  const rightPipes = right.map((s) => {
+    const y = s.top + 19;
+    return { d: `M 372 176 C 440 176, 460 ${y}, 526 ${y}`, color: s.color };
+  });
+  const allPipes = [...leftPipes, ...rightPipes];
+  const totalPings = allPipes.length;
+
   useEffect(() => {
     let k = 0;
     setPinged(0);
     setPulse((p) => p + 1);
     const id = setInterval(() => {
-      k = (k + 1) % 4;
+      k = (k + 1) % totalPings;
       setPinged(k);
       setPulse((p) => p + 1);
     }, 700);
     return () => clearInterval(id);
-  }, []);
-
-  const systems = [
-    { top: 30, ico: "▤", iconBg: "bg-[#20E0B2]/15 text-[#20E0B2]", name: "ERP" },
-    { top: 92, ico: "◍", iconBg: "bg-[#19C3FF]/15 text-[#19C3FF]", name: "CRM" },
-    { top: 222, ico: "▦", iconBg: "bg-[#f0b840]/15 text-[#f0b840]", name: "Base de datos" },
-    { top: 284, ico: "▣", iconBg: "bg-[#8ba3c7]/15 text-[#8ba3c7]", name: "Sistemas legacy" },
-  ];
-
-  // Inner coordinate space: 660 x 352. Centered in scene.
-  // System box: left=14, w=118, h≈38 → right edge x=132, center y = top+19
-  // Hub: 84x84 centered at (330,176) → left edge x=288, right edge x=372
-  // Right boxes: left=526, w=120, center y = top+19
-  const pipes = [
-    { d: "M 132 49 C 220 49, 220 176, 288 176", color: "#20E0B2" },
-    { d: "M 132 111 C 240 111, 240 176, 288 176", color: "#19C3FF" },
-    { d: "M 132 241 C 240 241, 240 176, 288 176", color: "#f0b840" },
-    { d: "M 132 303 C 220 303, 220 176, 288 176", color: "#8ba3c7" },
-  ];
+  }, [totalPings]);
 
   return (
-    <div className="relative h-full overflow-hidden">
-      <div className="relative mx-auto h-full w-full max-w-[660px]">
-        <svg className="absolute inset-0 h-[352px] w-full pointer-events-none" viewBox="0 0 660 352" preserveAspectRatio="xMidYMid meet">
-          {pipes.map((p, i) => (
-            <path key={`pp${i}`} d={p.d} stroke={p.color} strokeWidth="4.5" strokeLinecap="round" fill="none" opacity="0.22" />
+    <div className="flex h-full items-center justify-center px-2">
+      <div className="relative w-full max-w-[660px] h-[352px]">
+        <svg
+          className="absolute inset-0 h-full w-full pointer-events-none"
+          viewBox="0 0 660 352"
+          preserveAspectRatio="none"
+        >
+          {allPipes.map((p, i) => (
+            <path key={`pp${i}`} d={p.d} stroke={p.color} strokeWidth="4.5" strokeLinecap="round" fill="none" opacity="0.22" vectorEffect="non-scaling-stroke" />
           ))}
-          <path d="M 372 176 C 440 176, 460 69, 526 69" stroke="#19C3FF" strokeWidth="4.5" strokeLinecap="round" fill="none" opacity="0.22" />
-          <path d="M 372 176 C 440 176, 460 253, 526 253" stroke="#20E0B2" strokeWidth="4.5" strokeLinecap="round" fill="none" opacity="0.22" />
-          {pipes.map((p, i) => (
+          {allPipes.map((p, i) => (
             <path
               key={`pl${i}-${pulse}-${pinged}`}
               d={p.d}
@@ -475,6 +512,7 @@ function IntegrationScene() {
               strokeWidth="4.5"
               strokeLinecap="round"
               fill="none"
+              vectorEffect="non-scaling-stroke"
               opacity={pinged === i ? 0.95 : 0}
               style={{
                 strokeDasharray: "14 320",
@@ -484,13 +522,13 @@ function IntegrationScene() {
           ))}
         </svg>
 
-        {systems.map((s, i) => (
+        {left.map((s, i) => (
           <div
             key={s.name}
-            className={`absolute flex w-[118px] items-center gap-2 rounded-[10px] border bg-white/[0.04] px-2.5 py-2 transition-all ${
+            className={`absolute flex items-center gap-2 rounded-[10px] border bg-white/[0.04] px-2.5 py-2 transition-all ${
               pinged === i ? "border-[#19C3FF] shadow-[0_0_18px_-4px_rgba(25,195,255,0.5)]" : "border-white/10"
             }`}
-            style={{ left: 14, top: s.top, zIndex: 1 }}
+            style={{ left: X(14), top: Y(s.top), width: W(118), zIndex: 1 }}
           >
             <div className={`flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-md text-[12px] ${s.iconBg}`}>{s.ico}</div>
             <div className="text-[10px] font-semibold leading-tight text-[#e6eefc]">{s.name}</div>
@@ -498,24 +536,38 @@ function IntegrationScene() {
         ))}
 
         <div
-          className="absolute flex h-[84px] w-[84px] flex-col items-center justify-center rounded-[18px] bg-[#19C3FF]/13 border border-[#19C3FF]/40"
-          style={{ left: 288, top: 134, zIndex: 2 }}
+          className="absolute flex flex-col items-center justify-center rounded-[18px] bg-[#19C3FF]/13 border border-[#19C3FF]/40"
+          style={{ left: X(288), top: Y(134), width: W(84), height: H(84), zIndex: 2 }}
         >
-          <div className="text-[22px] text-[#19C3FF]">⇄</div>
-          <div className="mt-0.5 text-[10px] font-bold text-[#19C3FF]">amensg</div>
+          <div className="text-[22px] text-[#19C3FF] leading-none">⇄</div>
+          <div className="mt-1 text-[10px] font-bold text-[#19C3FF]">amensg</div>
+          <div className="text-[7.5px] text-[#8ba3c7] mt-0.5">hub</div>
         </div>
 
-        <div className="absolute w-[120px] rounded-[10px] border border-white/10 bg-white/[0.04] px-2.5 py-2" style={{ left: 526, top: 50, zIndex: 1 }}>
-          <div className="text-[10px] font-semibold text-[#e6eefc]">Dashboard</div>
-          <div className="mt-0.5 text-[8.5px] text-[#7088a8]">analítica en vivo</div>
-        </div>
-        <div className="absolute w-[120px] rounded-[10px] border border-white/10 bg-white/[0.04] px-2.5 py-2" style={{ left: 526, top: 234, zIndex: 1 }}>
-          <div className="text-[10px] font-semibold text-[#e6eefc]">App / API</div>
-          <div className="mt-0.5 text-[8.5px] text-[#7088a8]">datos unificados</div>
-        </div>
+        {right.map((s, i) => {
+          const pingIdx = leftPipes.length + i;
+          return (
+            <div
+              key={s.name}
+              className={`absolute rounded-[10px] border bg-white/[0.04] px-2.5 py-2 transition-all ${
+                pinged === pingIdx ? "border-[#19C3FF] shadow-[0_0_18px_-4px_rgba(25,195,255,0.5)]" : "border-white/10"
+              }`}
+              style={{ left: X(526), top: Y(s.top), width: W(120), zIndex: 1 }}
+            >
+              <div className="flex items-center gap-1.5">
+                <div className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-md text-[10px] ${s.iconBg}`}>{s.ico}</div>
+                <div className="text-[10px] font-semibold leading-tight text-[#e6eefc]">{s.name}</div>
+                {s.external && (
+                  <span className="ml-auto rounded-[3px] bg-[#a78bfa]/15 px-1 py-[1px] text-[7px] font-bold text-[#a78bfa] leading-none">EXT</span>
+                )}
+              </div>
+              <div className="mt-0.5 text-[8.5px] text-[#7088a8] truncate">{s.sub}</div>
+            </div>
+          );
+        })}
 
         <div className="absolute bottom-1.5 left-0 right-0 text-center text-[9px] text-[#7088a8]">
-          AUTO-SYNC <b className="text-[#20E0B2]">ON</b> · última sincronización: hace 1 min
+          AUTO-SYNC <b className="text-[#20E0B2]">ON</b> · sistemas internos + <span className="text-[#a78bfa]">externos</span>
         </div>
       </div>
 
