@@ -4,6 +4,7 @@ import {
   Menu, X, ArrowRight, Workflow, Bot, Network, Mail, MapPin,
   MessageCircle, CheckCircle2, AlertCircle,
 } from "lucide-react";
+import { DynamicMockup } from "@/components/amensg/DynamicMockup";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -262,7 +263,7 @@ function Hero() {
         </Reveal>
 
         <Reveal delay={120} className="lg:pl-4">
-          <AppMockup />
+          <DynamicMockup />
         </Reveal>
       </div>
 
@@ -392,8 +393,8 @@ function Nosotros() {
   ];
   const partners = [
     { initials: "NL", name: "Néstor Lemo", role: "Director / Cofundador",
-      bio: "Ingeniero en Informática, lidera estrategia comercial, análisis de negocio y relacionamiento con clientes." },
-    { initials: "L", name: "Liber", role: "Director Técnico / Cofundador",
+      bio: "Ingeniero en Informática, lidera estrategia comercial y análisis de negocio." },
+    { initials: "LB", name: "Liber Batalla", role: "Director Técnico / Cofundador",
       bio: "Arquitecto de software, lidera arquitectura de integraciones y desarrollo backend." },
   ];
   return (
