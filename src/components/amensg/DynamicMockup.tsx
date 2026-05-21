@@ -41,18 +41,29 @@ export function DynamicMockup() {
   const [playing, setPlaying] = useState(true);
   const autoRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => { setReduced(mq.matches); if (mq.matches) setPlaying(false); };
+    update();
+    mq.addEventListener?.("change", update);
+    return () => mq.removeEventListener?.("change", update);
+  }, []);
+
   const stopAuto = () => {
     if (autoRef.current) { clearInterval(autoRef.current); autoRef.current = null; }
   };
   const startAuto = () => {
     stopAuto();
+    if (reduced) return;
     autoRef.current = setInterval(() => setCur((c) => (c + 1) % 4), 6500);
   };
 
   useEffect(() => {
-    if (playing) startAuto(); else stopAuto();
+    if (playing && !reduced) startAuto(); else stopAuto();
     return stopAuto;
-  }, [playing]);
+  }, [playing, reduced]);
 
   const goTo = (i: number) => { setCur(((i % 4) + 4) % 4); if (playing) startAuto(); };
   const prev = () => goTo(cur - 1);
