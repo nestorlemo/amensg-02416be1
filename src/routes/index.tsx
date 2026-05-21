@@ -83,6 +83,7 @@ function SiteHeader() {
     { href: "#servicios", label: "Servicios" },
     { href: "#caso", label: "Caso" },
     { href: "#proceso", label: "Cómo trabajamos" },
+    { href: "#equipo", label: "Equipo" },
     { href: "#contacto", label: "Contacto" },
   ];
 
