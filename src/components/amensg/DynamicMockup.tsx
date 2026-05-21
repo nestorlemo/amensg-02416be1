@@ -37,9 +37,10 @@ const ST: Array<[string, string]> = [["ok", "Activo"], ["pr", "Proceso"], ["wt",
 const R = <T,>(a: T[]): T => a[Math.floor(Math.random() * a.length)];
 
 export function DynamicMockup() {
-  const [cur, setCur] = useState(0);
+  // Index into TABS_ORDER (0..3). Independent of scene index so rotation
+  // visibly follows the tab order: Automatización → Integración → Agentes → Gestión.
+  const [tabIdx, setTabIdx] = useState(0);
   const [playing, setPlaying] = useState(true);
-  const autoRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const [reduced, setReduced] = useState(false);
   useEffect(() => {
@@ -51,24 +52,22 @@ export function DynamicMockup() {
     return () => mq.removeEventListener?.("change", update);
   }, []);
 
-  const stopAuto = () => {
-    if (autoRef.current) { clearInterval(autoRef.current); autoRef.current = null; }
-  };
-  const startAuto = () => {
-    stopAuto();
-    if (reduced) return;
-    autoRef.current = setInterval(() => setCur((c) => (c + 1) % 4), 6500);
-  };
-
+  // Outer carousel runs on its OWN timer, independent of any inner scene.
+  // Uses functional updater so it never goes stale.
   useEffect(() => {
-    if (playing && !reduced) startAuto(); else stopAuto();
-    return stopAuto;
+    if (!playing || reduced) return;
+    const id = setInterval(() => {
+      setTabIdx((i) => (i + 1) % TABS_ORDER.length);
+    }, 7000);
+    return () => clearInterval(id);
   }, [playing, reduced]);
 
-  const goTo = (i: number) => { setCur(((i % 4) + 4) % 4); if (playing) startAuto(); };
-  const prev = () => goTo(cur - 1);
-  const next = () => goTo(cur + 1);
+  const goToTab = (i: number) =>
+    setTabIdx(((i % TABS_ORDER.length) + TABS_ORDER.length) % TABS_ORDER.length);
+  const prev = () => goToTab(tabIdx - 1);
+  const next = () => goToTab(tabIdx + 1);
 
+  const cur = TABS_ORDER[tabIdx].scene;
   const [badgeCls, badgeTxt] = BADGES[cur];
 
   return (
@@ -141,13 +140,13 @@ export function DynamicMockup() {
       </div>
 
       <div className="mt-4 flex flex-wrap justify-center gap-2 px-1">
-        {TABS_ORDER.map((t) => {
-          const active = cur === t.scene;
+        {TABS_ORDER.map((t, i) => {
+          const active = tabIdx === i;
           return (
             <button
               key={t.label}
               type="button"
-              onClick={() => goTo(t.scene)}
+              onClick={() => goToTab(i)}
               aria-pressed={active}
               className={`inline-flex items-center gap-2 rounded-lg border px-3.5 py-2 text-[12px] font-semibold transition-all ${
                 active
@@ -163,7 +162,7 @@ export function DynamicMockup() {
       </div>
 
       <p className="mt-4 mb-2 px-2 text-center text-[12.5px] leading-relaxed text-white/65 min-h-[2.2em]">
-        {TABS_ORDER.find((t) => t.scene === cur)?.desc}
+        {TABS_ORDER[tabIdx].desc}
       </p>
     </div>
   );
