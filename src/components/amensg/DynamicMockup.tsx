@@ -459,21 +459,29 @@ const mkRow = (): Row => ({
   st: R(ST),
 });
 
-function AppScene() {
+function AppScene({ onCycleComplete, reduced }: SceneProps) {
   const [act, setAct] = useState(1247);
   const [exito, setExito] = useState("98,4%");
   const [entregas, setEntregas] = useState(312);
   const [rows, setRows] = useState<Row[]>([mkRow(), mkRow(), mkRow()]);
 
   useEffect(() => {
+    if (reduced) { onCycleComplete?.(); return; }
+    let ticks = 0;
+    const TOTAL = 4; // 4 row updates ≈ 6.4s per cycle
     const id = setInterval(() => {
       setAct((a) => a + Math.floor(Math.random() * 5) + 1);
       setEntregas(300 + Math.floor(Math.random() * 25));
       setExito(`${(97.5 + Math.random() * 1.4).toFixed(1)}%`);
       setRows((rs) => [mkRow(), ...rs].slice(0, 3));
+      ticks += 1;
+      if (ticks >= TOTAL) {
+        clearInterval(id);
+        onCycleComplete?.();
+      }
     }, 1600);
     return () => clearInterval(id);
-  }, []);
+  }, [onCycleComplete, reduced]);
 
   const stats: Array<[string, string, string]> = [
     [act.toLocaleString("es"), "Activaciones hoy", "text-white"],
