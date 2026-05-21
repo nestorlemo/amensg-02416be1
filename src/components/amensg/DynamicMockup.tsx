@@ -140,23 +140,31 @@ export function DynamicMockup() {
         </button>
       </div>
 
-      <div className="mt-3 flex flex-wrap justify-center gap-2">
-        {LABELS.map((l, i) => (
-          <button
-            key={l}
-            type="button"
-            onClick={() => goTo(i)}
-            className={`inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-[11px] font-medium transition-all ${
-              cur === i
-                ? "bg-[#19C3FF]/10 border-[#19C3FF]/40 text-white"
-                : "bg-white/[0.03] border-white/[0.07] text-[#8ba3c7] hover:text-white"
-            }`}
-          >
-            <span className={`h-1.5 w-1.5 rounded-full ${cur === i ? "bg-[#19C3FF]" : "bg-[#5a7090]"}`} />
-            {l}
-          </button>
-        ))}
+      <div className="mt-4 flex flex-wrap justify-center gap-2 px-1">
+        {TABS_ORDER.map((t) => {
+          const active = cur === t.scene;
+          return (
+            <button
+              key={t.label}
+              type="button"
+              onClick={() => goTo(t.scene)}
+              aria-pressed={active}
+              className={`inline-flex items-center gap-2 rounded-lg border px-3.5 py-2 text-[12px] font-semibold transition-all ${
+                active
+                  ? "bg-[#19C3FF]/20 border-[#19C3FF]/70 text-white shadow-[0_0_0_1px_rgba(25,195,255,0.35)]"
+                  : "bg-white/[0.04] border-white/15 text-white/70 hover:text-white hover:border-white/30"
+              }`}
+            >
+              <span className={`h-1.5 w-1.5 rounded-full ${active ? "bg-[#19C3FF]" : "bg-[#5a7090]"}`} />
+              {t.label}
+            </button>
+          );
+        })}
       </div>
+
+      <p className="mt-4 mb-2 px-2 text-center text-[12.5px] leading-relaxed text-white/65 min-h-[2.2em]">
+        {TABS_ORDER.find((t) => t.scene === cur)?.desc}
+      </p>
     </div>
   );
 }
