@@ -12,7 +12,14 @@ const BADGES: Array<[string, string]> = [
   ["te", "EN PRODUCCIÓN"],
   ["te", "SINCRONIZANDO"],
 ];
-const LABELS = ["Automatización", "Agentes de IA", "Gestión", "Integración"];
+// Tab order requested: Automatización · Integración · Agentes de IA · Gestión
+// Scenes by index: 0 Workflow, 1 Chat, 2 App, 3 Integration
+const TABS_ORDER: Array<{ label: string; scene: number; desc: string }> = [
+  { label: "Automatización", scene: 0, desc: "Automatizamos tareas repetitivas, validaciones y flujos críticos." },
+  { label: "Integración", scene: 3, desc: "Conectamos ERP, CRM, APIs y sistemas legacy sin retrabajo." },
+  { label: "Agentes de IA", scene: 1, desc: "Agentes conectados al conocimiento, datos y procesos de la empresa." },
+  { label: "Gestión", scene: 2, desc: "Plataformas para ventas, backoffice, distribución y operación en campo." },
+];
 
 const CONVO: Array<["ai" | "u", string]> = [
   ["ai", "Hola, soy el asistente de operaciones. ¿En qué te ayudo?"],
@@ -34,18 +41,29 @@ export function DynamicMockup() {
   const [playing, setPlaying] = useState(true);
   const autoRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => { setReduced(mq.matches); if (mq.matches) setPlaying(false); };
+    update();
+    mq.addEventListener?.("change", update);
+    return () => mq.removeEventListener?.("change", update);
+  }, []);
+
   const stopAuto = () => {
     if (autoRef.current) { clearInterval(autoRef.current); autoRef.current = null; }
   };
   const startAuto = () => {
     stopAuto();
+    if (reduced) return;
     autoRef.current = setInterval(() => setCur((c) => (c + 1) % 4), 6500);
   };
 
   useEffect(() => {
-    if (playing) startAuto(); else stopAuto();
+    if (playing && !reduced) startAuto(); else stopAuto();
     return stopAuto;
-  }, [playing]);
+  }, [playing, reduced]);
 
   const goTo = (i: number) => { setCur(((i % 4) + 4) % 4); if (playing) startAuto(); };
   const prev = () => goTo(cur - 1);
@@ -122,23 +140,31 @@ export function DynamicMockup() {
         </button>
       </div>
 
-      <div className="mt-3 flex flex-wrap justify-center gap-2">
-        {LABELS.map((l, i) => (
-          <button
-            key={l}
-            type="button"
-            onClick={() => goTo(i)}
-            className={`inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-[11px] font-medium transition-all ${
-              cur === i
-                ? "bg-[#19C3FF]/10 border-[#19C3FF]/40 text-white"
-                : "bg-white/[0.03] border-white/[0.07] text-[#8ba3c7] hover:text-white"
-            }`}
-          >
-            <span className={`h-1.5 w-1.5 rounded-full ${cur === i ? "bg-[#19C3FF]" : "bg-[#5a7090]"}`} />
-            {l}
-          </button>
-        ))}
+      <div className="mt-4 flex flex-wrap justify-center gap-2 px-1">
+        {TABS_ORDER.map((t) => {
+          const active = cur === t.scene;
+          return (
+            <button
+              key={t.label}
+              type="button"
+              onClick={() => goTo(t.scene)}
+              aria-pressed={active}
+              className={`inline-flex items-center gap-2 rounded-lg border px-3.5 py-2 text-[12px] font-semibold transition-all ${
+                active
+                  ? "bg-[#19C3FF]/20 border-[#19C3FF]/70 text-white shadow-[0_0_0_1px_rgba(25,195,255,0.35)]"
+                  : "bg-white/[0.04] border-white/15 text-white/70 hover:text-white hover:border-white/30"
+              }`}
+            >
+              <span className={`h-1.5 w-1.5 rounded-full ${active ? "bg-[#19C3FF]" : "bg-[#5a7090]"}`} />
+              {t.label}
+            </button>
+          );
+        })}
       </div>
+
+      <p className="mt-4 mb-2 px-2 text-center text-[12.5px] leading-relaxed text-white/65 min-h-[2.2em]">
+        {TABS_ORDER.find((t) => t.scene === cur)?.desc}
+      </p>
     </div>
   );
 }
