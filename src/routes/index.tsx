@@ -621,52 +621,47 @@ function Equipo() {
     {
       initials: "NL",
       name: "Néstor Lemo",
-      role: "Director Comercial / Cofundador",
-      bio: "Ingeniero de Sistemas, lidera la relación con clientes, la dirección comercial y la definición de soluciones junto al negocio.",
+      role: "Director Comercial · Cofundador",
+      area: "Procesos, negocio y relación con clientes.",
+      bio: "Ingeniero de Sistemas. Lidera la relación comercial y la definición de soluciones junto al negocio.",
     },
     {
       initials: "LB",
       name: "Liber Batalla",
-      role: "Director Técnico / Cofundador",
-      bio: "Ingeniero de Sistemas, lidera la arquitectura de integraciones, el desarrollo backend y la ingeniería de las plataformas en producción.",
+      role: "Director Técnico · Cofundador",
+      area: "Arquitectura, integración y plataformas en producción.",
+      bio: "Ingeniero de Sistemas. Lidera la arquitectura de integración, el backend y la evolución de plataformas empresariales.",
     },
   ];
   return (
-    <section id="equipo" className="bg-[#F5F7FA] py-24 md:py-32">
-      <div className="mx-auto max-w-7xl px-5 md:px-8">
+    <section id="equipo" className="bg-[#F5F7FA] py-16 md:py-20">
+      <div className="mx-auto max-w-4xl px-5 md:px-8">
         <Reveal>
           <Eyebrow light>Equipo</Eyebrow>
-          <h2 className="mt-3 max-w-3xl font-extrabold tracking-[-0.025em] text-[#0B1F3A]" style={{ fontSize: "clamp(30px,3.8vw,48px)" }}>
-            Quiénes lideran AMENSG.
+          <h2 className="mt-2 font-extrabold tracking-[-0.025em] text-[#0B1F3A]" style={{ fontSize: "clamp(26px,3.2vw,40px)" }}>
+            Equipo fundador
           </h2>
-          <p className="mt-6 max-w-2xl text-[16px] leading-relaxed text-[#5a6a82]">
-            Un equipo con experiencia real en operación crítica, ingeniería de software e integración de sistemas empresariales.
+          <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-[#5a6a82]">
+            Perfiles complementarios en negocio, procesos, arquitectura e integración de sistemas empresariales.
           </p>
         </Reveal>
 
-        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:gap-8">
+        <div className="mt-10 grid gap-5 sm:grid-cols-2">
           {team.map((p, i) => (
-            <Reveal key={p.name} delay={i * 90}>
-              <div className="flex h-full items-start gap-5 rounded-2xl border border-[#0B1F3A]/10 bg-white p-6 md:p-8 transition-all hover:border-[#19C3FF]/40">
-                <div
-                  className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-[15px] font-bold text-white"
-                  style={{ background: "linear-gradient(135deg,#0B1F3A 0%, #1769E0 100%)" }}
-                >
-                  {p.initials}
-                </div>
-                <div className="min-w-0">
-                  <h3 className="text-[18px] font-bold tracking-tight text-[#0B1F3A]">{p.name}</h3>
-                  <p className="mt-1 text-[12px] font-semibold uppercase tracking-[1.2px] text-[#1769E0]">{p.role}</p>
-                  <p className="mt-3 text-[14.5px] leading-relaxed text-[#5a6a82]">{p.bio}</p>
-                </div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
+            <Reveal key={p.name} delay={i * 80}>
+              <div className="flex h-full flex-col rounded-2xl border border-[#0B1F3A]/10 bg-white p-6 transition-all hover:border-[#19C3FF]/40">
+                <div className="flex items-center gap-3.5">
+                  <div
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[13px] font-bold text-white"
+                    style={{ background: "linear-gradient(135deg,#0B1F3A 0%, #1769E0 100%)" }}
+                  >
+                    {p.initials}
+                  </div>
+                  <div className="min-w-1 flex-1">
+                    <h3 className="text-[15px] font-medium tracking-tight text-[#0B1F3A]">{p.name}</h3>
+                    <p className="text-[12px] font-medium text-[#1769E0]">{p.role}</p>
+                  </div>
+                </<div>
 
 /* ─────────────── 10. CONTACTO ─────────────── */
 function ContactBlock() {
