@@ -83,6 +83,7 @@ function SiteHeader() {
     { href: "#servicios", label: "Servicios" },
     { href: "#caso", label: "Caso" },
     { href: "#proceso", label: "Cómo trabajamos" },
+    { href: "#equipo", label: "Equipo" },
     { href: "#contacto", label: "Contacto" },
   ];
 
@@ -614,6 +615,59 @@ function PorQue() {
   );
 }
 
+/* ─────────────── 9.5 EQUIPO ─────────────── */
+function Equipo() {
+  const team = [
+    {
+      initials: "NL",
+      name: "Néstor Lemo",
+      role: "Director Comercial / Cofundador",
+      bio: "Ingeniero de Sistemas, lidera la relación con clientes, la dirección comercial y la definición de soluciones junto al negocio.",
+    },
+    {
+      initials: "LB",
+      name: "Liber Batalla",
+      role: "Director Técnico / Cofundador",
+      bio: "Ingeniero de Sistemas, lidera la arquitectura de integraciones, el desarrollo backend y la ingeniería de las plataformas en producción.",
+    },
+  ];
+  return (
+    <section id="equipo" className="bg-[#F5F7FA] py-24 md:py-32">
+      <div className="mx-auto max-w-7xl px-5 md:px-8">
+        <Reveal>
+          <Eyebrow light>Equipo</Eyebrow>
+          <h2 className="mt-3 max-w-3xl font-extrabold tracking-[-0.025em] text-[#0B1F3A]" style={{ fontSize: "clamp(30px,3.8vw,48px)" }}>
+            Quiénes lideran AMENSG.
+          </h2>
+          <p className="mt-6 max-w-2xl text-[16px] leading-relaxed text-[#5a6a82]">
+            Un equipo con experiencia real en operación crítica, ingeniería de software e integración de sistemas empresariales.
+          </p>
+        </Reveal>
+
+        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:gap-8">
+          {team.map((p, i) => (
+            <Reveal key={p.name} delay={i * 90}>
+              <div className="flex h-full items-start gap-5 rounded-2xl border border-[#0B1F3A]/10 bg-white p-6 md:p-8 transition-all hover:border-[#19C3FF]/40">
+                <div
+                  className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-[15px] font-bold text-white"
+                  style={{ background: "linear-gradient(135deg,#0B1F3A 0%, #1769E0 100%)" }}
+                >
+                  {p.initials}
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-[18px] font-bold tracking-tight text-[#0B1F3A]">{p.name}</h3>
+                  <p className="mt-1 text-[12px] font-semibold uppercase tracking-[1.2px] text-[#1769E0]">{p.role}</p>
+                  <p className="mt-3 text-[14.5px] leading-relaxed text-[#5a6a82]">{p.bio}</p>
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─────────────── 10. CONTACTO ─────────────── */
 function ContactBlock() {
   const [f, setF] = useState({ nombre: "", empresa: "", email: "", telefono: "", proceso: "", mensaje: "" });
@@ -760,6 +814,7 @@ function LandingPage() {
         <Tecnologias />
         <Proceso />
         <PorQue />
+        <Equipo />
         <Contacto />
       </main>
     </div>
