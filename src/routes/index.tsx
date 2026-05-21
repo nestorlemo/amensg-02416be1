@@ -657,11 +657,27 @@ function Equipo() {
                   >
                     {p.initials}
                   </div>
-                  <div className="min-w-1 flex-1">
+                  <div className="min-w-0 flex-1">
                     <h3 className="text-[15px] font-medium tracking-tight text-[#0B1F3A]">{p.name}</h3>
                     <p className="text-[12px] font-medium text-[#1769E0]">{p.role}</p>
                   </div>
-                </<div>
+                </div>
+                <p className="mt-4 text-[13px] font-medium leading-snug text-[#0B1F3A]">{p.area}</p>
+                <p className="mt-2 text-[13px] leading-relaxed text-[#5a6a82]">{p.bio}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+
+        <Reveal delay={120}>
+          <p className="mx-auto mt-10 max-w-xl text-center text-[13px] leading-relaxed text-[#5a6a82]">
+            Capacidad técnica y cercanía operativa para integrarnos rápido a los equipos de nuestros clientes.
+          </p>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
 
 /* ─────────────── 10. CONTACTO ─────────────── */
 function ContactBlock() {
