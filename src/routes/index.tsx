@@ -814,6 +814,7 @@ function LandingPage() {
         <Tecnologias />
         <Proceso />
         <PorQue />
+        <Equipo />
         <Contacto />
       </main>
     </div>
