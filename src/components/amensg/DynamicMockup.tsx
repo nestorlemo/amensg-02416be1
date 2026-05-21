@@ -543,7 +543,7 @@ type Scenario = {
   edges: EdgeSpec[];
 };
 
-function IntegrationScene() {
+function IntegrationScene({ onCycleComplete, reduced, pairIdx = 0 }: SceneProps & { pairIdx?: number }) {
   const LEFT = [
     { name: "ERP", ico: "▤", color: "#20E0B2" },
     { name: "CRM", ico: "◍", color: "#19C3FF" },
@@ -605,28 +605,23 @@ function IntegrationScene() {
     },
   ];
 
-  const [active, setActive] = useState(0);
-  const [playing, setPlaying] = useState(true);
-  const [reduced, setReduced] = useState(false);
+  // Show exactly 2 scenarios per visit, rotating which pair via pairIdx.
+  const pair = [pairIdx * 2, pairIdx * 2 + 1] as const;
+  const [step, setStep] = useState(0); // 0 -> first scenario of pair, 1 -> second
+  const STEP_MS = 4200;
 
   useEffect(() => {
-    if (typeof window === "undefined" || !window.matchMedia) return;
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const u = () => { setReduced(mq.matches); if (mq.matches) setPlaying(false); };
-    u();
-    mq.addEventListener?.("change", u);
-    return () => mq.removeEventListener?.("change", u);
-  }, []);
+    setStep(0);
+    if (reduced) { onCycleComplete?.(); return; }
+    const t1 = setTimeout(() => setStep(1), STEP_MS);
+    const t2 = setTimeout(() => { onCycleComplete?.(); }, STEP_MS * 2);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, [onCycleComplete, reduced, pairIdx]);
 
-  useEffect(() => {
-    if (!playing || reduced) return;
-    const id = setInterval(() => setActive((a) => (a + 1) % SCENARIOS.length), 4200);
-    return () => clearInterval(id);
-  }, [playing, reduced, SCENARIOS.length]);
-
+  const active = pair[step];
   const scene = SCENARIOS[active];
 
-  // Logical canvas 720 x 352 (extra width so long labels fit)
+  // Logical canvas 720 x 352
   const CW = 720;
   const CH = 352;
   const X = (px: number) => `${((px / CW) * 100).toFixed(3)}%`;
@@ -634,9 +629,10 @@ function IntegrationScene() {
   const W = (w: number) => `${((w / CW) * 100).toFixed(3)}%`;
   const H = (h: number) => `${((h / CH) * 100).toFixed(3)}%`;
 
-  // Right edge of left-column nodes (anchor) and left edge of right-column nodes (anchor)
-  const LEFT_EDGE_X = 160;   // right edge of every left node
-  const RIGHT_EDGE_X = 560;  // left edge of every right node
+  // Anchors moved inward to give node boxes room to grow without touching
+  // the panel edges. ~24px breathing room on each side at 720px canvas.
+  const LEFT_EDGE_X = 180;   // right edge of every left node
+  const RIGHT_EDGE_X = 540;  // left edge of every right node
 
   // Vertical placement
   const leftTops = [40, 110, 180, 250];
@@ -646,31 +642,18 @@ function IntegrationScene() {
 
   const leftPath = (i: number) => {
     const y = leftTops[i] + NODE_H / 2;
-    return `M ${LEFT_EDGE_X} ${y} C 230 ${y}, 250 ${hub.cy}, ${hub.x} ${hub.cy}`;
+    return `M ${LEFT_EDGE_X} ${y} C 250 ${y}, 280 ${hub.cy}, ${hub.x} ${hub.cy}`;
   };
   const rightPath = (i: number) => {
     const y = rightTops[i] + NODE_H / 2;
-    return `M ${hub.x + hub.w} ${hub.cy} C 470 ${hub.cy}, 480 ${y}, ${RIGHT_EDGE_X} ${y}`;
+    return `M ${hub.x + hub.w} ${hub.cy} C 450 ${hub.cy}, 480 ${y}, ${RIGHT_EDGE_X} ${y}`;
   };
 
   return (
-    <div className="flex h-full items-center justify-center px-2">
+    <div className="flex h-full items-center justify-center px-6">
       <div className="relative w-full max-w-[720px] h-[352px]">
-        {/* Top-left controls: play/pause + pattern label (free of any node) */}
+        {/* Pattern label (free of any node) */}
         <div className="absolute top-2 left-2 z-10 flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setPlaying((p) => !p)}
-            disabled={reduced}
-            aria-label={playing ? "Pausar rotación" : "Reanudar rotación"}
-            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-white/10 bg-white/[0.05] text-[#aebfd6] hover:text-white hover:border-white/25 transition-all disabled:opacity-30"
-          >
-            {playing ? (
-              <svg viewBox="0 0 24 24" className="h-3 w-3" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1" /><rect x="14" y="5" width="4" height="14" rx="1" /></svg>
-            ) : (
-              <svg viewBox="0 0 24 24" className="h-3 w-3" fill="currentColor"><polygon points="7,5 19,12 7,19" /></svg>
-            )}
-          </button>
           <div
             key={`pat-${active}`}
             className="rounded-md border border-[#19C3FF]/30 bg-[#19C3FF]/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.6px] text-[#7DD8FF] animate-[intfade_0.4s_ease] whitespace-nowrap"
@@ -752,7 +735,7 @@ function IntegrationScene() {
           })}
         </svg>
 
-        {/* Left nodes: anchored by RIGHT edge at x=LEFT_EDGE_X, auto width */}
+        {/* Left nodes: anchored by RIGHT edge at x=LEFT_EDGE_X, fit-content width */}
         {LEFT.map((s, i) => {
           const isOn = scene.leftActive.includes(i);
           return (
@@ -763,10 +746,9 @@ function IntegrationScene() {
                 right: X(CW - LEFT_EDGE_X),
                 top: Y(leftTops[i]),
                 height: H(NODE_H),
-                width: "auto",
-                minWidth: W(72),
-                paddingLeft: "12px",
-                paddingRight: "12px",
+                width: "fit-content",
+                paddingLeft: "16px",
+                paddingRight: "16px",
                 zIndex: 1,
                 opacity: isOn ? 1 : 0.25,
                 borderColor: isOn ? s.color : "rgba(255,255,255,0.1)",
@@ -801,7 +783,7 @@ function IntegrationScene() {
           <div className="text-[10px] text-[#19C3FF] mt-0.5 uppercase tracking-[0.8px]">hub</div>
         </div>
 
-        {/* Right nodes: anchored by LEFT edge at x=RIGHT_EDGE_X, auto width */}
+        {/* Right nodes: anchored by LEFT edge at x=RIGHT_EDGE_X, fit-content width */}
         {RIGHT.map((s, i) => {
           const isOn = scene.rightActive.includes(i);
           return (
@@ -812,10 +794,9 @@ function IntegrationScene() {
                 left: X(RIGHT_EDGE_X),
                 top: Y(rightTops[i]),
                 height: H(NODE_H),
-                width: "auto",
-                minWidth: W(72),
-                paddingLeft: "12px",
-                paddingRight: "12px",
+                width: "fit-content",
+                paddingLeft: "16px",
+                paddingRight: "16px",
                 zIndex: 1,
                 opacity: isOn ? 1 : 0.25,
                 borderColor: isOn ? s.color : "rgba(255,255,255,0.1)",
