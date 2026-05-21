@@ -480,135 +480,309 @@ function AppScene() {
 }
 
 /* ─────────── Integration scene ─────────── */
-function IntegrationScene() {
-  const [pinged, setPinged] = useState(-1);
-  const [pulse, setPulse] = useState(0);
+type EdgeSpec = { side: "L" | "R"; idx: number; bi: boolean };
+type Scenario = {
+  pattern: string;
+  desc: string;
+  leftActive: number[];
+  rightActive: number[];
+  edges: EdgeSpec[];
+};
 
-  // Logical coord space: 660 x 352 (matches SVG viewBox + container ratio)
+function IntegrationScene() {
+  const LEFT = [
+    { name: "ERP", ico: "▤", color: "#20E0B2" },
+    { name: "CRM", ico: "◍", color: "#19C3FF" },
+    { name: "Operaciones", ico: "▦", color: "#f0b840" },
+    { name: "Sistema legacy", ico: "▣", color: "#8ba3c7" },
+  ];
+  const RIGHT = [
+    { name: "Analítica / BI", ico: "▥", color: "#19C3FF" },
+    { name: "API pública", ico: "◇", color: "#20E0B2" },
+    { name: "SaaS externos", ico: "☁", color: "#a78bfa" },
+    { name: "Facturación", ico: "⚡", color: "#a78bfa" },
+    { name: "Agente IA", ico: "◆", color: "#c4b5fd" },
+  ];
+
+  const SCENARIOS: Scenario[] = [
+    {
+      pattern: "sync bidireccional",
+      desc: "Mantenemos ERP y CRM sincronizados para que finanzas y comercial trabajen sobre la misma información.",
+      leftActive: [0, 1],
+      rightActive: [0],
+      edges: [
+        { side: "L", idx: 0, bi: true },
+        { side: "L", idx: 1, bi: true },
+        { side: "R", idx: 0, bi: false },
+      ],
+    },
+    {
+      pattern: "orquestación event-driven",
+      desc: "Eventos de tu operación disparan acciones en SaaS externos y facturación electrónica, sin intervención manual.",
+      leftActive: [0],
+      rightActive: [2, 3],
+      edges: [
+        { side: "L", idx: 0, bi: false },
+        { side: "R", idx: 2, bi: false },
+        { side: "R", idx: 3, bi: false },
+      ],
+    },
+    {
+      pattern: "fachada de API",
+      desc: "Envolvemos tus sistemas heredados y exponemos una API moderna, sin reemplazar lo que ya funciona.",
+      leftActive: [3],
+      rightActive: [1],
+      edges: [
+        { side: "L", idx: 3, bi: false },
+        { side: "R", idx: 1, bi: false },
+      ],
+    },
+    {
+      pattern: "contexto para IA",
+      desc: "Unificamos sistemas y datos para que la IA opere con el contexto real de tu negocio.",
+      leftActive: [0, 1, 2],
+      rightActive: [4],
+      edges: [
+        { side: "L", idx: 0, bi: false },
+        { side: "L", idx: 1, bi: false },
+        { side: "L", idx: 2, bi: false },
+        { side: "R", idx: 4, bi: false },
+      ],
+    },
+  ];
+
+  const [active, setActive] = useState(0);
+  const [playing, setPlaying] = useState(true);
+  const [reduced, setReduced] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const u = () => { setReduced(mq.matches); if (mq.matches) setPlaying(false); };
+    u();
+    mq.addEventListener?.("change", u);
+    return () => mq.removeEventListener?.("change", u);
+  }, []);
+
+  useEffect(() => {
+    if (!playing || reduced) return;
+    const id = setInterval(() => setActive((a) => (a + 1) % SCENARIOS.length), 4200);
+    return () => clearInterval(id);
+  }, [playing, reduced, SCENARIOS.length]);
+
+  const scene = SCENARIOS[active];
+
+  // Logical canvas 660 x 352
   const X = (px: number) => `${((px / 660) * 100).toFixed(3)}%`;
   const Y = (py: number) => `${((py / 352) * 100).toFixed(3)}%`;
   const W = (w: number) => `${((w / 660) * 100).toFixed(3)}%`;
   const H = (h: number) => `${((h / 352) * 100).toFixed(3)}%`;
 
-  const left = [
-    { top: 30, ico: "▤", iconBg: "bg-[#20E0B2]/15 text-[#20E0B2]", name: "ERP", color: "#20E0B2" },
-    { top: 92, ico: "◍", iconBg: "bg-[#19C3FF]/15 text-[#19C3FF]", name: "CRM", color: "#19C3FF" },
-    { top: 222, ico: "▦", iconBg: "bg-[#f0b840]/15 text-[#f0b840]", name: "Base de datos", color: "#f0b840" },
-    { top: 284, ico: "▣", iconBg: "bg-[#8ba3c7]/15 text-[#8ba3c7]", name: "Sistemas legacy", color: "#8ba3c7" },
-  ];
+  // Vertical placement
+  const leftTops = [40, 110, 180, 250];
+  const rightTops = [12, 80, 148, 216, 284];
+  const hub = { x: 285, y: 134, w: 90, h: 90, cx: 330, cy: 179 };
 
-  const right = [
-    { top: 18, ico: "▥", iconBg: "bg-[#19C3FF]/15 text-[#19C3FF]", name: "Dashboard", sub: "analítica en vivo", color: "#19C3FF", external: false },
-    { top: 98, ico: "☁", iconBg: "bg-[#a78bfa]/15 text-[#a78bfa]", name: "APIs externas", sub: "proveedores · SaaS", color: "#a78bfa", external: true },
-    { top: 200, ico: "◇", iconBg: "bg-[#20E0B2]/15 text-[#20E0B2]", name: "App / API", sub: "datos unificados", color: "#20E0B2", external: false },
-    { top: 280, ico: "⚡", iconBg: "bg-[#a78bfa]/15 text-[#a78bfa]", name: "Webhooks", sub: "servicios externos", color: "#a78bfa", external: true },
-  ];
+  const leftPath = (i: number) => {
+    const y = leftTops[i] + 17;
+    return `M 132 ${y} C 215 ${y}, 230 ${hub.cy}, ${hub.x} ${hub.cy}`;
+  };
+  const rightPath = (i: number) => {
+    const y = rightTops[i] + 17;
+    return `M ${hub.x + hub.w} ${hub.cy} C 445 ${hub.cy}, 445 ${y}, 528 ${y}`;
+  };
 
-  // Hub: 84x84 centered at (330, 176). Left edge x=288, right edge x=372.
-  // Left boxes: right edge x=132, center y = top+19
-  // Right boxes: left edge x=526, center y = top+19
-  const leftPipes = left.map((s) => {
-    const y = s.top + 19;
-    return { d: `M 132 ${y} C 220 ${y}, 230 176, 288 176`, color: s.color };
-  });
-  const rightPipes = right.map((s) => {
-    const y = s.top + 19;
-    return { d: `M 372 176 C 440 176, 460 ${y}, 526 ${y}`, color: s.color };
-  });
-  const allPipes = [...leftPipes, ...rightPipes];
-  const totalPings = allPipes.length;
-
-  useEffect(() => {
-    let k = 0;
-    setPinged(0);
-    setPulse((p) => p + 1);
-    const id = setInterval(() => {
-      k = (k + 1) % totalPings;
-      setPinged(k);
-      setPulse((p) => p + 1);
-    }, 700);
-    return () => clearInterval(id);
-  }, [totalPings]);
+  const edgeActive = (side: "L" | "R", idx: number) =>
+    scene.edges.find((e) => e.side === side && e.idx === idx);
 
   return (
     <div className="flex h-full items-center justify-center px-2">
       <div className="relative w-full max-w-[660px] h-[352px]">
+        {/* Pattern label */}
+        <div
+          key={`pat-${active}`}
+          className="absolute top-2 right-2 z-10 rounded-md border border-[#19C3FF]/30 bg-[#19C3FF]/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.6px] text-[#19C3FF] animate-[intfade_0.4s_ease]"
+        >
+          {scene.pattern}
+        </div>
+
+        {/* Play/pause */}
+        <button
+          type="button"
+          onClick={() => setPlaying((p) => !p)}
+          disabled={reduced}
+          aria-label={playing ? "Pausar rotación" : "Reanudar rotación"}
+          className="absolute top-2 left-2 z-10 flex h-6 w-6 items-center justify-center rounded-md border border-white/10 bg-white/[0.05] text-[#aebfd6] hover:text-white hover:border-white/25 transition-all disabled:opacity-30"
+        >
+          {playing ? (
+            <svg viewBox="0 0 24 24" className="h-3 w-3" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1" /><rect x="14" y="5" width="4" height="14" rx="1" /></svg>
+          ) : (
+            <svg viewBox="0 0 24 24" className="h-3 w-3" fill="currentColor"><polygon points="7,5 19,12 7,19" /></svg>
+          )}
+        </button>
+
         <svg
           className="absolute inset-0 h-full w-full pointer-events-none"
           viewBox="0 0 660 352"
           preserveAspectRatio="none"
         >
-          {allPipes.map((p, i) => (
-            <path key={`pp${i}`} d={p.d} stroke={p.color} strokeWidth="4.5" strokeLinecap="round" fill="none" opacity="0.22" vectorEffect="non-scaling-stroke" />
+          <defs>
+            <marker id="arrHub" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="#19C3FF" />
+            </marker>
+            <marker id="arrOut" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="#19C3FF" />
+            </marker>
+            <marker id="arrBack" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="#19C3FF" />
+            </marker>
+          </defs>
+
+          {/* All edges dimmed */}
+          {LEFT.map((_, i) => (
+            <path key={`Lb${i}`} d={leftPath(i)} stroke="#ffffff" strokeWidth="1.4" fill="none" opacity="0.06" vectorEffect="non-scaling-stroke" />
           ))}
-          {allPipes.map((p, i) => (
-            <path
-              key={`pl${i}-${pulse}-${pinged}`}
-              d={p.d}
-              stroke={p.color}
-              strokeWidth="4.5"
-              strokeLinecap="round"
-              fill="none"
-              vectorEffect="non-scaling-stroke"
-              opacity={pinged === i ? 0.95 : 0}
-              style={{
-                strokeDasharray: "14 320",
-                animation: pinged === i ? "intpulse 0.9s linear" : "none",
-              }}
-            />
+          {RIGHT.map((_, i) => (
+            <path key={`Rb${i}`} d={rightPath(i)} stroke="#ffffff" strokeWidth="1.4" fill="none" opacity="0.06" vectorEffect="non-scaling-stroke" />
           ))}
+
+          {/* Active edges */}
+          {scene.edges.map((e, k) => {
+            const d = e.side === "L" ? leftPath(e.idx) : rightPath(e.idx);
+            return (
+              <g key={`act-${active}-${k}`} className="animate-[intfade_0.4s_ease]">
+                <path
+                  d={d}
+                  stroke="#19C3FF"
+                  strokeWidth="1.6"
+                  fill="none"
+                  opacity="0.45"
+                  vectorEffect="non-scaling-stroke"
+                  markerEnd={e.side === "R" ? "url(#arrOut)" : "url(#arrHub)"}
+                  markerStart={e.bi ? "url(#arrBack)" : undefined}
+                />
+                {/* Forward pulse */}
+                {!reduced && (
+                  <path
+                    d={d}
+                    stroke="#19C3FF"
+                    strokeWidth="2.4"
+                    fill="none"
+                    strokeLinecap="round"
+                    vectorEffect="non-scaling-stroke"
+                    style={{
+                      strokeDasharray: "16 260",
+                      animation: "intpulseF 1.6s linear infinite",
+                    }}
+                  />
+                )}
+                {/* Reverse pulse for bidirectional */}
+                {!reduced && e.bi && (
+                  <path
+                    d={d}
+                    stroke="#20E0B2"
+                    strokeWidth="2.4"
+                    fill="none"
+                    strokeLinecap="round"
+                    vectorEffect="non-scaling-stroke"
+                    style={{
+                      strokeDasharray: "16 260",
+                      animation: "intpulseR 1.6s linear infinite",
+                    }}
+                  />
+                )}
+              </g>
+            );
+          })}
         </svg>
 
-        {left.map((s, i) => (
-          <div
-            key={s.name}
-            className={`absolute flex items-center gap-2 rounded-[10px] border bg-white/[0.04] px-2.5 py-2 transition-all ${
-              pinged === i ? "border-[#19C3FF] shadow-[0_0_18px_-4px_rgba(25,195,255,0.5)]" : "border-white/10"
-            }`}
-            style={{ left: X(14), top: Y(s.top), width: W(118), zIndex: 1 }}
-          >
-            <div className={`flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-md text-[12px] ${s.iconBg}`}>{s.ico}</div>
-            <div className="text-[10px] font-semibold leading-tight text-[#e6eefc]">{s.name}</div>
-          </div>
-        ))}
-
-        <div
-          className="absolute flex flex-col items-center justify-center rounded-[18px] bg-[#19C3FF]/13 border border-[#19C3FF]/40"
-          style={{ left: X(288), top: Y(134), width: W(84), height: H(84), zIndex: 2 }}
-        >
-          <div className="text-[22px] text-[#19C3FF] leading-none">⇄</div>
-          <div className="mt-1 text-[10px] font-bold text-[#19C3FF]">amensg</div>
-          <div className="text-[7.5px] text-[#8ba3c7] mt-0.5">hub</div>
-        </div>
-
-        {right.map((s, i) => {
-          const pingIdx = leftPipes.length + i;
+        {/* Left nodes */}
+        {LEFT.map((s, i) => {
+          const isOn = scene.leftActive.includes(i);
           return (
             <div
               key={s.name}
-              className={`absolute rounded-[10px] border bg-white/[0.04] px-2.5 py-2 transition-all ${
-                pinged === pingIdx ? "border-[#19C3FF] shadow-[0_0_18px_-4px_rgba(25,195,255,0.5)]" : "border-white/10"
-              }`}
-              style={{ left: X(526), top: Y(s.top), width: W(120), zIndex: 1 }}
+              className="absolute flex items-center gap-2 rounded-[10px] border bg-white/[0.04] px-2.5 py-2 transition-all duration-400"
+              style={{
+                left: X(14),
+                top: Y(leftTops[i]),
+                width: W(118),
+                zIndex: 1,
+                opacity: isOn ? 1 : 0.25,
+                borderColor: isOn ? s.color : "rgba(255,255,255,0.1)",
+                boxShadow: isOn ? `0 0 18px -4px ${s.color}66` : "none",
+              }}
             >
-              <div className="flex items-center gap-1.5">
-                <div className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-md text-[10px] ${s.iconBg}`}>{s.ico}</div>
-                <div className="text-[10px] font-semibold leading-tight text-[#e6eefc]">{s.name}</div>
-                {s.external && (
-                  <span className="ml-auto rounded-[3px] bg-[#a78bfa]/15 px-1 py-[1px] text-[7px] font-bold text-[#a78bfa] leading-none">EXT</span>
-                )}
+              <div
+                className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-md text-[12px]"
+                style={{ background: `${s.color}26`, color: s.color }}
+              >
+                {s.ico}
               </div>
-              <div className="mt-0.5 text-[8.5px] text-[#7088a8] truncate">{s.sub}</div>
+              <div className="text-[13px] font-semibold leading-tight text-[#e6eefc]">{s.name}</div>
             </div>
           );
         })}
 
-        <div className="absolute bottom-1.5 left-0 right-0 text-center text-[9px] text-[#7088a8]">
-          AUTO-SYNC <b className="text-[#20E0B2]">ON</b> · sistemas internos + <span className="text-[#a78bfa]">externos</span>
+        {/* Hub */}
+        <div
+          className="absolute flex flex-col items-center justify-center rounded-[18px] bg-[#19C3FF]/15 border-2 border-[#19C3FF]/55"
+          style={{
+            left: X(hub.x),
+            top: Y(hub.y),
+            width: W(hub.w),
+            height: H(hub.h),
+            zIndex: 2,
+            boxShadow: "0 0 28px -6px rgba(25,195,255,0.55)",
+          }}
+        >
+          <div className="text-[24px] text-[#19C3FF] leading-none">⇄</div>
+          <div className="mt-1 text-[13px] font-bold text-white">amensg</div>
+          <div className="text-[10px] text-[#19C3FF] mt-0.5 uppercase tracking-[0.8px]">hub</div>
+        </div>
+
+        {/* Right nodes */}
+        {RIGHT.map((s, i) => {
+          const isOn = scene.rightActive.includes(i);
+          return (
+            <div
+              key={s.name}
+              className="absolute flex items-center gap-2 rounded-[10px] border bg-white/[0.04] px-2.5 py-2 transition-all duration-400"
+              style={{
+                left: X(528),
+                top: Y(rightTops[i]),
+                width: W(120),
+                zIndex: 1,
+                opacity: isOn ? 1 : 0.25,
+                borderColor: isOn ? s.color : "rgba(255,255,255,0.1)",
+                boxShadow: isOn ? `0 0 18px -4px ${s.color}66` : "none",
+              }}
+            >
+              <div
+                className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-md text-[11px]"
+                style={{ background: `${s.color}26`, color: s.color }}
+              >
+                {s.ico}
+              </div>
+              <div className="text-[13px] font-semibold leading-tight text-[#e6eefc]">{s.name}</div>
+            </div>
+          );
+        })}
+
+        {/* Dynamic subtitle */}
+        <div
+          key={`desc-${active}`}
+          className="absolute bottom-1 left-4 right-4 text-center text-[11px] leading-snug text-[#aebfd6] animate-[intfade_0.4s_ease]"
+        >
+          {scene.desc}
         </div>
       </div>
 
-      <style>{`@keyframes intpulse { from { stroke-dashoffset: 334; } to { stroke-dashoffset: 0; } }`}</style>
+      <style>{`
+        @keyframes intpulseF { from { stroke-dashoffset: 276; } to { stroke-dashoffset: 0; } }
+        @keyframes intpulseR { from { stroke-dashoffset: 0; } to { stroke-dashoffset: 276; } }
+        @keyframes intfade { from { opacity: 0; } to { opacity: 1; } }
+      `}</style>
     </div>
   );
 }
