@@ -1,4 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+type SceneProps = {
+  onCycleComplete?: () => void;
+  reduced?: boolean;
+};
 
 const TABS = [
   "amensg / workflow.n8n",
@@ -37,9 +42,15 @@ const ST: Array<[string, string]> = [["ok", "Activo"], ["pr", "Proceso"], ["wt",
 const R = <T,>(a: T[]): T => a[Math.floor(Math.random() * a.length)];
 
 export function DynamicMockup() {
-  // Index into TABS_ORDER (0..3). Independent of scene index so rotation
-  // visibly follows the tab order: Automatización → Integración → Agentes → Gestión.
+  // Index into TABS_ORDER (0..3). Advances ONLY when the active scene reports
+  // it has finished its own cycle (onCycleComplete). No fixed-time interval.
   const [tabIdx, setTabIdx] = useState(0);
+  // Toggles 0/1 each time we LEAVE the Integration slide so the next visit
+  // shows the other pair of internal scenarios.
+  const [integrationPairIdx, setIntegrationPairIdx] = useState(0);
+  // Bumped on every advance / manual jump so the active scene remounts and
+  // restarts its animation from zero.
+  const [cycleKey, setCycleKey] = useState(0);
   const [playing, setPlaying] = useState(true);
 
   const [reduced, setReduced] = useState(false);
@@ -52,23 +63,35 @@ export function DynamicMockup() {
     return () => mq.removeEventListener?.("change", update);
   }, []);
 
-  // Outer carousel runs on its OWN timer, independent of any inner scene.
-  // Uses functional updater so it never goes stale.
-  useEffect(() => {
-    if (!playing || reduced) return;
-    const id = setInterval(() => {
-      setTabIdx((i) => (i + 1) % TABS_ORDER.length);
-    }, 7000);
-    return () => clearInterval(id);
-  }, [playing, reduced]);
+  // Ref so the callback stays stable but always sees latest playing state.
+  const playingRef = useRef(playing);
+  playingRef.current = playing;
 
-  const goToTab = (i: number) =>
-    setTabIdx(((i % TABS_ORDER.length) + TABS_ORDER.length) % TABS_ORDER.length);
+  const handleCycleComplete = useCallback(() => {
+    if (!playingRef.current) return;
+    setTabIdx((i) => {
+      // If we are leaving the Integration scene, toggle which pair to show next.
+      if (TABS_ORDER[i].scene === 3) {
+        setIntegrationPairIdx((p) => (p + 1) % 2);
+      }
+      return (i + 1) % TABS_ORDER.length;
+    });
+    setCycleKey((k) => k + 1);
+  }, []);
+
+  const goToTab = (i: number) => {
+    const next = ((i % TABS_ORDER.length) + TABS_ORDER.length) % TABS_ORDER.length;
+    setTabIdx(next);
+    setCycleKey((k) => k + 1);
+  };
   const prev = () => goToTab(tabIdx - 1);
   const next = () => goToTab(tabIdx + 1);
 
   const cur = TABS_ORDER[tabIdx].scene;
   const [badgeCls, badgeTxt] = BADGES[cur];
+
+  // Unique key per (tab, cycle) to force a clean remount each cycle.
+  const sceneKey = `${tabIdx}-${cycleKey}`;
 
   return (
     <div className="w-full max-w-[720px] mx-auto">
@@ -100,10 +123,17 @@ export function DynamicMockup() {
         </div>
 
         <div className="relative h-[calc(100%-38px)]">
-          {cur === 0 && <WorkflowScene />}
-          {cur === 1 && <ChatScene />}
-          {cur === 2 && <AppScene />}
-          {cur === 3 && <IntegrationScene />}
+          {cur === 0 && <WorkflowScene key={sceneKey} onCycleComplete={handleCycleComplete} reduced={reduced} />}
+          {cur === 1 && <ChatScene key={sceneKey} onCycleComplete={handleCycleComplete} reduced={reduced} />}
+          {cur === 2 && <AppScene key={sceneKey} onCycleComplete={handleCycleComplete} reduced={reduced} />}
+          {cur === 3 && (
+            <IntegrationScene
+              key={sceneKey}
+              onCycleComplete={handleCycleComplete}
+              reduced={reduced}
+              pairIdx={integrationPairIdx}
+            />
+          )}
         </div>
       </div>
 
@@ -169,20 +199,29 @@ export function DynamicMockup() {
 }
 
 /* ─────────── Workflow scene (horizontal n8n) ─────────── */
-function WorkflowScene() {
+function WorkflowScene({ onCycleComplete, reduced }: SceneProps) {
   const [step, setStep] = useState(0);
   const order = ["w0", "w1", "w2", "w3", "w5"];
+  const doneRef = useRef(false);
 
   useEffect(() => {
+    if (reduced) { setStep(order.length); onCycleComplete?.(); return; }
     let s = 0;
-    const tick = () => {
-      s = (s + 1) % (order.length + 2); // pause at the end
-      setStep(s);
-    };
     setStep(0);
-    const id = setInterval(tick, 850);
+    doneRef.current = false;
+    const total = order.length + 2; // last steps freeze at end state
+    const id = setInterval(() => {
+      s += 1;
+      if (s >= total) {
+        clearInterval(id);
+        setStep(order.length); // freeze at completed state
+        if (!doneRef.current) { doneRef.current = true; onCycleComplete?.(); }
+        return;
+      }
+      setStep(s);
+    }, 850);
     return () => clearInterval(id);
-  }, []);
+  }, [onCycleComplete, reduced]);
 
   const nodeState = (i: number): "" | "active" | "done" => {
     if (step > order.length) return i < order.length ? "done" : "";
@@ -327,20 +366,28 @@ function WorkflowScene() {
 }
 
 /* ─────────── Chat scene ─────────── */
-function ChatScene() {
+function ChatScene({ onCycleComplete, reduced }: SceneProps) {
   const [msgs, setMsgs] = useState<Array<{ w: "ai" | "u"; t: string; typing?: boolean }>>([]);
   const iRef = useRef(0);
 
   useEffect(() => {
     iRef.current = 0;
     setMsgs([]);
+    if (reduced) { onCycleComplete?.(); return; }
     let cancelled = false;
+    let done = false;
     const timeouts: ReturnType<typeof setTimeout>[] = [];
+    const finish = () => {
+      if (done || cancelled) return;
+      done = true;
+      onCycleComplete?.();
+    };
 
     const next = () => {
       if (cancelled) return;
       if (iRef.current >= CONVO.length) {
-        timeouts.push(setTimeout(() => { iRef.current = 0; setMsgs([]); next(); }, 2600));
+        // One full pass. Hold the final state briefly, then signal completion.
+        timeouts.push(setTimeout(finish, 1200));
         return;
       }
       const [w, t] = CONVO[iRef.current];
@@ -354,12 +401,12 @@ function ChatScene() {
             return c;
           });
           iRef.current++;
-          timeouts.push(setTimeout(next, 1000));
-        }, 800));
+          timeouts.push(setTimeout(next, 700));
+        }, 600));
       } else {
         setMsgs((m) => [...m, { w, t }].slice(-4));
         iRef.current++;
-        timeouts.push(setTimeout(next, 850));
+        timeouts.push(setTimeout(next, 600));
       }
     };
     next();
@@ -412,21 +459,29 @@ const mkRow = (): Row => ({
   st: R(ST),
 });
 
-function AppScene() {
+function AppScene({ onCycleComplete, reduced }: SceneProps) {
   const [act, setAct] = useState(1247);
   const [exito, setExito] = useState("98,4%");
   const [entregas, setEntregas] = useState(312);
   const [rows, setRows] = useState<Row[]>([mkRow(), mkRow(), mkRow()]);
 
   useEffect(() => {
+    if (reduced) { onCycleComplete?.(); return; }
+    let ticks = 0;
+    const TOTAL = 4; // 4 row updates ≈ 6.4s per cycle
     const id = setInterval(() => {
       setAct((a) => a + Math.floor(Math.random() * 5) + 1);
       setEntregas(300 + Math.floor(Math.random() * 25));
       setExito(`${(97.5 + Math.random() * 1.4).toFixed(1)}%`);
       setRows((rs) => [mkRow(), ...rs].slice(0, 3));
+      ticks += 1;
+      if (ticks >= TOTAL) {
+        clearInterval(id);
+        onCycleComplete?.();
+      }
     }, 1600);
     return () => clearInterval(id);
-  }, []);
+  }, [onCycleComplete, reduced]);
 
   const stats: Array<[string, string, string]> = [
     [act.toLocaleString("es"), "Activaciones hoy", "text-white"],
@@ -488,7 +543,7 @@ type Scenario = {
   edges: EdgeSpec[];
 };
 
-function IntegrationScene() {
+function IntegrationScene({ onCycleComplete, reduced, pairIdx = 0 }: SceneProps & { pairIdx?: number }) {
   const LEFT = [
     { name: "ERP", ico: "▤", color: "#20E0B2" },
     { name: "CRM", ico: "◍", color: "#19C3FF" },
@@ -550,28 +605,23 @@ function IntegrationScene() {
     },
   ];
 
-  const [active, setActive] = useState(0);
-  const [playing, setPlaying] = useState(true);
-  const [reduced, setReduced] = useState(false);
+  // Show exactly 2 scenarios per visit, rotating which pair via pairIdx.
+  const pair = [pairIdx * 2, pairIdx * 2 + 1] as const;
+  const [step, setStep] = useState(0); // 0 -> first scenario of pair, 1 -> second
+  const STEP_MS = 4200;
 
   useEffect(() => {
-    if (typeof window === "undefined" || !window.matchMedia) return;
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const u = () => { setReduced(mq.matches); if (mq.matches) setPlaying(false); };
-    u();
-    mq.addEventListener?.("change", u);
-    return () => mq.removeEventListener?.("change", u);
-  }, []);
+    setStep(0);
+    if (reduced) { onCycleComplete?.(); return; }
+    const t1 = setTimeout(() => setStep(1), STEP_MS);
+    const t2 = setTimeout(() => { onCycleComplete?.(); }, STEP_MS * 2);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, [onCycleComplete, reduced, pairIdx]);
 
-  useEffect(() => {
-    if (!playing || reduced) return;
-    const id = setInterval(() => setActive((a) => (a + 1) % SCENARIOS.length), 4200);
-    return () => clearInterval(id);
-  }, [playing, reduced, SCENARIOS.length]);
-
+  const active = pair[step];
   const scene = SCENARIOS[active];
 
-  // Logical canvas 720 x 352 (extra width so long labels fit)
+  // Logical canvas 720 x 352
   const CW = 720;
   const CH = 352;
   const X = (px: number) => `${((px / CW) * 100).toFixed(3)}%`;
@@ -579,9 +629,10 @@ function IntegrationScene() {
   const W = (w: number) => `${((w / CW) * 100).toFixed(3)}%`;
   const H = (h: number) => `${((h / CH) * 100).toFixed(3)}%`;
 
-  // Right edge of left-column nodes (anchor) and left edge of right-column nodes (anchor)
-  const LEFT_EDGE_X = 160;   // right edge of every left node
-  const RIGHT_EDGE_X = 560;  // left edge of every right node
+  // Anchors moved inward to give node boxes room to grow without touching
+  // the panel edges. ~24px breathing room on each side at 720px canvas.
+  const LEFT_EDGE_X = 180;   // right edge of every left node
+  const RIGHT_EDGE_X = 540;  // left edge of every right node
 
   // Vertical placement
   const leftTops = [40, 110, 180, 250];
@@ -591,31 +642,18 @@ function IntegrationScene() {
 
   const leftPath = (i: number) => {
     const y = leftTops[i] + NODE_H / 2;
-    return `M ${LEFT_EDGE_X} ${y} C 230 ${y}, 250 ${hub.cy}, ${hub.x} ${hub.cy}`;
+    return `M ${LEFT_EDGE_X} ${y} C 250 ${y}, 280 ${hub.cy}, ${hub.x} ${hub.cy}`;
   };
   const rightPath = (i: number) => {
     const y = rightTops[i] + NODE_H / 2;
-    return `M ${hub.x + hub.w} ${hub.cy} C 470 ${hub.cy}, 480 ${y}, ${RIGHT_EDGE_X} ${y}`;
+    return `M ${hub.x + hub.w} ${hub.cy} C 450 ${hub.cy}, 480 ${y}, ${RIGHT_EDGE_X} ${y}`;
   };
 
   return (
-    <div className="flex h-full items-center justify-center px-2">
+    <div className="flex h-full items-center justify-center px-6">
       <div className="relative w-full max-w-[720px] h-[352px]">
-        {/* Top-left controls: play/pause + pattern label (free of any node) */}
+        {/* Pattern label (free of any node) */}
         <div className="absolute top-2 left-2 z-10 flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setPlaying((p) => !p)}
-            disabled={reduced}
-            aria-label={playing ? "Pausar rotación" : "Reanudar rotación"}
-            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-white/10 bg-white/[0.05] text-[#aebfd6] hover:text-white hover:border-white/25 transition-all disabled:opacity-30"
-          >
-            {playing ? (
-              <svg viewBox="0 0 24 24" className="h-3 w-3" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1" /><rect x="14" y="5" width="4" height="14" rx="1" /></svg>
-            ) : (
-              <svg viewBox="0 0 24 24" className="h-3 w-3" fill="currentColor"><polygon points="7,5 19,12 7,19" /></svg>
-            )}
-          </button>
           <div
             key={`pat-${active}`}
             className="rounded-md border border-[#19C3FF]/30 bg-[#19C3FF]/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.6px] text-[#7DD8FF] animate-[intfade_0.4s_ease] whitespace-nowrap"
@@ -697,7 +735,7 @@ function IntegrationScene() {
           })}
         </svg>
 
-        {/* Left nodes: anchored by RIGHT edge at x=LEFT_EDGE_X, auto width */}
+        {/* Left nodes: anchored by RIGHT edge at x=LEFT_EDGE_X, fit-content width */}
         {LEFT.map((s, i) => {
           const isOn = scene.leftActive.includes(i);
           return (
@@ -708,10 +746,9 @@ function IntegrationScene() {
                 right: X(CW - LEFT_EDGE_X),
                 top: Y(leftTops[i]),
                 height: H(NODE_H),
-                width: "auto",
-                minWidth: W(72),
-                paddingLeft: "12px",
-                paddingRight: "12px",
+                width: "fit-content",
+                paddingLeft: "16px",
+                paddingRight: "16px",
                 zIndex: 1,
                 opacity: isOn ? 1 : 0.25,
                 borderColor: isOn ? s.color : "rgba(255,255,255,0.1)",
@@ -746,7 +783,7 @@ function IntegrationScene() {
           <div className="text-[10px] text-[#19C3FF] mt-0.5 uppercase tracking-[0.8px]">hub</div>
         </div>
 
-        {/* Right nodes: anchored by LEFT edge at x=RIGHT_EDGE_X, auto width */}
+        {/* Right nodes: anchored by LEFT edge at x=RIGHT_EDGE_X, fit-content width */}
         {RIGHT.map((s, i) => {
           const isOn = scene.rightActive.includes(i);
           return (
@@ -757,10 +794,9 @@ function IntegrationScene() {
                 left: X(RIGHT_EDGE_X),
                 top: Y(rightTops[i]),
                 height: H(NODE_H),
-                width: "auto",
-                minWidth: W(72),
-                paddingLeft: "12px",
-                paddingRight: "12px",
+                width: "fit-content",
+                paddingLeft: "16px",
+                paddingRight: "16px",
                 zIndex: 1,
                 opacity: isOn ? 1 : 0.25,
                 borderColor: isOn ? s.color : "rgba(255,255,255,0.1)",
