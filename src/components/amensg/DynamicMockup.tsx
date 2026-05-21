@@ -1,4 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+type SceneProps = {
+  onCycleComplete?: () => void;
+  reduced?: boolean;
+};
 
 const TABS = [
   "amensg / workflow.n8n",
