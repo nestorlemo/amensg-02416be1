@@ -12,7 +12,14 @@ const BADGES: Array<[string, string]> = [
   ["te", "EN PRODUCCIÓN"],
   ["te", "SINCRONIZANDO"],
 ];
-const LABELS = ["Automatización", "Agentes de IA", "Gestión", "Integración"];
+// Tab order requested: Automatización · Integración · Agentes de IA · Gestión
+// Scenes by index: 0 Workflow, 1 Chat, 2 App, 3 Integration
+const TABS_ORDER: Array<{ label: string; scene: number; desc: string }> = [
+  { label: "Automatización", scene: 0, desc: "Automatizamos tareas repetitivas, validaciones y flujos críticos." },
+  { label: "Integración", scene: 3, desc: "Conectamos ERP, CRM, APIs y sistemas legacy sin retrabajo." },
+  { label: "Agentes de IA", scene: 1, desc: "Agentes conectados al conocimiento, datos y procesos de la empresa." },
+  { label: "Gestión", scene: 2, desc: "Plataformas para ventas, backoffice, distribución y operación en campo." },
+];
 
 const CONVO: Array<["ai" | "u", string]> = [
   ["ai", "Hola, soy el asistente de operaciones. ¿En qué te ayudo?"],
