@@ -136,10 +136,10 @@ function Hero() {
         <div className="absolute top-1/3 left-1/2 h-[360px] w-[360px] -translate-x-1/2 rounded-full blur-3xl"
           style={{ background: "radial-gradient(closest-side, rgba(32,224,178,0.10), transparent 70%)", animation: "meshFloat 22s ease-in-out infinite" }} />
       </div>
-      <div aria-hidden className="pointer-events-none absolute inset-0 opacity-[0.08]"
+      <div aria-hidden className="pointer-events-none absolute inset-0 opacity-[0.04]"
         style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.6) 1px, transparent 1px)", backgroundSize: "26px 26px" }} />
 
-      <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-5 md:px-8 lg:grid-cols-2 lg:gap-10">
+      <div className="relative mx-auto grid max-w-7xl items-center gap-14 px-5 md:px-8 lg:grid-cols-2 lg:gap-10">
         <Reveal>
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1.5 text-[11px] font-medium tracking-wide text-white/75">
@@ -147,31 +147,42 @@ function Hero() {
                 <span className="absolute inset-0 animate-ping rounded-full bg-[#20E0B2] opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-[#20E0B2]" />
               </span>
-              SOCIOS EN AUTOMATIZACIÓN INTELIGENTE
+              IA APLICADA A PROCESOS REALES
             </div>
-            <h1 className="mt-7 font-extrabold text-white tracking-[-0.025em] leading-[1.04]" style={{ fontSize: "clamp(40px, 6vw, 74px)" }}>
-              Automatización inteligente para empresas en operación.
+            <h1 className="mt-8 font-extrabold text-white tracking-[-0.025em] leading-[1.06]" style={{ fontSize: "clamp(32px, 4.8vw, 56px)" }}>
+              Automatización, integración e IA para operaciones reales
             </h1>
-            <p className="mt-7 max-w-xl text-[17px] leading-relaxed text-white/65">
-              Construimos plataformas, integraciones y agentes de IA sobre procesos reales. Ayudamos a reducir tareas manuales, conectar sistemas y alcanzar objetivos de negocio junto a un socio tecnológico.
+            <p className="mt-8 max-w-xl text-[17px] leading-relaxed text-white/65">
+              Nos integramos a tu equipo para automatizar procesos, conectar sistemas e incorporar IA donde genera impacto real.
             </p>
-            <div className="mt-9 flex flex-wrap items-center gap-3">
+            <div className="mt-7 flex flex-wrap items-center gap-x-3 gap-y-2 text-[13px] font-medium text-white/55">
+              <span>200–300 usuarios</span>
+              <span className="text-white/25">·</span>
+              <span>4 empresas</span>
+              <span className="text-white/25">·</span>
+              <span>4 call centers</span>
+              <span className="text-white/25">·</span>
+              <span>13+ años</span>
+            </div>
+            <div className="mt-10 flex flex-wrap items-center gap-3">
               <a href="#contacto" className="inline-flex h-12 items-center gap-2 rounded-full px-6 text-sm font-semibold text-white shadow-[0_10px_30px_-10px_rgba(25,195,255,0.6)] transition-transform hover:-translate-y-0.5"
                 style={{ background: "linear-gradient(135deg, #0B1F3A 0%, #1769E0 100%)" }}>
                 Agendar diagnóstico <ArrowRight className="h-4 w-4" />
               </a>
               <a href="#caso" className="inline-flex h-12 items-center rounded-full border border-white/15 px-6 text-sm font-semibold text-white hover:bg-white/5 transition-colors">
-                Ver casos reales
+                Ver caso destacado
               </a>
             </div>
-            <p className="mt-8 text-[13px] text-white/45">
-              Desde 2011 desarrollando soluciones empresariales sostenibles, integradas y en producción.
-            </p>
           </div>
         </Reveal>
 
         <Reveal delay={120} className="lg:pl-4">
-          <DynamicMockup />
+          <div>
+            <p className="mb-3 text-[10.5px] font-semibold uppercase tracking-[2px] text-white/40">
+              Capacidades AMENSG en acción
+            </p>
+            <DynamicMockup />
+          </div>
         </Reveal>
       </div>
 
