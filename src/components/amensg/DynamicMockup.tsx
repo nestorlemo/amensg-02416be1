@@ -199,20 +199,29 @@ export function DynamicMockup() {
 }
 
 /* ─────────── Workflow scene (horizontal n8n) ─────────── */
-function WorkflowScene() {
+function WorkflowScene({ onCycleComplete, reduced }: SceneProps) {
   const [step, setStep] = useState(0);
   const order = ["w0", "w1", "w2", "w3", "w5"];
+  const doneRef = useRef(false);
 
   useEffect(() => {
+    if (reduced) { setStep(order.length); onCycleComplete?.(); return; }
     let s = 0;
-    const tick = () => {
-      s = (s + 1) % (order.length + 2); // pause at the end
-      setStep(s);
-    };
     setStep(0);
-    const id = setInterval(tick, 850);
+    doneRef.current = false;
+    const total = order.length + 2; // last steps freeze at end state
+    const id = setInterval(() => {
+      s += 1;
+      if (s >= total) {
+        clearInterval(id);
+        setStep(order.length); // freeze at completed state
+        if (!doneRef.current) { doneRef.current = true; onCycleComplete?.(); }
+        return;
+      }
+      setStep(s);
+    }, 850);
     return () => clearInterval(id);
-  }, []);
+  }, [onCycleComplete, reduced]);
 
   const nodeState = (i: number): "" | "active" | "done" => {
     if (step > order.length) return i < order.length ? "done" : "";
