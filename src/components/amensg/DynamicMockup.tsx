@@ -366,20 +366,28 @@ function WorkflowScene({ onCycleComplete, reduced }: SceneProps) {
 }
 
 /* ─────────── Chat scene ─────────── */
-function ChatScene() {
+function ChatScene({ onCycleComplete, reduced }: SceneProps) {
   const [msgs, setMsgs] = useState<Array<{ w: "ai" | "u"; t: string; typing?: boolean }>>([]);
   const iRef = useRef(0);
 
   useEffect(() => {
     iRef.current = 0;
     setMsgs([]);
+    if (reduced) { onCycleComplete?.(); return; }
     let cancelled = false;
+    let done = false;
     const timeouts: ReturnType<typeof setTimeout>[] = [];
+    const finish = () => {
+      if (done || cancelled) return;
+      done = true;
+      onCycleComplete?.();
+    };
 
     const next = () => {
       if (cancelled) return;
       if (iRef.current >= CONVO.length) {
-        timeouts.push(setTimeout(() => { iRef.current = 0; setMsgs([]); next(); }, 2600));
+        // One full pass. Hold the final state briefly, then signal completion.
+        timeouts.push(setTimeout(finish, 1200));
         return;
       }
       const [w, t] = CONVO[iRef.current];
@@ -393,12 +401,12 @@ function ChatScene() {
             return c;
           });
           iRef.current++;
-          timeouts.push(setTimeout(next, 1000));
-        }, 800));
+          timeouts.push(setTimeout(next, 700));
+        }, 600));
       } else {
         setMsgs((m) => [...m, { w, t }].slice(-4));
         iRef.current++;
-        timeouts.push(setTimeout(next, 850));
+        timeouts.push(setTimeout(next, 600));
       }
     };
     next();
