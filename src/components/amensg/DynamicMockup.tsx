@@ -42,9 +42,15 @@ const ST: Array<[string, string]> = [["ok", "Activo"], ["pr", "Proceso"], ["wt",
 const R = <T,>(a: T[]): T => a[Math.floor(Math.random() * a.length)];
 
 export function DynamicMockup() {
-  // Index into TABS_ORDER (0..3). Independent of scene index so rotation
-  // visibly follows the tab order: Automatización → Integración → Agentes → Gestión.
+  // Index into TABS_ORDER (0..3). Advances ONLY when the active scene reports
+  // it has finished its own cycle (onCycleComplete). No fixed-time interval.
   const [tabIdx, setTabIdx] = useState(0);
+  // Toggles 0/1 each time we LEAVE the Integration slide so the next visit
+  // shows the other pair of internal scenarios.
+  const [integrationPairIdx, setIntegrationPairIdx] = useState(0);
+  // Bumped on every advance / manual jump so the active scene remounts and
+  // restarts its animation from zero.
+  const [cycleKey, setCycleKey] = useState(0);
   const [playing, setPlaying] = useState(true);
 
   const [reduced, setReduced] = useState(false);
@@ -57,23 +63,35 @@ export function DynamicMockup() {
     return () => mq.removeEventListener?.("change", update);
   }, []);
 
-  // Outer carousel runs on its OWN timer, independent of any inner scene.
-  // Uses functional updater so it never goes stale.
-  useEffect(() => {
-    if (!playing || reduced) return;
-    const id = setInterval(() => {
-      setTabIdx((i) => (i + 1) % TABS_ORDER.length);
-    }, 7000);
-    return () => clearInterval(id);
-  }, [playing, reduced]);
+  // Ref so the callback stays stable but always sees latest playing state.
+  const playingRef = useRef(playing);
+  playingRef.current = playing;
 
-  const goToTab = (i: number) =>
-    setTabIdx(((i % TABS_ORDER.length) + TABS_ORDER.length) % TABS_ORDER.length);
+  const handleCycleComplete = useCallback(() => {
+    if (!playingRef.current) return;
+    setTabIdx((i) => {
+      // If we are leaving the Integration scene, toggle which pair to show next.
+      if (TABS_ORDER[i].scene === 3) {
+        setIntegrationPairIdx((p) => (p + 1) % 2);
+      }
+      return (i + 1) % TABS_ORDER.length;
+    });
+    setCycleKey((k) => k + 1);
+  }, []);
+
+  const goToTab = (i: number) => {
+    const next = ((i % TABS_ORDER.length) + TABS_ORDER.length) % TABS_ORDER.length;
+    setTabIdx(next);
+    setCycleKey((k) => k + 1);
+  };
   const prev = () => goToTab(tabIdx - 1);
   const next = () => goToTab(tabIdx + 1);
 
   const cur = TABS_ORDER[tabIdx].scene;
   const [badgeCls, badgeTxt] = BADGES[cur];
+
+  // Unique key per (tab, cycle) to force a clean remount each cycle.
+  const sceneKey = `${tabIdx}-${cycleKey}`;
 
   return (
     <div className="w-full max-w-[720px] mx-auto">
@@ -105,10 +123,17 @@ export function DynamicMockup() {
         </div>
 
         <div className="relative h-[calc(100%-38px)]">
-          {cur === 0 && <WorkflowScene />}
-          {cur === 1 && <ChatScene />}
-          {cur === 2 && <AppScene />}
-          {cur === 3 && <IntegrationScene />}
+          {cur === 0 && <WorkflowScene key={sceneKey} onCycleComplete={handleCycleComplete} reduced={reduced} />}
+          {cur === 1 && <ChatScene key={sceneKey} onCycleComplete={handleCycleComplete} reduced={reduced} />}
+          {cur === 2 && <AppScene key={sceneKey} onCycleComplete={handleCycleComplete} reduced={reduced} />}
+          {cur === 3 && (
+            <IntegrationScene
+              key={sceneKey}
+              onCycleComplete={handleCycleComplete}
+              reduced={reduced}
+              pairIdx={integrationPairIdx}
+            />
+          )}
         </div>
       </div>
 
