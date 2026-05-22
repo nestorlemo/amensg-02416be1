@@ -2,7 +2,7 @@ import { useState } from "react";
 import { z } from "zod";
 import { Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 
-const N8N_WEBHOOK_URL: string = "REEMPLAZAR_POR_WEBHOOK_REAL";
+const N8N_WEBHOOK_URL = import.meta.env.VITE_N8N_WEBHOOK_URL?.trim() ?? "";
 
 const schema = z.object({
   nombre: z.string().trim().min(2, "Ingresá tu nombre").max(80),
@@ -24,7 +24,7 @@ const TIPOS = [
   "Otro",
 ];
 
-const webhookConfigured = N8N_WEBHOOK_URL !== "REEMPLAZAR_POR_WEBHOOK_REAL" && N8N_WEBHOOK_URL.startsWith("http");
+const webhookConfigured = N8N_WEBHOOK_URL.startsWith("http");
 
 export function ContactForm() {
   const [form, setForm] = useState<FormState>({
@@ -49,7 +49,8 @@ export function ContactForm() {
     }
 
     if (!webhookConfigured) {
-      setStatus("success"); // pretend-submit; alert shown in UI
+      console.warn("VITE_N8N_WEBHOOK_URL no está configurada. El formulario no enviará datos.");
+      setStatus("success");
       return;
     }
 
