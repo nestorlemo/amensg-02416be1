@@ -2,7 +2,7 @@ import { useState } from "react";
 import { z } from "zod";
 import { Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 
-const N8N_WEBHOOK_URL = import.meta.env.VITE_N8N_WEBHOOK_URL?.trim() ?? "";
+const CONTACT_API_URL = import.meta.env.VITE_CONTACT_API_URL?.trim() ?? "";
 
 const schema = z.object({
   nombre: z.string().trim().min(2, "Ingresá tu nombre").max(80),
@@ -24,7 +24,7 @@ const TIPOS = [
   "Otro",
 ];
 
-const webhookConfigured = N8N_WEBHOOK_URL.startsWith("http");
+const contactApiConfigured = CONTACT_API_URL.startsWith("http");
 
 export function ContactForm() {
   const [form, setForm] = useState<FormState>({
@@ -48,18 +48,26 @@ export function ContactForm() {
       return;
     }
 
-    if (!webhookConfigured) {
-      console.warn("VITE_N8N_WEBHOOK_URL no está configurada. El formulario no enviará datos.");
-      setStatus("success");
+    if (!contactApiConfigured) {
+      console.error("VITE_CONTACT_API_URL no está configurada. El formulario no puede enviar datos.");
+      setStatus("error");
       return;
     }
 
     setStatus("loading");
     try {
-      const res = await fetch(N8N_WEBHOOK_URL, {
+      const { nombre, empresa, email, telefono, tipo, mensaje } = parsed.data;
+      const res = await fetch(CONTACT_API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...parsed.data, source: "amensg-landing", ts: new Date().toISOString() }),
+        body: JSON.stringify({
+          nombre,
+          empresa,
+          email,
+          telefono: telefono ?? "",
+          proceso: tipo,
+          mensaje,
+        }),
       });
       if (!res.ok) throw new Error("Network");
       setStatus("success");
@@ -74,10 +82,10 @@ export function ContactForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      {!webhookConfigured && (
+      {!contactApiConfigured && (
         <div className="flex items-start gap-2 rounded-lg border border-cyan-bright/40 bg-cyan-bright/5 px-4 py-3 text-xs text-foreground/80">
           <AlertCircle className="h-4 w-4 text-tech-blue mt-0.5 shrink-0" />
-          <span>Formulario preparado para integración. Configurar webhook de n8n antes de publicar.</span>
+          <span>Formulario preparado para integración. Configurar VITE_CONTACT_API_URL antes de publicar.</span>
         </div>
       )}
 
@@ -126,16 +134,18 @@ export function ContactForm() {
         <div className="flex items-start gap-2 rounded-lg border border-teal-accent/40 bg-teal-accent/10 px-4 py-3 text-sm text-foreground">
           <CheckCircle2 className="h-4 w-4 text-teal-accent mt-0.5 shrink-0" />
           <span>
-            {webhookConfigured
-              ? "Gracias. Recibimos tu mensaje y te respondemos a la brevedad."
-              : "Mensaje validado correctamente. (El webhook de n8n aún no está configurado, por lo que no se envió a destino.)"}
+            Gracias. Recibimos tu mensaje y te respondemos a la brevedad.
           </span>
         </div>
       )}
       {status === "error" && (
         <div className="flex items-start gap-2 rounded-lg border border-destructive/40 bg-destructive/5 px-4 py-3 text-sm text-foreground">
           <AlertCircle className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
-          <span>No pudimos enviar el mensaje. Probá nuevamente o escribinos por WhatsApp.</span>
+          <span>
+            {contactApiConfigured
+              ? "No pudimos enviar el mensaje. Probá nuevamente o escribinos por WhatsApp."
+              : "No pudimos enviar el mensaje porque VITE_CONTACT_API_URL no está configurada."}
+          </span>
         </div>
       )}
     </form>

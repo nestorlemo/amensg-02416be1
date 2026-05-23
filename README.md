@@ -16,11 +16,11 @@ npm run preview
 Crear un `.env` local (no versionado) a partir de `.env.example`:
 
 ```bash
-VITE_N8N_WEBHOOK_URL=
+VITE_CONTACT_API_URL=
 ```
 
-- `VITE_N8N_WEBHOOK_URL`: webhook de n8n para recepción de formularios de contacto.
-- Si no está configurada, el formulario no rompe la página y muestra aviso.
+- `VITE_CONTACT_API_URL`: endpoint público de API Gateway para recepción de formularios de contacto.
+- Si no está configurada, el formulario no rompe la página y muestra un error claro.
 
 ## Deploy manual a S3
 
