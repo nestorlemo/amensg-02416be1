@@ -41,6 +41,15 @@ const EN = ["Documentación", "Equipo enviado", "En reparto", "Pendiente", "Entr
 const ST: Array<[string, string]> = [["ok", "Activo"], ["pr", "Proceso"], ["wt", "En cola"]];
 const R = <T,>(a: T[]): T => a[Math.floor(Math.random() * a.length)];
 
+const WORKFLOW_STEP_MS = 1200;
+const CHAT_TYPING_MS = 950;
+const CHAT_PAUSE_MS = 1100;
+const CHAT_HOLD_MS = 2500;
+const APP_UPDATE_MS = 2200;
+const APP_TOTAL_UPDATES = 4;
+const APP_HOLD_MS = 2000;
+const INTEGRATION_SCENE_MS = 6500;
+
 export function DynamicMockup() {
   // Index into TABS_ORDER (0..3). Advances ONLY when the active scene reports
   // it has finished its own cycle (onCycleComplete). No fixed-time interval.
@@ -57,7 +66,7 @@ export function DynamicMockup() {
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) return;
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const update = () => { setReduced(mq.matches); if (mq.matches) setPlaying(false); };
+    const update = () => setReduced(mq.matches);
     update();
     mq.addEventListener?.("change", update);
     return () => mq.removeEventListener?.("change", update);
@@ -205,7 +214,6 @@ function WorkflowScene({ onCycleComplete, reduced }: SceneProps) {
   const doneRef = useRef(false);
 
   useEffect(() => {
-    if (reduced) { setStep(order.length); onCycleComplete?.(); return; }
     let s = 0;
     setStep(0);
     doneRef.current = false;
@@ -219,9 +227,9 @@ function WorkflowScene({ onCycleComplete, reduced }: SceneProps) {
         return;
       }
       setStep(s);
-    }, 850);
+    }, WORKFLOW_STEP_MS);
     return () => clearInterval(id);
-  }, [onCycleComplete, reduced]);
+  }, [onCycleComplete]);
 
   const nodeState = (i: number): "" | "active" | "done" => {
     if (step > order.length) return i < order.length ? "done" : "";
@@ -369,17 +377,17 @@ function WorkflowScene({ onCycleComplete, reduced }: SceneProps) {
 function ChatScene({ onCycleComplete, reduced }: SceneProps) {
   const [msgs, setMsgs] = useState<Array<{ w: "ai" | "u"; t: string; typing?: boolean }>>([]);
   const iRef = useRef(0);
+  const doneRef = useRef(false);
 
   useEffect(() => {
     iRef.current = 0;
+    doneRef.current = false;
     setMsgs([]);
-    if (reduced) { onCycleComplete?.(); return; }
     let cancelled = false;
-    let done = false;
     const timeouts: ReturnType<typeof setTimeout>[] = [];
     const finish = () => {
-      if (done || cancelled) return;
-      done = true;
+      if (doneRef.current || cancelled) return;
+      doneRef.current = true;
       onCycleComplete?.();
     };
 
@@ -387,7 +395,7 @@ function ChatScene({ onCycleComplete, reduced }: SceneProps) {
       if (cancelled) return;
       if (iRef.current >= CONVO.length) {
         // One full pass. Hold the final state briefly, then signal completion.
-        timeouts.push(setTimeout(finish, 1200));
+        timeouts.push(setTimeout(finish, CHAT_HOLD_MS));
         return;
       }
       const [w, t] = CONVO[iRef.current];
@@ -401,17 +409,17 @@ function ChatScene({ onCycleComplete, reduced }: SceneProps) {
             return c;
           });
           iRef.current++;
-          timeouts.push(setTimeout(next, 700));
-        }, 600));
+          timeouts.push(setTimeout(next, CHAT_PAUSE_MS));
+        }, CHAT_TYPING_MS));
       } else {
         setMsgs((m) => [...m, { w, t }].slice(-4));
         iRef.current++;
-        timeouts.push(setTimeout(next, 600));
+        timeouts.push(setTimeout(next, CHAT_PAUSE_MS));
       }
     };
     next();
     return () => { cancelled = true; timeouts.forEach(clearTimeout); };
-  }, []);
+  }, [onCycleComplete]);
 
   return (
     <div className="flex h-full flex-col gap-2.5 p-5">
@@ -464,24 +472,33 @@ function AppScene({ onCycleComplete, reduced }: SceneProps) {
   const [exito, setExito] = useState("98,4%");
   const [entregas, setEntregas] = useState(312);
   const [rows, setRows] = useState<Row[]>([mkRow(), mkRow(), mkRow()]);
+  const doneRef = useRef(false);
 
   useEffect(() => {
-    if (reduced) { onCycleComplete?.(); return; }
+    doneRef.current = false;
     let ticks = 0;
-    const TOTAL = 4; // 4 row updates ≈ 6.4s per cycle
+    let finishTimeout: ReturnType<typeof setTimeout> | null = null;
+    const finish = () => {
+      if (doneRef.current) return;
+      doneRef.current = true;
+      onCycleComplete?.();
+    };
     const id = setInterval(() => {
       setAct((a) => a + Math.floor(Math.random() * 5) + 1);
       setEntregas(300 + Math.floor(Math.random() * 25));
       setExito(`${(97.5 + Math.random() * 1.4).toFixed(1)}%`);
       setRows((rs) => [mkRow(), ...rs].slice(0, 3));
       ticks += 1;
-      if (ticks >= TOTAL) {
+      if (ticks >= APP_TOTAL_UPDATES) {
         clearInterval(id);
-        onCycleComplete?.();
+        finishTimeout = setTimeout(finish, APP_HOLD_MS);
       }
-    }, 1600);
-    return () => clearInterval(id);
-  }, [onCycleComplete, reduced]);
+    }, APP_UPDATE_MS);
+    return () => {
+      clearInterval(id);
+      if (finishTimeout) clearTimeout(finishTimeout);
+    };
+  }, [onCycleComplete]);
 
   const stats: Array<[string, string, string]> = [
     [act.toLocaleString("es"), "Activaciones hoy", "text-white"],
@@ -608,15 +625,20 @@ function IntegrationScene({ onCycleComplete, reduced, pairIdx = 0 }: SceneProps 
   // Show exactly 2 scenarios per visit, rotating which pair via pairIdx.
   const pair = [pairIdx * 2, pairIdx * 2 + 1] as const;
   const [step, setStep] = useState(0); // 0 -> first scenario of pair, 1 -> second
-  const STEP_MS = 4200;
+  const doneRef = useRef(false);
 
   useEffect(() => {
     setStep(0);
-    if (reduced) { onCycleComplete?.(); return; }
-    const t1 = setTimeout(() => setStep(1), STEP_MS);
-    const t2 = setTimeout(() => { onCycleComplete?.(); }, STEP_MS * 2);
+    doneRef.current = false;
+    const finish = () => {
+      if (doneRef.current) return;
+      doneRef.current = true;
+      onCycleComplete?.();
+    };
+    const t1 = setTimeout(() => setStep(1), INTEGRATION_SCENE_MS);
+    const t2 = setTimeout(finish, INTEGRATION_SCENE_MS * 2);
     return () => { clearTimeout(t1); clearTimeout(t2); };
-  }, [onCycleComplete, reduced, pairIdx]);
+  }, [onCycleComplete, pairIdx]);
 
   const active = pair[step];
   const scene = SCENARIOS[active];

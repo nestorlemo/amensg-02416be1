@@ -332,20 +332,23 @@ function CasoDestacado() {
   const ref = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     if (!ref.current) return;
+    let intervalId: ReturnType<typeof setInterval> | null = null;
     const io = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) {
+      if (e.isIntersecting && !intervalId) {
         let i = 0;
-        const id = setInterval(() => {
+        intervalId = setInterval(() => {
           setLit(i);
           i++;
           if (i > flow.length + 2) i = 0;
         }, 700);
         io.disconnect();
-        return () => clearInterval(id);
       }
     }, { threshold: 0.3 });
     io.observe(ref.current);
-    return () => io.disconnect();
+    return () => {
+      io.disconnect();
+      if (intervalId) clearInterval(intervalId);
+    };
   }, []);
 
   return (
