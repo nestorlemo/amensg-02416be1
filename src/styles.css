@@ -85,6 +85,23 @@
     text-rendering: optimizeLegibility;
   }
   h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; }
+  .contact-field {
+    color-scheme: dark;
+  }
+  .contact-field option {
+    background-color: #0B1628;
+    color: #ffffff;
+  }
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  textarea:-webkit-autofill,
+  textarea:-webkit-autofill:hover,
+  textarea:-webkit-autofill:focus {
+    -webkit-text-fill-color: #ffffff;
+    -webkit-box-shadow: 0 0 0px 1000px #0B1628 inset;
+    transition: background-color 5000s ease-in-out 0s;
+  }
 }
 
 @layer utilities {

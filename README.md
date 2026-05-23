@@ -22,6 +22,31 @@ VITE_CONTACT_API_URL=
 - `VITE_CONTACT_API_URL`: endpoint público de API Gateway para recepción de formularios de contacto.
 - Si no está configurada, el formulario no rompe la página y muestra un error claro.
 
+## Email generado por Lambda / SES
+
+Para evitar pies automáticos de Google Groups, enviar el lead directamente desde Amazon SES a `contacto@amensg.com` o a una casilla real equivalente, sin reenviar a través de un grupo.
+
+Recomendación de asunto:
+
+```text
+Nuevo contacto desde la web — {empresa o nombre}
+```
+
+Recomendación de cuerpo HTML:
+
+- Nombre
+- Empresa
+- Email
+- Teléfono
+- Proceso
+- Mensaje
+
+Pie sugerido:
+
+```text
+Este mensaje fue generado automáticamente desde el formulario de contacto de AMENSG.
+```
+
 ## Deploy manual a S3
 
 ```bash

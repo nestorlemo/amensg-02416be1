@@ -78,12 +78,12 @@ export function ContactForm() {
   };
 
   const inputCls =
-    "w-full h-11 px-4 rounded-lg border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition";
+    "contact-field w-full h-12 px-4 rounded-2xl border border-white/10 bg-[#0B1628] text-sm text-white placeholder:text-white/35 focus:outline-none focus:ring-2 focus:ring-[#19C3FF]/25 focus:border-[#19C3FF] transition";
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       {!contactApiConfigured && (
-        <div className="flex items-start gap-2 rounded-lg border border-cyan-bright/40 bg-cyan-bright/5 px-4 py-3 text-xs text-foreground/80">
+        <div className="flex items-start gap-2 rounded-2xl border border-[#19C3FF]/30 bg-[#19C3FF]/10 px-4 py-3 text-xs text-white/75">
           <AlertCircle className="h-4 w-4 text-tech-blue mt-0.5 shrink-0" />
           <span>Formulario preparado para integración. Configurar VITE_CONTACT_API_URL antes de publicar.</span>
         </div>
@@ -131,7 +131,7 @@ export function ContactForm() {
       </button>
 
       {status === "success" && (
-        <div className="flex items-start gap-2 rounded-lg border border-teal-accent/40 bg-teal-accent/10 px-4 py-3 text-sm text-foreground">
+        <div className="flex items-start gap-2 rounded-2xl border border-teal-accent/40 bg-teal-accent/10 px-4 py-3 text-sm text-white/85">
           <CheckCircle2 className="h-4 w-4 text-teal-accent mt-0.5 shrink-0" />
           <span>
             Gracias. Recibimos tu mensaje y te respondemos a la brevedad.
@@ -139,7 +139,7 @@ export function ContactForm() {
         </div>
       )}
       {status === "error" && (
-        <div className="flex items-start gap-2 rounded-lg border border-destructive/40 bg-destructive/5 px-4 py-3 text-sm text-foreground">
+        <div className="flex items-start gap-2 rounded-2xl border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-white/85">
           <AlertCircle className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
           <span>
             {contactApiConfigured
@@ -155,9 +155,9 @@ export function ContactForm() {
 function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="block text-xs font-semibold text-foreground/70 mb-1.5 uppercase tracking-wide">{label}</span>
+      <span className="block text-[11px] font-semibold text-[#8ba3c7] mb-1.5 uppercase tracking-[0.12em]">{label}</span>
       {children}
-      {error && <span className="block mt-1 text-xs text-destructive">{error}</span>}
+      {error && <span className="block mt-1.5 text-xs text-red-300">{error}</span>}
     </label>
   );
 }
