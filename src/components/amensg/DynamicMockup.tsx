@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 type SceneProps = {
   onCycleComplete?: () => void;
   reduced?: boolean;
+  compact?: boolean;
 };
 
 const TABS = [
@@ -50,6 +51,21 @@ const APP_TOTAL_UPDATES = 4;
 const APP_HOLD_MS = 2000;
 const INTEGRATION_SCENE_MS = 6500;
 
+function useCompactMockup() {
+  const [compact, setCompact] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const mq = window.matchMedia("(max-width: 640px)");
+    const update = () => setCompact(mq.matches);
+    update();
+    mq.addEventListener?.("change", update);
+    return () => mq.removeEventListener?.("change", update);
+  }, []);
+
+  return compact;
+}
+
 export function DynamicMockup() {
   // Index into TABS_ORDER (0..3). Advances ONLY when the active scene reports
   // it has finished its own cycle (onCycleComplete). No fixed-time interval.
@@ -61,6 +77,7 @@ export function DynamicMockup() {
   // restarts its animation from zero.
   const [cycleKey, setCycleKey] = useState(0);
   const [playing, setPlaying] = useState(true);
+  const compact = useCompactMockup();
 
   const [reduced, setReduced] = useState(false);
   useEffect(() => {
@@ -103,12 +120,12 @@ export function DynamicMockup() {
   const sceneKey = `${tabIdx}-${cycleKey}`;
 
   return (
-    <div className="w-full max-w-[720px] mx-auto">
+    <div className="w-full max-w-[720px] min-w-0 mx-auto px-0">
       <div
-        className="relative h-[430px] rounded-2xl overflow-hidden border border-white/10 bg-[#0B1F3A]/55 backdrop-blur-xl"
+        className="relative h-[360px] sm:h-[430px] rounded-xl sm:rounded-2xl overflow-hidden border border-white/10 bg-[#0B1F3A]/55 backdrop-blur-xl"
         style={{
           boxShadow: "0 30px 70px -15px rgba(25,195,255,0.22)",
-          transform: "perspective(1500px) rotateY(-5deg) rotateX(2deg)",
+          transform: compact ? "none" : "perspective(1500px) rotateY(-5deg) rotateX(2deg)",
         }}
       >
         {/* Title bar */}
@@ -132,14 +149,15 @@ export function DynamicMockup() {
         </div>
 
         <div className="relative h-[calc(100%-38px)]">
-          {cur === 0 && <WorkflowScene key={sceneKey} onCycleComplete={handleCycleComplete} reduced={reduced} />}
-          {cur === 1 && <ChatScene key={sceneKey} onCycleComplete={handleCycleComplete} reduced={reduced} />}
-          {cur === 2 && <AppScene key={sceneKey} onCycleComplete={handleCycleComplete} reduced={reduced} />}
+          {cur === 0 && <WorkflowScene key={sceneKey} onCycleComplete={handleCycleComplete} reduced={reduced} compact={compact} />}
+          {cur === 1 && <ChatScene key={sceneKey} onCycleComplete={handleCycleComplete} reduced={reduced} compact={compact} />}
+          {cur === 2 && <AppScene key={sceneKey} onCycleComplete={handleCycleComplete} reduced={reduced} compact={compact} />}
           {cur === 3 && (
             <IntegrationScene
               key={sceneKey}
               onCycleComplete={handleCycleComplete}
               reduced={reduced}
+              compact={compact}
               pairIdx={integrationPairIdx}
             />
           )}
@@ -147,12 +165,12 @@ export function DynamicMockup() {
       </div>
 
       {/* Transport controls */}
-      <div className="mt-5 flex items-center justify-center gap-2">
+      <div className="mt-6 sm:mt-5 flex items-center justify-center gap-3 sm:gap-2">
         <button
           type="button"
           onClick={prev}
           aria-label="Escena anterior"
-          className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-[#aebfd6] hover:text-white hover:border-white/20 transition-all"
+          className="flex h-9 w-9 sm:h-8 sm:w-8 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-[#aebfd6] hover:text-white hover:border-white/20 transition-all"
         >
           <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
         </button>
@@ -160,7 +178,7 @@ export function DynamicMockup() {
           type="button"
           onClick={() => setPlaying((p) => !p)}
           aria-label={playing ? "Pausar" : "Reproducir"}
-          className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#19C3FF]/30 bg-[#19C3FF]/10 text-[#19C3FF] hover:bg-[#19C3FF]/15 transition-all"
+          className="flex h-9 w-9 sm:h-8 sm:w-8 items-center justify-center rounded-lg border border-[#19C3FF]/30 bg-[#19C3FF]/10 text-[#19C3FF] hover:bg-[#19C3FF]/15 transition-all"
         >
           {playing ? (
             <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1" /><rect x="14" y="5" width="4" height="14" rx="1" /></svg>
@@ -172,13 +190,13 @@ export function DynamicMockup() {
           type="button"
           onClick={next}
           aria-label="Escena siguiente"
-          className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-[#aebfd6] hover:text-white hover:border-white/20 transition-all"
+          className="flex h-9 w-9 sm:h-8 sm:w-8 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-[#aebfd6] hover:text-white hover:border-white/20 transition-all"
         >
           <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
         </button>
       </div>
 
-      <div className="mt-4 flex flex-wrap justify-center gap-2 px-1">
+      <div className="mt-4 grid grid-cols-2 gap-2 px-1 sm:flex sm:flex-wrap sm:justify-center">
         {TABS_ORDER.map((t, i) => {
           const active = tabIdx === i;
           return (
@@ -187,7 +205,7 @@ export function DynamicMockup() {
               type="button"
               onClick={() => goToTab(i)}
               aria-pressed={active}
-              className={`inline-flex items-center gap-2 rounded-lg border px-3.5 py-2 text-[12px] font-semibold transition-all ${
+              className={`inline-flex min-w-0 items-center justify-center gap-2 rounded-lg border px-2.5 sm:px-3.5 py-2 text-[11px] sm:text-[12px] font-semibold transition-all ${
                 active
                   ? "bg-[#19C3FF]/20 border-[#19C3FF]/70 text-white shadow-[0_0_0_1px_rgba(25,195,255,0.35)]"
                   : "bg-white/[0.04] border-white/15 text-white/70 hover:text-white hover:border-white/30"
@@ -200,7 +218,7 @@ export function DynamicMockup() {
         })}
       </div>
 
-      <p className="mt-4 mb-2 px-2 text-center text-[12.5px] leading-relaxed text-white/65 min-h-[2.2em]">
+      <p className="mt-5 sm:mt-4 mb-2 px-4 sm:px-2 text-center text-[12px] sm:text-[12.5px] leading-relaxed text-white/65 min-h-[3.4em] sm:min-h-[2.2em]">
         {TABS_ORDER[tabIdx].desc}
       </p>
     </div>
@@ -208,7 +226,7 @@ export function DynamicMockup() {
 }
 
 /* ─────────── Workflow scene (horizontal n8n) ─────────── */
-function WorkflowScene({ onCycleComplete, reduced }: SceneProps) {
+function WorkflowScene({ onCycleComplete, reduced, compact }: SceneProps) {
   const [step, setStep] = useState(0);
   const order = ["w0", "w1", "w2", "w3", "w5"];
   const doneRef = useRef(false);
@@ -238,57 +256,70 @@ function WorkflowScene({ onCycleComplete, reduced }: SceneProps) {
     return "";
   };
 
-  const nodes = [
-    { id: "w0", x: 30, y: 96, icon: "⚡", label: "Webhook\nentrada" },
-    { id: "w1", x: 135, y: 96, icon: "⚙", label: "Validar\ndatos" },
-    { id: "w2", x: 240, y: 96, icon: "◇", label: "Agente\nIA" },
-    { id: "w3", x: 345, y: 41, icon: "{ }", label: "Procesar\nrespuesta" },
-    { id: "w4", x: 345, y: 161, icon: "↻", label: "Reintentar" },
-    { id: "w5", x: 520, y: 96, icon: "↗", label: "Integrar\nsistema" },
-  ];
-
-  // map node index in `order` to which edge lights up after entering it
-  const litEdges = step; // number of lit edges so far (0..4)
-
   // Logical canvas
-  const CW = 620;
-  const CH = 270;
+  const CW = compact ? 360 : 620;
+  const CH = compact ? 286 : 270;
   const X = (px: number) => `${((px / CW) * 100).toFixed(3)}%`;
   const Y = (py: number) => `${((py / CH) * 100).toFixed(3)}%`;
   const W = (w: number) => `${((w / CW) * 100).toFixed(3)}%`;
 
+  const nodes = compact
+    ? [
+        { id: "w0", x: 8, y: 94, icon: "⚡", label: "Webhook\nentrada" },
+        { id: "w1", x: 79, y: 94, icon: "⚙", label: "Validar\ndatos" },
+        { id: "w2", x: 150, y: 94, icon: "◇", label: "Agente\nIA" },
+        { id: "w3", x: 214, y: 40, icon: "{ }", label: "Procesar\nrespuesta" },
+        { id: "w4", x: 214, y: 163, icon: "↻", label: "Reintentar" },
+        { id: "w5", x: 296, y: 94, icon: "↗", label: "Integrar\nsistema" },
+      ]
+    : [
+        { id: "w0", x: 30, y: 96, icon: "⚡", label: "Webhook\nentrada" },
+        { id: "w1", x: 135, y: 96, icon: "⚙", label: "Validar\ndatos" },
+        { id: "w2", x: 240, y: 96, icon: "◇", label: "Agente\nIA" },
+        { id: "w3", x: 345, y: 41, icon: "{ }", label: "Procesar\nrespuesta" },
+        { id: "w4", x: 345, y: 161, icon: "↻", label: "Reintentar" },
+        { id: "w5", x: 520, y: 96, icon: "↗", label: "Integrar\nsistema" },
+      ];
+
+  const paths = compact
+    ? [
+        "M 53 117 C 63 117, 76 117, 82 117",
+        "M 124 117 C 134 117, 147 117, 153 117",
+        "M 195 117 C 207 117, 216 65, 219 65",
+        "M 195 117 C 207 117, 216 188, 219 188",
+        "M 260 65 C 281 65, 292 117, 299 117",
+        "M 260 188 C 281 188, 292 117, 299 117",
+      ]
+    : [
+        "M 96 123 C 120 123, 150 123, 147 123",
+        "M 201 123 C 225 123, 255 123, 252 123",
+        "M 306 123 C 335 123, 355 68, 357 68",
+        "M 306 123 C 335 123, 355 188, 357 188",
+        "M 411 68 C 470 68, 500 123, 532 123",
+        "M 411 188 C 470 188, 500 123, 532 123",
+      ];
+
+  // map node index in `order` to which edge lights up after entering it
+  const litEdges = step; // number of lit edges so far (0..4)
+
   return (
-    <div className="flex h-full items-center justify-center px-3">
+    <div className="flex h-full items-center justify-center px-1 sm:px-3">
       <div className="relative w-full max-w-[620px]" style={{ aspectRatio: `${CW} / ${CH}` }}>
       <svg className="absolute inset-0 h-full w-full pointer-events-none" viewBox={`0 0 ${CW} ${CH}`} preserveAspectRatio="none">
-        {(() => {
-          const paths = [
-            "M 96 123 C 120 123, 150 123, 147 123",
-            "M 201 123 C 225 123, 255 123, 252 123",
-            "M 306 123 C 335 123, 355 68, 357 68",
-            "M 306 123 C 335 123, 355 188, 357 188",
-            "M 411 68 C 470 68, 500 123, 532 123",
-            "M 411 188 C 470 188, 500 123, 532 123",
-          ];
-          return (
-            <>
-              {paths.map((d, i) => (
-                <path key={i} d={d} stroke="rgba(255,255,255,0.13)" strokeWidth="1.8" fill="none" vectorEffect="non-scaling-stroke" />
-              ))}
-              {[paths[0], paths[1], paths[2], paths[4]].map((d, i) => (
-                <path
-                  key={`l${i}`}
-                  d={d}
-                  stroke="#19C3FF"
-                  strokeWidth="1.8"
-                  fill="none"
-                  vectorEffect="non-scaling-stroke"
-                  style={{ opacity: i < litEdges ? 1 : 0, transition: "opacity 0.6s ease" }}
-                />
-              ))}
-            </>
-          );
-        })()}
+        {paths.map((d, i) => (
+          <path key={i} d={d} stroke="rgba(255,255,255,0.13)" strokeWidth="1.8" fill="none" vectorEffect="non-scaling-stroke" />
+        ))}
+        {[paths[0], paths[1], paths[2], paths[4]].map((d, i) => (
+          <path
+            key={`l${i}`}
+            d={d}
+            stroke="#19C3FF"
+            strokeWidth="1.8"
+            fill="none"
+            vectorEffect="non-scaling-stroke"
+            style={{ opacity: i < litEdges ? 1 : 0, transition: "opacity 0.6s ease" }}
+          />
+        ))}
       </svg>
 
       {nodes.map((n) => {
@@ -305,14 +336,14 @@ function WorkflowScene({ onCycleComplete, reduced }: SceneProps) {
             style={{
               left: X(n.x),
               top: Y(n.y),
-              width: W(78),
+              width: W(compact ? 56 : 78),
               opacity: visible ? 1 : 0,
               transform: visible ? "scale(1)" : "scale(0.8)",
             }}
           >
             <div
-              className={`relative mx-auto flex h-[54px] w-[54px] items-center justify-center rounded-[13px] border transition-all ${
-                isAgent ? "text-[18px]" : "text-[21px]"
+              className={`relative mx-auto flex h-[46px] w-[46px] sm:h-[54px] sm:w-[54px] items-center justify-center rounded-[12px] sm:rounded-[13px] border transition-all ${
+                isAgent ? "text-[16px] sm:text-[18px]" : "text-[18px] sm:text-[21px]"
               } ${
                 isActive
                   ? "border-[#19C3FF] bg-[#19C3FF]/12 text-[#19C3FF] shadow-[0_0_22px_-4px_rgba(25,195,255,0.5)]"
@@ -325,7 +356,7 @@ function WorkflowScene({ onCycleComplete, reduced }: SceneProps) {
             >
               {isAgent ? (
                 <>
-                  <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <svg viewBox="0 0 24 24" className="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="4" y="8" width="16" height="11" rx="2.5" />
                     <path d="M12 3v5" />
                     <circle cx="12" cy="3" r="1.2" fill="currentColor" />
@@ -333,13 +364,13 @@ function WorkflowScene({ onCycleComplete, reduced }: SceneProps) {
                     <circle cx="15" cy="13" r="1.1" fill="currentColor" />
                     <path d="M9 16.5h6" />
                   </svg>
-                  <span className="absolute -top-1.5 -right-1.5 rounded-[5px] bg-[#a78bfa] px-1 py-[1px] text-[7px] font-bold text-[#1a0f2e] leading-none">AI</span>
+                  <span className="absolute -top-1.5 -right-1.5 rounded-[5px] bg-[#a78bfa] px-1 py-[1px] text-[6.5px] sm:text-[7px] font-bold text-[#1a0f2e] leading-none">AI</span>
                 </>
               ) : (
                 n.icon
               )}
             </div>
-            <div className="mt-1.5 text-center text-[9.5px] font-medium leading-tight text-[#aebfd6] whitespace-pre-line">
+            <div className="mt-1 text-center text-[8px] sm:text-[9.5px] font-medium leading-tight text-[#aebfd6] whitespace-pre-line">
               {n.label}
             </div>
           </div>
@@ -349,13 +380,13 @@ function WorkflowScene({ onCycleComplete, reduced }: SceneProps) {
       {/* branch labels */}
       <div
         className="absolute text-[8px] font-semibold px-1.5 py-0.5 rounded text-[#20E0B2] bg-[#20E0B2]/15 transition-opacity"
-        style={{ left: X(340), top: Y(74), opacity: step >= 3 ? 1 : 0 }}
+        style={{ left: X(compact ? 212 : 340), top: Y(compact ? 72 : 74), opacity: step >= 3 ? 1 : 0 }}
       >
         true
       </div>
       <div
         className="absolute text-[8px] font-semibold px-1.5 py-0.5 rounded text-[#7088a8] bg-white/[0.06] transition-opacity"
-        style={{ left: X(340), top: Y(200), opacity: step >= 3 ? 1 : 0 }}
+        style={{ left: X(compact ? 212 : 340), top: Y(compact ? 205 : 200), opacity: step >= 3 ? 1 : 0 }}
       >
         false
       </div>
@@ -363,9 +394,9 @@ function WorkflowScene({ onCycleComplete, reduced }: SceneProps) {
       {/* sub: OpenAI under w2 */}
       <div
         className="absolute transition-opacity duration-300"
-        style={{ left: X(253), top: Y(215), width: W(48), opacity: step >= 2 ? 1 : 0 }}
+        style={{ left: X(compact ? 154 : 253), top: Y(compact ? 214 : 215), width: W(compact ? 48 : 48), opacity: step >= 2 ? 1 : 0 }}
       >
-        <div className="mx-auto flex h-9 w-9 items-center justify-center rounded-[10px] border border-white/10 bg-white/[0.04] text-sm text-[#7e9fc4]">◎</div>
+        <div className="mx-auto flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-[10px] border border-white/10 bg-white/[0.04] text-xs sm:text-sm text-[#7e9fc4]">◎</div>
         <div className="mt-0.5 text-center text-[8px] text-[#7088a8]">OpenAI</div>
       </div>
       </div>
@@ -422,14 +453,14 @@ function ChatScene({ onCycleComplete, reduced }: SceneProps) {
   }, [onCycleComplete]);
 
   return (
-    <div className="flex h-full flex-col gap-2.5 p-5">
+    <div className="flex h-full flex-col gap-2 p-3 sm:gap-2.5 sm:p-5">
       {msgs.map((m, i) => (
         <div
           key={i}
-          className={`flex gap-2.5 items-start animate-[fadeUp_0.4s_ease_both] ${m.w === "u" ? "flex-row-reverse" : ""}`}
+            className={`flex gap-2 sm:gap-2.5 items-start animate-[fadeUp_0.4s_ease_both] ${m.w === "u" ? "flex-row-reverse" : ""}`}
         >
           <div
-            className={`flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[9px] text-sm ${
+            className={`flex h-[26px] w-[26px] sm:h-[30px] sm:w-[30px] shrink-0 items-center justify-center rounded-[8px] sm:rounded-[9px] text-xs sm:text-sm ${
               m.w === "ai"
                 ? "bg-[#19C3FF]/12 border border-[#19C3FF]/25 text-[#19C3FF]"
                 : "bg-white/[0.06] border border-white/12 text-[#aebfd6]"
@@ -438,7 +469,7 @@ function ChatScene({ onCycleComplete, reduced }: SceneProps) {
             {m.w === "ai" ? "◇" : "◍"}
           </div>
           <div
-            className={`max-w-[78%] rounded-[11px] px-3 py-2 text-[12px] leading-snug ${
+            className={`max-w-[82%] sm:max-w-[78%] rounded-[11px] px-2.5 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-[12px] leading-snug ${
               m.w === "ai"
                 ? "bg-[#19C3FF]/10 border border-[#19C3FF]/16 text-[#cfeeff]"
                 : "bg-white/[0.05] border border-white/10 text-[#e6eefc]"
@@ -507,12 +538,12 @@ function AppScene({ onCycleComplete, reduced }: SceneProps) {
   ];
 
   return (
-    <div className="h-full p-5">
-      <div className="mb-3 flex gap-2.5">
+    <div className="h-full p-3 sm:p-5">
+      <div className="mb-3 flex gap-2 sm:gap-2.5">
         {stats.map(([n, l, cls]) => (
-          <div key={l} className="flex-1 rounded-[11px] border border-white/10 bg-white/[0.04] p-2.5">
-            <div className={`text-[20px] font-bold tabular-nums ${cls}`}>{n}</div>
-            <div className="mt-0.5 text-[9px] uppercase tracking-[0.4px] text-[#7088a8]">{l}</div>
+          <div key={l} className="flex-1 rounded-[10px] sm:rounded-[11px] border border-white/10 bg-white/[0.04] p-2 sm:p-2.5">
+            <div className={`text-[16px] sm:text-[20px] font-bold tabular-nums ${cls}`}>{n}</div>
+            <div className="mt-0.5 text-[7.5px] sm:text-[9px] uppercase tracking-[0.3px] sm:tracking-[0.4px] text-[#7088a8]">{l}</div>
           </div>
         ))}
       </div>
@@ -520,19 +551,19 @@ function AppScene({ onCycleComplete, reduced }: SceneProps) {
         <thead>
           <tr>
             {["Servicio", "Activación", "Entrega", "Estado"].map((h) => (
-              <th key={h} className="border-b border-white/[0.08] px-1.5 py-1.5 text-left text-[9px] font-semibold uppercase tracking-[0.4px] text-[#5a7090]">{h}</th>
+              <th key={h} className="border-b border-white/[0.08] px-1 py-1.5 sm:px-1.5 text-left text-[7.5px] sm:text-[9px] font-semibold uppercase tracking-[0.3px] sm:tracking-[0.4px] text-[#5a7090]">{h}</th>
             ))}
           </tr>
         </thead>
         <tbody>
           {rows.map((r, i) => (
             <tr key={`${r.s}-${i}`} className={i === 0 ? "animate-[rowin_0.5s_ease]" : ""}>
-              <td className="border-b border-white/[0.04] px-1.5 py-1.5 text-[11px] text-[#aebfd6]">{r.s}</td>
-              <td className="border-b border-white/[0.04] px-1.5 py-1.5 text-[11px] text-[#aebfd6]">{r.a}</td>
-              <td className="border-b border-white/[0.04] px-1.5 py-1.5 text-[11px] text-[#aebfd6]">{r.e}</td>
-              <td className="border-b border-white/[0.04] px-1.5 py-1.5">
+              <td className="border-b border-white/[0.04] px-1 py-1.5 sm:px-1.5 text-[9px] sm:text-[11px] text-[#aebfd6]">{r.s}</td>
+              <td className="border-b border-white/[0.04] px-1 py-1.5 sm:px-1.5 text-[9px] sm:text-[11px] text-[#aebfd6]">{r.a}</td>
+              <td className="border-b border-white/[0.04] px-1 py-1.5 sm:px-1.5 text-[9px] sm:text-[11px] text-[#aebfd6]">{r.e}</td>
+              <td className="border-b border-white/[0.04] px-1 py-1.5 sm:px-1.5">
                 <span
-                  className={`rounded px-1.5 py-0.5 text-[9px] font-semibold ${
+                  className={`rounded px-1 sm:px-1.5 py-0.5 text-[7.5px] sm:text-[9px] font-semibold ${
                     r.st[0] === "ok" ? "text-[#20E0B2] bg-[#20E0B2]/12"
                       : r.st[0] === "pr" ? "text-[#19C3FF] bg-[#19C3FF]/12"
                         : "text-[#f0b840] bg-[#f0b840]/12"
@@ -560,7 +591,7 @@ type Scenario = {
   edges: EdgeSpec[];
 };
 
-function IntegrationScene({ onCycleComplete, reduced, pairIdx = 0 }: SceneProps & { pairIdx?: number }) {
+function IntegrationScene({ onCycleComplete, reduced, compact, pairIdx = 0 }: SceneProps & { pairIdx?: number }) {
   const LEFT = [
     { name: "ERP", ico: "▤", color: "#20E0B2" },
     { name: "CRM", ico: "◍", color: "#19C3FF" },
@@ -643,9 +674,10 @@ function IntegrationScene({ onCycleComplete, reduced, pairIdx = 0 }: SceneProps 
   const active = pair[step];
   const scene = SCENARIOS[active];
 
-  // Logical canvas 720 x 352
-  const CW = 720;
-  const CH = 352;
+  // Logical canvas. Mobile uses its own geometry instead of compressing the
+  // desktop diagram, which keeps labels readable and avoids edge clipping.
+  const CW = compact ? 360 : 720;
+  const CH = compact ? 318 : 352;
   const X = (px: number) => `${((px / CW) * 100).toFixed(3)}%`;
   const Y = (py: number) => `${((py / CH) * 100).toFixed(3)}%`;
   const W = (w: number) => `${((w / CW) * 100).toFixed(3)}%`;
@@ -653,32 +685,38 @@ function IntegrationScene({ onCycleComplete, reduced, pairIdx = 0 }: SceneProps 
 
   // Anchors moved inward to give node boxes room to grow without touching
   // the panel edges. ~24px breathing room on each side at 720px canvas.
-  const LEFT_EDGE_X = 180;   // right edge of every left node
-  const RIGHT_EDGE_X = 540;  // left edge of every right node
+  const LEFT_EDGE_X = compact ? 116 : 180;   // right edge of every left node
+  const RIGHT_EDGE_X = compact ? 232 : 540;  // left edge of every right node
 
   // Vertical placement
-  const leftTops = [40, 110, 180, 250];
-  const rightTops = [12, 80, 148, 216, 284];
-  const hub = { x: 315, y: 134, w: 90, h: 90, cx: 360, cy: 179 };
-  const NODE_H = 38;
+  const leftTops = compact ? [55, 112, 169, 226] : [40, 110, 180, 250];
+  const rightTops = compact ? [30, 84, 138, 192, 246] : [12, 80, 148, 216, 284];
+  const hub = compact
+    ? { x: 151, y: 126, w: 58, h: 76, cx: 180, cy: 164 }
+    : { x: 315, y: 134, w: 90, h: 90, cx: 360, cy: 179 };
+  const NODE_H = compact ? 32 : 38;
 
   const leftPath = (i: number) => {
     const y = leftTops[i] + NODE_H / 2;
-    return `M ${LEFT_EDGE_X} ${y} C 250 ${y}, 280 ${hub.cy}, ${hub.x} ${hub.cy}`;
+    return compact
+      ? `M ${LEFT_EDGE_X} ${y} C 134 ${y}, 142 ${hub.cy}, ${hub.x} ${hub.cy}`
+      : `M ${LEFT_EDGE_X} ${y} C 250 ${y}, 280 ${hub.cy}, ${hub.x} ${hub.cy}`;
   };
   const rightPath = (i: number) => {
     const y = rightTops[i] + NODE_H / 2;
-    return `M ${hub.x + hub.w} ${hub.cy} C 450 ${hub.cy}, 480 ${y}, ${RIGHT_EDGE_X} ${y}`;
+    return compact
+      ? `M ${hub.x + hub.w} ${hub.cy} C 218 ${hub.cy}, 224 ${y}, ${RIGHT_EDGE_X} ${y}`
+      : `M ${hub.x + hub.w} ${hub.cy} C 450 ${hub.cy}, 480 ${y}, ${RIGHT_EDGE_X} ${y}`;
   };
 
   return (
-    <div className="flex h-full items-center justify-center px-6">
-      <div className="relative w-full max-w-[720px] h-[352px]">
+    <div className="flex h-full items-center justify-center px-1 sm:px-6">
+      <div className="relative w-full max-w-[720px] h-[318px] sm:h-[352px]">
         {/* Pattern label (free of any node) */}
         <div className="absolute top-2 left-2 z-10 flex items-center gap-2">
           <div
             key={`pat-${active}`}
-            className="rounded-md border border-[#19C3FF]/30 bg-[#19C3FF]/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.6px] text-[#7DD8FF] animate-[intfade_0.4s_ease] whitespace-nowrap"
+            className="rounded-md border border-[#19C3FF]/30 bg-[#19C3FF]/10 px-2 py-1 text-[8.5px] sm:text-[10px] font-semibold uppercase tracking-[0.5px] sm:tracking-[0.6px] text-[#7DD8FF] animate-[intfade_0.4s_ease] whitespace-nowrap"
           >
             {scene.pattern}
           </div>
@@ -763,14 +801,14 @@ function IntegrationScene({ onCycleComplete, reduced, pairIdx = 0 }: SceneProps 
           return (
             <div
               key={s.name}
-              className="absolute flex items-center gap-2 rounded-[10px] border bg-white/[0.04] transition-all duration-400"
+              className="absolute flex items-center gap-1.5 sm:gap-2 rounded-[9px] sm:rounded-[10px] border bg-white/[0.04] transition-all duration-400"
               style={{
                 right: X(CW - LEFT_EDGE_X),
                 top: Y(leftTops[i]),
                 height: H(NODE_H),
                 width: "fit-content",
-                paddingLeft: "16px",
-                paddingRight: "16px",
+                paddingLeft: compact ? "7px" : "16px",
+                paddingRight: compact ? "7px" : "16px",
                 zIndex: 1,
                 opacity: isOn ? 1 : 0.25,
                 borderColor: isOn ? s.color : "rgba(255,255,255,0.1)",
@@ -778,19 +816,19 @@ function IntegrationScene({ onCycleComplete, reduced, pairIdx = 0 }: SceneProps 
               }}
             >
               <div
-                className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-md text-[12px]"
+                className="flex h-[18px] w-[18px] sm:h-[22px] sm:w-[22px] shrink-0 items-center justify-center rounded-md text-[10px] sm:text-[12px]"
                 style={{ background: `${s.color}26`, color: s.color }}
               >
                 {s.ico}
               </div>
-              <div className="text-[13px] font-semibold leading-tight text-[#e6eefc] whitespace-nowrap">{s.name}</div>
+              <div className="text-[8.8px] sm:text-[13px] font-semibold leading-tight text-[#e6eefc] whitespace-nowrap">{s.name}</div>
             </div>
           );
         })}
 
         {/* Hub */}
         <div
-          className="absolute flex flex-col items-center justify-center rounded-[18px] bg-[#19C3FF]/15 border-2 border-[#19C3FF]/55"
+          className="absolute flex flex-col items-center justify-center rounded-[12px] sm:rounded-[18px] bg-[#19C3FF]/15 border-2 border-[#19C3FF]/55"
           style={{
             left: X(hub.x),
             top: Y(hub.y),
@@ -800,9 +838,9 @@ function IntegrationScene({ onCycleComplete, reduced, pairIdx = 0 }: SceneProps 
             boxShadow: "0 0 28px -6px rgba(25,195,255,0.55)",
           }}
         >
-          <div className="text-[24px] text-[#19C3FF] leading-none">⇄</div>
-          <div className="mt-1 text-[13px] font-bold text-white">amensg</div>
-          <div className="text-[10px] text-[#19C3FF] mt-0.5 uppercase tracking-[0.8px]">hub</div>
+          <div className="text-[18px] sm:text-[24px] text-[#19C3FF] leading-none">⇄</div>
+          <div className="mt-1 text-[9px] sm:text-[13px] font-bold text-white">amensg</div>
+          <div className="text-[7px] sm:text-[10px] text-[#19C3FF] mt-0.5 uppercase tracking-[0.8px]">hub</div>
         </div>
 
         {/* Right nodes: anchored by LEFT edge at x=RIGHT_EDGE_X, fit-content width */}
@@ -811,14 +849,14 @@ function IntegrationScene({ onCycleComplete, reduced, pairIdx = 0 }: SceneProps 
           return (
             <div
               key={s.name}
-              className="absolute flex items-center gap-2 rounded-[10px] border bg-white/[0.04] transition-all duration-400"
+              className="absolute flex items-center gap-1.5 sm:gap-2 rounded-[9px] sm:rounded-[10px] border bg-white/[0.04] transition-all duration-400"
               style={{
                 left: X(RIGHT_EDGE_X),
                 top: Y(rightTops[i]),
                 height: H(NODE_H),
                 width: "fit-content",
-                paddingLeft: "16px",
-                paddingRight: "16px",
+                paddingLeft: compact ? "7px" : "16px",
+                paddingRight: compact ? "7px" : "16px",
                 zIndex: 1,
                 opacity: isOn ? 1 : 0.25,
                 borderColor: isOn ? s.color : "rgba(255,255,255,0.1)",
@@ -826,12 +864,12 @@ function IntegrationScene({ onCycleComplete, reduced, pairIdx = 0 }: SceneProps 
               }}
             >
               <div
-                className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-md text-[11px]"
+                className="flex h-[18px] w-[18px] sm:h-[22px] sm:w-[22px] shrink-0 items-center justify-center rounded-md text-[9px] sm:text-[11px]"
                 style={{ background: `${s.color}26`, color: s.color }}
               >
                 {s.ico}
               </div>
-              <div className="text-[13px] font-semibold leading-tight text-[#e6eefc] whitespace-nowrap">{s.name}</div>
+              <div className="text-[8.8px] sm:text-[13px] font-semibold leading-tight text-[#e6eefc] whitespace-nowrap">{s.name}</div>
             </div>
           );
         })}
@@ -839,7 +877,7 @@ function IntegrationScene({ onCycleComplete, reduced, pairIdx = 0 }: SceneProps 
         {/* Dynamic subtitle */}
         <div
           key={`desc-${active}`}
-          className="absolute bottom-1 left-4 right-4 text-center text-[11px] leading-snug text-[#aebfd6] animate-[intfade_0.4s_ease]"
+          className="absolute bottom-4 sm:bottom-1 left-4 sm:left-4 right-4 sm:right-4 text-center text-[9.5px] sm:text-[11px] leading-snug text-[#aebfd6] animate-[intfade_0.4s_ease]"
         >
           {scene.desc}
         </div>
